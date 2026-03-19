@@ -47,3 +47,4 @@ vendor
 *.cache
 /db/*
 !/db/01_schema.sql
+config/config.php

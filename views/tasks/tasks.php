@@ -1,5 +1,12 @@
 <?php
 
+use app\models\Tasks;
+
+/** @var yii\web\View $this */
+
+$this->title = 'TaskForce';
+$cats = new Tasks()->find()->all();
+
 ?>
 
 <main class="main-content container">
@@ -137,5 +144,3 @@
         </div>
     </div>
 </main>
-</body>
-</html>

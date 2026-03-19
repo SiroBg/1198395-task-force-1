@@ -16,6 +16,7 @@ class CsvToSqlFilesConverter
 {
     private string $sourceDir;
     private string $destinationDir;
+    private string $dbName;
 
     /**
      * Создаёт экземпляр класса CsvToSqlFilesConverter.
@@ -23,10 +24,11 @@ class CsvToSqlFilesConverter
      * @param string $sourceDir      Путь к папке с CSV файлами.
      * @param string $destinationDir Путь к папке для создания SQL файлов.
      */
-    public function __construct(string $sourceDir, string $destinationDir)
+    public function __construct(string $sourceDir, string $destinationDir, string $dbName)
     {
         $this->sourceDir = $sourceDir;
         $this->destinationDir = $destinationDir;
+        $this->dbName = $dbName;
     }
 
     /**
@@ -40,7 +42,7 @@ class CsvToSqlFilesConverter
     {
         if (!is_dir($this->sourceDir)) {
             throw new SourceDirectoryException(
-                'Переданной директории не существует'
+                'Переданной директории не существует',
             );
         }
 
@@ -49,7 +51,7 @@ class CsvToSqlFilesConverter
         } catch (RuntimeException $exception) {
             throw new SourceDirectoryException(
                 'Не удалось открыть переданную директорию'
-                . $exception->getMessage()
+                . $exception->getMessage(),
             );
         }
 
@@ -81,7 +83,7 @@ class CsvToSqlFilesConverter
             $fileInfo->getBasename('.csv'),
             $this->destinationDir,
             $csvFileImporter->data,
-            'taskforce'
+            $this->dbName,
         );
 
         try {
