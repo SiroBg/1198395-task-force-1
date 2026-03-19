@@ -21,10 +21,8 @@ RUN docker-php-ext-install pdo pdo_mysql
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
 # Copy the application code
-COPY . ./
+COPY ./composer.json ./composer.lock ./
 
 # Run composer install to fetch dependencies
-RUN composer update
-RUN composer install --prefer-dist --no-interaction --optimize-autoloader --no-dev
 
-RUN php sql-fill-cli.php
+RUN composer install --prefer-dist --no-interaction --optimize-autoloader --no-dev

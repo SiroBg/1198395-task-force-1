@@ -81,6 +81,7 @@ class CsvToSqlFilesConverter
             $fileInfo->getBasename('.csv'),
             $this->destinationDir,
             $csvFileImporter->data,
+            'taskforce'
         );
 
         try {
