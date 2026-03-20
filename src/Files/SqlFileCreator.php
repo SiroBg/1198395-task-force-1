@@ -14,7 +14,6 @@ class SqlFileCreator
 {
     protected CsvFileData $data;
     protected string $filePath;
-    protected string $dbName;
     protected SplFileObject $fileObj;
 
     /**
@@ -28,11 +27,9 @@ class SqlFileCreator
         string $fileName,
         string $dirPath,
         CsvFileData $data,
-        string $dbName,
     ) {
         $this->filePath = $dirPath . $fileName . '.sql';
         $this->data = $data;
-        $this->dbName = $dbName;
     }
 
     /**
@@ -56,14 +53,9 @@ class SqlFileCreator
         }
 
         $this->fileObj->fwrite(
-            $this->addDbName() . $this->addCharSet() . $this->addInsertQuery()
+            $this->addCharSet() . $this->addInsertQuery()
             . $this->addColumns() . $this->addValues(),
         );
-    }
-
-    private function addDbName(): string
-    {
-        return 'USE `' . $this->dbName . "`;\n";
     }
 
     private function addCharSet(): string

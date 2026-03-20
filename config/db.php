@@ -1,12 +1,10 @@
 <?php
 
-$config = require_once __DIR__ . '/config.php';
-
 return [
     'class' => 'yii\db\Connection',
-    'dsn' => 'mysql:host=' . $config['db']['host'] . ';dbname=' . $config['db']['dbName'],
-    'username' => $config['db']['user'],
-    'password' => $config['db']['password'],
+    'dsn' => 'mysql:host=' . $_ENV['DB_HOST'] . ';dbname=taskforce',
+    'username' => $_ENV['DB_USER'],
+    'password' => $_ENV['DB_PASSWORD'],
     'charset' => 'utf8',
 
     // Schema cache options (for production environment)

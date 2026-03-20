@@ -2,6 +2,7 @@
 
 namespace app\controllers;
 
+use app\models\Tasks;
 use yii\web\Controller;
 
 class TasksController extends Controller
@@ -13,6 +14,8 @@ class TasksController extends Controller
      */
     public function actionIndex()
     {
-        return $this->render('tasks');
+        $tasks = new Tasks()->newTasks;
+
+        return $this->render('tasks', ['tasks' => $tasks]);
     }
 }

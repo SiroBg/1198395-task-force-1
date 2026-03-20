@@ -7,7 +7,6 @@ require_once __DIR__ . '/init.php';
 $converter = new CsvToSqlFilesConverter(
     __DIR__ . '/data/',
     __DIR__ . '/db/',
-    $config['db']['dbName'],
 );
 
 try {

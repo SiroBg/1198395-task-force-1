@@ -45,6 +45,5 @@ tests/_support/_generated
 Thumbs.db
 vendor
 *.cache
-/db/*
-!/db/01_schema.sql
 config/config.php
+.env

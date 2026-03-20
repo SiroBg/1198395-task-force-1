@@ -16,7 +16,6 @@ class CsvToSqlFilesConverter
 {
     private string $sourceDir;
     private string $destinationDir;
-    private string $dbName;
 
     /**
      * Создаёт экземпляр класса CsvToSqlFilesConverter.
@@ -24,11 +23,10 @@ class CsvToSqlFilesConverter
      * @param string $sourceDir      Путь к папке с CSV файлами.
      * @param string $destinationDir Путь к папке для создания SQL файлов.
      */
-    public function __construct(string $sourceDir, string $destinationDir, string $dbName)
+    public function __construct(string $sourceDir, string $destinationDir)
     {
         $this->sourceDir = $sourceDir;
         $this->destinationDir = $destinationDir;
-        $this->dbName = $dbName;
     }
 
     /**
@@ -83,7 +81,6 @@ class CsvToSqlFilesConverter
             $fileInfo->getBasename('.csv'),
             $this->destinationDir,
             $csvFileImporter->data,
-            $this->dbName,
         );
 
         try {
