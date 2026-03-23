@@ -20,10 +20,10 @@ services:
     image: mysql:latest
     command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
     environment:
-      WEB_SERVER_HOST: ${DB_HOST}
       MYSQL_ROOT_USER: ${DB_USER}
       MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: taskforce
+      MYSQL_ROOT_HOST: '%'
     restart: always
     volumes:
       - ./db:/docker-entrypoint-initdb.d

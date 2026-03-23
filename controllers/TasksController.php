@@ -14,7 +14,7 @@ class TasksController extends Controller
      */
     public function actionIndex()
     {
-        $tasks = new Tasks()->newTasks;
+        $tasks = new Tasks()->find()->all();
 
         return $this->render('tasks', ['tasks' => $tasks]);
     }
