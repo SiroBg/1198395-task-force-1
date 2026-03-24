@@ -91,11 +91,6 @@ class Tasks extends \yii\db\ActiveRecord
         ];
     }
 
-    public function getNewTasks()
-    {
-        return $this->find()->where(['status' => self::STATUS_STATUS_NEW])->orderBy(['created_at' => SORT_DESC]);
-    }
-
     /**
      * Gets query for [[Author]].
      *

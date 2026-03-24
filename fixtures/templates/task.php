@@ -2,27 +2,25 @@
 
 use app\models\Categories;
 use app\models\Cities;
-use app\models\Users;
 
 /**
  * @var $faker \Faker\Generator
  * @var $index integer
  */
 
-$usersCount = Users::find()->count();
 $categoriesCount = Categories::find()->count();
 $citiesCount = Cities::find()->count();
 
 return [
-    'author_id' => rand(1, $usersCount),
-    'name' => $faker->sentences(2),
+    'author_id' => $index + 1,
+    'name' => $faker->word,
     'description' => $faker->text,
     'category_id' => rand(1, $categoriesCount),
     'location' => $faker->streetAddress,
-    'lat' => $faker->randomFloat(10, -180, 180),
-    'long' => $faker->randomFloat(10, -180, 180),
+    'lat' => $faker->randomFloat(10, 0, 180),
+    'long' => $faker->randomFloat(10, 0, 180),
     'city_id' => rand(1, $citiesCount),
     'budget' => rand(100, 10000),
-    'expire_date' => $faker->dateTimeBetween('+1 week', '+4 week'),
+    'expire_date' => $faker->date,
     'status' => 1,
 ];
