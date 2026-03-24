@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "tasks".
  *
@@ -32,15 +30,14 @@ use Yii;
  */
 class Tasks extends \yii\db\ActiveRecord
 {
-
     /**
      * ENUM field values
      */
-    const STATUS_STATUS_NEW = 'status_new';
-    const STATUS_STATUS_CANCELED = 'status_canceled';
-    const STATUS_STATUS_ACTIVE = 'status_active';
-    const STATUS_STATUS_FINISHED = 'status_finished';
-    const STATUS_STATUS_FAILED = 'status_failed';
+    public const STATUS_STATUS_NEW = 'status_new';
+    public const STATUS_STATUS_CANCELED = 'status_canceled';
+    public const STATUS_STATUS_ACTIVE = 'status_active';
+    public const STATUS_STATUS_FINISHED = 'status_finished';
+    public const STATUS_STATUS_FAILED = 'status_failed';
 
     /**
      * {@inheritdoc}
@@ -163,7 +160,6 @@ class Tasks extends \yii\db\ActiveRecord
     {
         return $this->hasMany(TaskFiles::class, ['task_id' => 'id']);
     }
-
 
     /**
      * column status ENUM value labels

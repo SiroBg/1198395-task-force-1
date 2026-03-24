@@ -40,7 +40,7 @@ class CsvToSqlFilesConverter
     {
         if (!is_dir($this->sourceDir)) {
             throw new SourceDirectoryException(
-                'Переданной директории не существует'
+                'Переданной директории не существует',
             );
         }
 
@@ -49,7 +49,7 @@ class CsvToSqlFilesConverter
         } catch (RuntimeException $exception) {
             throw new SourceDirectoryException(
                 'Не удалось открыть переданную директорию'
-                . $exception->getMessage()
+                . $exception->getMessage(),
             );
         }
 

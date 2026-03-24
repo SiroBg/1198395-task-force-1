@@ -26,7 +26,7 @@ class SqlFileCreator
     public function __construct(
         string $fileName,
         string $dirPath,
-        CsvFileData $data
+        CsvFileData $data,
     ) {
         $this->filePath = $dirPath . $fileName . '.sql';
         $this->data = $data;
@@ -40,12 +40,6 @@ class SqlFileCreator
      */
     public function create(): void
     {
-        if (file_exists($this->filePath)) {
-            throw new DestinationFileException(
-                'Переданный файл ' . $this->filePath . ' уже существует',
-            );
-        }
-
         try {
             $this->fileObj = new SplFileObject(
                 $this->filePath,
@@ -59,8 +53,15 @@ class SqlFileCreator
         }
 
         $this->fileObj->fwrite(
-            $this->addInsertQuery() . $this->addColumns() . $this->addValues(),
+            $this->addCharSet() . $this->addInsertQuery()
+            . $this->addColumns() . $this->addValues(),
         );
+    }
+
+    private function addCharSet(): string
+    {
+        return "SET NAMES 'utf8mb4';\n"
+            . "SET CHARACTER SET 'utf8mb4';\n";
     }
 
     /**

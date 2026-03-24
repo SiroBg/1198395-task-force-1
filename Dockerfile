@@ -24,5 +24,5 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local
 COPY ./composer.json ./composer.lock ./
 
 # Run composer install to fetch dependencies
-RUN composer update
+
 RUN composer install --prefer-dist --no-interaction --optimize-autoloader --no-dev
