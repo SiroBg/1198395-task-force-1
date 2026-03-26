@@ -2,7 +2,10 @@
 
 namespace app\controllers;
 
+use app\models\Categories;
 use app\models\Tasks;
+use app\models\TasksForm;
+use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
 
@@ -17,10 +20,28 @@ class TasksController extends Controller
     {
         $query = Tasks::find()->where(['status' => Tasks::STATUS_STATUS_NEW]);
 
+        $categories = Categories::find()->select(['id', 'name'])->all();
+
+        $tasksForm = new TasksForm();
+
+        if ($tasksForm->load(Yii::$app->request->get())) {
+            if (!empty($tasksForm->categories)) {
+                $query->andWhere(['category_id' => $tasksForm->categories]);
+            }
+
+            if ($tasksForm->noResponds) {
+                $query->andWhere(['executor_id' => null]);
+            }
+
+            if ($tasksForm->period) {
+
+            }
+        }
+
         $provider = new ActiveDataProvider([
             'query' => $query,
-                'pagination' => [
-            'pageSize' => 10,
+            'pagination' => [
+                'pageSize' => 5,
             ],
             'sort' => [
                 'defaultOrder' => [
@@ -31,6 +52,6 @@ class TasksController extends Controller
 
         $tasks = $provider->getModels();
 
-        return $this->render('tasks', ['tasks' => $tasks]);
+        return $this->render('tasks', ['tasks' => $tasks, 'categories' => $categories, 'tasksForm' => $tasksForm]);
     }
 }
