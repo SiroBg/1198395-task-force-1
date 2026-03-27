@@ -5,6 +5,8 @@ namespace app\controllers;
 use app\models\Categories;
 use app\models\Tasks;
 use app\models\TasksForm;
+use DateInterval;
+use DateTime;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -33,8 +35,11 @@ class TasksController extends Controller
                 $query->andWhere(['executor_id' => null]);
             }
 
-            if ($tasksForm->period) {
+            if (!empty($tasksForm->period) && $tasksForm->validate()) {
+                $interval = new DateInterval($tasksForm->period);
 
+                $date = date_sub(new DateTime(), $interval);
+                $query->andWhere(['>', 'created_at', $date->format('Y-m-d H:i:s')]);
             }
         }
 

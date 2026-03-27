@@ -2,6 +2,7 @@
 
 namespace app\models;
 
+use DateInterval;
 use yii\base\Model;
 
 class TasksForm extends Model
@@ -24,8 +25,19 @@ class TasksForm extends Model
         return [
             ['categories', 'each', 'rule' => ['integer']],
             ['noResponds', 'boolean'],
-            ['period', 'string'],
+            ['period', 'validateIsoDuration'],
         ];
+    }
+
+    public function validateIsoDuration($attribute)
+    {
+        if (!empty($this->$attribute)) {
+            try {
+                new DateInterval($this->$attribute);
+            } catch (\Exception $e) {
+                $this->addError($attribute, 'Выберите период из списка.');
+            }
+        }
     }
 
 }

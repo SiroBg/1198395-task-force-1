@@ -80,7 +80,14 @@ use yii\widgets\ActiveForm;
             </div>
             <h4 class="head-card">Период</h4>
             <div class="form-group">
-
+            <?= $form->field($tasksForm, 'period')->dropDownList(
+                [
+                    '' => 'Любой',
+                    'PT1H' => '1 час',
+                    'PT12H' => '12 часов',
+                    'PT24H' => '24 часа',
+                ],
+            ); ?>
             </div>
             <input type="submit" class="button button--blue" value="Искать">
 

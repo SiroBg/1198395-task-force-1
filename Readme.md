@@ -18,5 +18,5 @@
 
 # Создание фикстур
 
-`./yii fixture/generate-all count-20`
-`php yii fixture/load '*'`
+`./yii fixture/generate-all --count-20`
+`./yii fixture/load '*'`
