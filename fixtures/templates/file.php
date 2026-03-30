@@ -6,5 +6,5 @@
  */
 return [
     'url' => $faker->url,
-    'file_path' => $faker->file(__DIR__ . '/../../web/img/', __DIR__ . '/../../uploads/', false),
+    'file_path' => $faker->url,
 ];

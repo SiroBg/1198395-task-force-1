@@ -15,3 +15,8 @@
 # Проект поддерживает юнит-тесты
 
 В директории проекта запустите тесты командой `./vendor/bin/codecept run`
+
+# Создание фикстур
+
+`./yii fixture/generate-all --count-20`
+`./yii fixture/load '*'`
