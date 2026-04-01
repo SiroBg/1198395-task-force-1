@@ -10,6 +10,7 @@ use DateTime;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class TasksController extends Controller
 {
@@ -57,6 +58,17 @@ class TasksController extends Controller
 
         $tasks = $provider->getModels();
 
-        return $this->render('tasks', ['tasks' => $tasks, 'categories' => $categories, 'tasksForm' => $tasksForm]);
+        return $this->render('index', ['tasks' => $tasks, 'categories' => $categories, 'tasksForm' => $tasksForm]);
+    }
+
+    public function actionView(int $id)
+    {
+        $task = Tasks::findOne($id);
+
+        if ($task === null) {
+            throw new NotFoundHttpException('Страница не найдена');
+        }
+
+        return $this->render('view', ['task' => $task]);
     }
 }
