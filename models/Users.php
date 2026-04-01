@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "users".
  *
@@ -31,7 +29,7 @@ use Yii;
  */
 class Users extends \yii\db\ActiveRecord
 {
-
+    public string $password_retype = '';
 
     /**
      * {@inheritdoc}
@@ -54,6 +52,7 @@ class Users extends \yii\db\ActiveRecord
             [['about'], 'string'],
             [['email', 'name'], 'string', 'max' => 256],
             [['password'], 'string', 'max' => 128],
+            ['password_retype', 'compare', 'compareAttribute' => 'password', 'message' => 'Пароли не совпадают'],
             [['phone'], 'string', 'max' => 11],
             [['telegram'], 'string', 'max' => 64],
             [['email'], 'unique'],
@@ -71,10 +70,11 @@ class Users extends \yii\db\ActiveRecord
             'id' => 'ID',
             'created_at' => 'Created At',
             'email' => 'Email',
-            'name' => 'Name',
-            'city_id' => 'City ID',
-            'password' => 'Password',
-            'is_executor' => 'Is Executor',
+            'name' => 'Ваше имя',
+            'city_id' => 'Город',
+            'password' => 'Пароль',
+            'password_retype' => 'Повтор пароля',
+            'is_executor' => 'я собираюсь откликаться на заказы',
             'profile_img_file_id' => 'Profile Img File ID',
             'birthday' => 'Birthday',
             'phone' => 'Phone',
