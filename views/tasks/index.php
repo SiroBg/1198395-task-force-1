@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
         <?php foreach ($tasks as $task) : ?>
             <div class="task-card">
             <div class="header-task">
-                <a href="#" class="link link--block link--big"><?= htmlspecialchars($task->name); ?></a>
+                <a href="/tasks/view/<?= $task->id; ?>" class="link link--block link--big"><?= htmlspecialchars($task->name); ?></a>
                 <p class="price price--task"><?= $task->budget; ?> ₽</p>
             </div>
             <p class="info-text"><span class="current-time">
