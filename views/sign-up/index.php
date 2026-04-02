@@ -12,8 +12,7 @@ use yii\widgets\ActiveForm;
 <main class="container container--registration">
     <div class="center-block">
         <div class="registration-form regular-form">
-             <?php $form = ActiveForm::begin(['method' => 'post',
-                'action' => ['signup/index']]); ?>
+             <?php $form = ActiveForm::begin(['method' => 'post']); ?>
                 <h3 class="head-main head-task">Регистрация нового пользователя</h3>
                 <div class="form-group">
                      <?= $form->field($user, 'name')

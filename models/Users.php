@@ -47,11 +47,11 @@ class Users extends \yii\db\ActiveRecord
         return [
             [['profile_img_file_id', 'birthday', 'phone', 'telegram', 'about'], 'default', 'value' => null],
             [['created_at', 'birthday'], 'safe'],
-            [['email', 'name', 'city_id', 'password', 'is_executor'], 'required'],
+            [['email', 'name', 'city_id', 'password', 'password_retype', 'is_executor'], 'required'],
             [['city_id', 'is_executor', 'profile_img_file_id'], 'integer'],
             [['about'], 'string'],
             [['email', 'name'], 'string', 'max' => 256],
-            [['password'], 'string', 'max' => 128],
+            [['password'], 'string', 'min' => 8, 'max' => 128],
             ['password_retype', 'compare', 'compareAttribute' => 'password', 'message' => 'Пароли не совпадают'],
             [['phone'], 'string', 'max' => 11],
             [['telegram'], 'string', 'max' => 64],

@@ -19,9 +19,10 @@ class SignUpController extends Controller
             $user->load(Yii::$app->request->post());
             if ($user->validate()) {
                 $user->password = Yii::$app->security->generatePasswordHash($user->password);
-                $user->save();
 
-                return $this->redirect(['site/index']);
+                if ($user->save(false)) {
+                    return $this->goHome();
+                }
             }
         }
         return $this->render('index', [
