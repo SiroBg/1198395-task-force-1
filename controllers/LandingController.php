@@ -2,14 +2,13 @@
 
 namespace app\controllers;
 
-use app\models\Cities;
-use app\models\Users;
+use app\models\LoginForm;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
-class SignUpController extends Controller
+class LandingController extends Controller
 {
     public function behaviors()
     {
@@ -31,27 +30,22 @@ class SignUpController extends Controller
 
     public function actionIndex()
     {
+        $this->layout = 'landing';
+        $loginForm = new LoginForm();
 
-        $cities = Cities::find()->select(['id', 'name'])->all();
-
-        $user = new Users();
         if (Yii::$app->request->getIsPost()) {
-            $user->load(Yii::$app->request->post());
+            $loginForm->load(Yii::$app->request->post());
             if (Yii::$app->request->isAjax) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($user);
+                return ActiveForm::validate($loginForm);
             }
-            if ($user->validate()) {
-                $user->password = Yii::$app->security->generatePasswordHash($user->password);
-
-                if ($user->save(false)) {
-                    return $this->goHome();
-                }
+            if ($loginForm->validate()) {
+                $user = $loginForm->getUser();
+                Yii::$app->user->login($user);
+                return $this->redirect(['tasks/index']);
             }
         }
-        return $this->render('index', [
-            'user' => $user,
-            'cities' => $cities,
-        ]);
+
+        return $this->render('index', ['loginForm' => $loginForm]);
     }
 }
