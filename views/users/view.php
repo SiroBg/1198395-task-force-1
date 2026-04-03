@@ -3,6 +3,7 @@
 /**
  * @var $user
  */
+use yii\helpers\Url;
 
 ?>
 
