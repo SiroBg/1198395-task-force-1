@@ -2,6 +2,9 @@
 
 namespace app\models;
 
+use Yii;
+use yii\web\IdentityInterface;
+
 /**
  * This is the model class for table "users".
  *
@@ -27,9 +30,36 @@ namespace app\models;
  * @property Tasks[] $tasks0
  * @property UserCategories[] $userCategories
  */
-class Users extends \yii\db\ActiveRecord
+class Users extends \yii\db\ActiveRecord implements IdentityInterface
 {
     public string $password_retype = '';
+
+    public static function findIdentity($id)
+    {
+        return self::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+    }
+
+    public function getId()
+    {
+        return $this->getPrimaryKey();
+    }
+
+    public function getAuthKey()
+    {
+    }
+
+    public function validateAuthKey($authKey)
+    {
+    }
+
+    public function validatePassword($password)
+    {
+        return Yii::$app->security->validatePassword($password, $this->password);
+    }
 
     /**
      * {@inheritdoc}
@@ -161,6 +191,13 @@ class Users extends \yii\db\ActiveRecord
     public function getUserCategories()
     {
         return $this->hasMany(UserCategories::class, ['user_id' => 'id']);
+    }
+
+    public function getName()
+    {
+        if ($id = Yii::$app->user->getId()) {
+            return self::findOne($id);
+        }
     }
 
 }

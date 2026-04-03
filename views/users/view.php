@@ -1,14 +1,14 @@
 <?php
+
 /**
  * @var $user
  */
-use yii\helpers\Url;
 
 ?>
 
 <main class="main-content container">
     <div class="left-column">
-        <h3 class="head-main"><?= htmlspecialchars($user->name); ?></h3>
+        <h3 class="head-main"><?= htmlspecialchars($user->name ?? ''); ?></h3>
         <div class="user-card">
             <div class="photo-rate">
                 <img class="card-photo" src="img/man-glasses.png" width="191" height="190" alt="Фото пользователя">
@@ -17,7 +17,7 @@ use yii\helpers\Url;
                     <span class="current-rate">4.23</span>
                 </div>
             </div>
-            <p class="user-description"><?= htmlspecialchars($user->about); ?></p>
+            <p class="user-description"><?= htmlspecialchars($user->about ?? ''); ?></p>
         </div>
         <div class="specialization-bio">
             <div class="specialization">

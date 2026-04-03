@@ -53,10 +53,11 @@ class SiteController extends Controller
     /**
      * Displays homepage.
      *
-     * @return string
+     * @return
      */
     public function actionIndex()
     {
-        return $this->render('index');
+
+        return $this->redirect('landing');
     }
 }
