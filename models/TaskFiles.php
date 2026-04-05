@@ -7,13 +7,13 @@ use Yii;
 /**
  * This is the model class for table "task_files".
  *
- * @property int $id
+ * @property int         $id
  * @property string|null $created_at
- * @property int $task_id
- * @property int $file_id
+ * @property int         $task_id
+ * @property int         $file_id
  *
- * @property Files $file
- * @property Tasks $task
+ * @property Files       $file
+ * @property Tasks       $task
  */
 class TaskFiles extends \yii\db\ActiveRecord
 {
@@ -36,8 +36,20 @@ class TaskFiles extends \yii\db\ActiveRecord
             [['created_at'], 'safe'],
             [['task_id', 'file_id'], 'required'],
             [['task_id', 'file_id'], 'integer'],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::class, 'targetAttribute' => ['task_id' => 'id']],
-            [['file_id'], 'exist', 'skipOnError' => true, 'targetClass' => Files::class, 'targetAttribute' => ['file_id' => 'id']],
+            [
+                ['task_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Tasks::class,
+                'targetAttribute' => ['task_id' => 'id']
+            ],
+            [
+                ['file_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Files::class,
+                'targetAttribute' => ['file_id' => 'id']
+            ],
         ];
     }
 
@@ -47,10 +59,10 @@ class TaskFiles extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
+            'id'         => 'ID',
             'created_at' => 'Created At',
-            'task_id' => 'Task ID',
-            'file_id' => 'File ID',
+            'task_id'    => 'Task ID',
+            'file_id'    => 'File ID',
         ];
     }
 
@@ -73,5 +85,5 @@ class TaskFiles extends \yii\db\ActiveRecord
     {
         return $this->hasOne(Tasks::class, ['id' => 'task_id']);
     }
-
+    
 }
