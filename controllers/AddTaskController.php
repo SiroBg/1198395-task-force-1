@@ -18,11 +18,11 @@ class AddTaskController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class'        => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules' => [
+                'rules'        => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
@@ -57,7 +57,9 @@ class AddTaskController extends Controller
 
             try {
                 if (!$task->save() || !$this->uploadTaskFiles($task)) {
-                    throw new \Exception('Ошибка при сохранении задания на сервер.');
+                    throw new \Exception(
+                        'Ошибка при сохранении задания на сервер.'
+                    );
                 }
 
                 $transaction->commit();
@@ -66,10 +68,9 @@ class AddTaskController extends Controller
                 $transaction->rollBack();
                 Yii::error($e->getMessage());
             }
-
         }
         return $this->render('index', [
-            'task' => $task,
+            'task'       => $task,
             'categories' => $categories,
         ]);
     }
@@ -78,15 +79,13 @@ class AddTaskController extends Controller
     {
         $success = true;
 
-        exit('Доходит');
-
         if (!empty($task->task_files)) {
             foreach ($task->task_files as $file) {
                 $fileName = uniqid() . '.' . $file->extension;
                 $file->saveAs('@webroot/uploads/' . $fileName);
 
                 $newFile = new Files();
-                $newFile->file_path = $fileName;
+                $newFile->file_path = $file->name;
                 $newFile->url = Yii::getAlias('@webroot/uploads/')
                     . $fileName;
 
@@ -94,8 +93,7 @@ class AddTaskController extends Controller
                     $taskFile = new TaskFiles();
                     $taskFile->task_id = $task->id;
                     $taskFile->file_id = $newFile->id;
-                    var_dump($task->id . ' ' . $newFile->id);
-                    exit();
+
                     $success = $taskFile->save();
                 } else {
                     $success = false;
