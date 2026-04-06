@@ -3,11 +3,9 @@
 namespace app\controllers;
 
 use app\models\Categories;
-use app\models\Cities;
 use app\models\Files;
 use app\models\TaskFiles;
 use app\models\Tasks;
-use app\models\Users;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -20,11 +18,11 @@ class AddTaskController extends Controller
     {
         return [
             'access' => [
-                'class'        => \yii\filters\AccessControl::class,
+                'class' => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules'        => [
+                'rules' => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
@@ -37,7 +35,6 @@ class AddTaskController extends Controller
     public function actionIndex(): array|Response|string
     {
         $categories = Categories::find()->select(['id', 'name'])->all();
-
         $task = new Tasks();
 
         if (Yii::$app->request->getIsPost()) {
@@ -45,7 +42,7 @@ class AddTaskController extends Controller
 
             $task->task_files = UploadedFile::getInstances(
                 $task,
-                'task_files'
+                'task_files',
             );
 
             $task->author_id = Yii::$app->user->id;
@@ -56,16 +53,56 @@ class AddTaskController extends Controller
                 return ActiveForm::validate($task);
             }
 
-            if ($task->validate()) {
-                if ($task->save()) {
-                    $task->upload();
-                    return $this->goHome();
+            $transaction = Yii::$app->db->beginTransaction();
+
+            try {
+                if (!$task->save() || !$this->uploadTaskFiles($task)) {
+                    throw new \Exception('Ошибка при сохранении задания на сервер.');
+                }
+
+                $transaction->commit();
+                return $this->goHome();
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+                Yii::error($e->getMessage());
+            }
+
+        }
+        return $this->render('index', [
+            'task' => $task,
+            'categories' => $categories,
+        ]);
+    }
+
+    private function uploadTaskFiles(Tasks $task)
+    {
+        $success = true;
+
+        exit('Доходит');
+
+        if (!empty($task->task_files)) {
+            foreach ($task->task_files as $file) {
+                $fileName = uniqid() . '.' . $file->extension;
+                $file->saveAs('@webroot/uploads/' . $fileName);
+
+                $newFile = new Files();
+                $newFile->file_path = $fileName;
+                $newFile->url = Yii::getAlias('@webroot/uploads/')
+                    . $fileName;
+
+                if ($newFile->save()) {
+                    $taskFile = new TaskFiles();
+                    $taskFile->task_id = $task->id;
+                    $taskFile->file_id = $newFile->id;
+                    var_dump($task->id . ' ' . $newFile->id);
+                    exit();
+                    $success = $taskFile->save();
+                } else {
+                    $success = false;
                 }
             }
         }
-        return $this->render('index', [
-            'task'       => $task,
-            'categories' => $categories,
-        ]);
+
+        return $success;
     }
 }

@@ -2,9 +2,7 @@
 
 namespace app\models;
 
-use Yii;
 use yii\db\ActiveQuery;
-use yii\db\Exception;
 
 /**
  * This is the model class for table "tasks".
@@ -67,22 +65,22 @@ class Tasks extends \yii\db\ActiveRecord
                     'city_id',
                     'budget',
                     'expire_date',
-                    'status'
+                    'status',
                 ],
                 'default',
-                'value' => null
+                'value' => null,
             ],
             [['created_at', 'expire_date'], 'safe'],
             [
                 'expire_date',
                 'date',
-                'format'   => 'php:Y-m-d',
-                'min'      => date('Y-m-d'),
+                'format' => 'php:Y-m-d',
+                'min' => date('Y-m-d'),
                 'tooSmall' => 'Выберите дату позже ' . date('d.m.Y'),
             ],
             [
                 ['author_id', 'name', 'description', 'category_id', 'location'],
-                'required'
+                'required',
             ],
             [
                 [
@@ -90,52 +88,52 @@ class Tasks extends \yii\db\ActiveRecord
                     'executor_id',
                     'category_id',
                     'city_id',
-                    'budget'
+                    'budget',
                 ],
                 'integer',
-                'min' => 0
+                'min' => 0,
             ],
             [['description', 'status'], 'string'],
             [
                 'description',
                 'validateStringLengthNoSpaces',
-                'params' => ['length' => 30]
+                'params' => ['length' => 30],
             ],
             [['lat', 'long'], 'number'],
             [['name', 'location'], 'string', 'max' => 256],
             [
                 'name',
                 'validateStringLengthNoSpaces',
-                'params' => ['length' => 10]
+                'params' => ['length' => 10],
             ],
             ['status', 'in', 'range' => array_keys(self::optsStatus())],
             [
                 ['author_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Users::class,
-                'targetAttribute' => ['author_id' => 'id']
+                'skipOnError' => true,
+                'targetClass' => Users::class,
+                'targetAttribute' => ['author_id' => 'id'],
             ],
             [
                 ['executor_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Users::class,
-                'targetAttribute' => ['executor_id' => 'id']
+                'skipOnError' => true,
+                'targetClass' => Users::class,
+                'targetAttribute' => ['executor_id' => 'id'],
             ],
             [
                 ['category_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Categories::class,
-                'targetAttribute' => ['category_id' => 'id']
+                'skipOnError' => true,
+                'targetClass' => Categories::class,
+                'targetAttribute' => ['category_id' => 'id'],
             ],
             [
                 ['city_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Cities::class,
-                'targetAttribute' => ['city_id' => 'id']
+                'skipOnError' => true,
+                'targetClass' => Cities::class,
+                'targetAttribute' => ['city_id' => 'id'],
             ],
             ['task_files', 'file', 'maxFiles' => 0, 'skipOnEmpty' => true],
         ];
@@ -147,21 +145,21 @@ class Tasks extends \yii\db\ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id'          => 'ID',
-            'created_at'  => 'Created At',
-            'author_id'   => 'Author ID',
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'author_id' => 'Author ID',
             'executor_id' => 'Executor ID',
-            'name'        => 'Опишите суть работы',
+            'name' => 'Опишите суть работы',
             'description' => 'Подробности задания',
             'category_id' => 'Категория',
-            'location'    => 'Локация',
-            'lat'         => 'Lat',
-            'long'        => 'Long',
-            'city_id'     => 'City ID',
-            'budget'      => 'Бюджет',
+            'location' => 'Локация',
+            'lat' => 'Lat',
+            'long' => 'Long',
+            'city_id' => 'City ID',
+            'budget' => 'Бюджет',
             'expire_date' => 'Срок исполнения',
-            'status'      => 'Status',
-            'task_files'  => 'Файлы'
+            'status' => 'Status',
+            'task_files' => 'Файлы',
         ];
     }
 
@@ -243,11 +241,11 @@ class Tasks extends \yii\db\ActiveRecord
     public static function optsStatus()
     {
         return [
-            self::STATUS_STATUS_NEW      => 'status_new',
+            self::STATUS_STATUS_NEW => 'status_new',
             self::STATUS_STATUS_CANCELED => 'status_canceled',
-            self::STATUS_STATUS_ACTIVE   => 'status_active',
+            self::STATUS_STATUS_ACTIVE => 'status_active',
             self::STATUS_STATUS_FINISHED => 'status_finished',
-            self::STATUS_STATUS_FAILED   => 'status_failed',
+            self::STATUS_STATUS_FAILED => 'status_failed',
         ];
     }
 
@@ -331,34 +329,8 @@ class Tasks extends \yii\db\ActiveRecord
                 $attribute,
                 'Длина поля должна быть не меньше '
                 . $params['length']
-                . ' символов.'
+                . ' символов.',
             );
-        }
-    }
-
-    public function upload(): void
-    {
-        if (!empty($this->task_files) && $this->validate()) {
-            foreach ($this->task_files as $file) {
-                $fileName = uniqid() . '.' . $file->extension;
-                $file->saveAs('@webroot/uploads/' . $fileName);
-
-                $newFile = new Files();
-                $newFile->file_path = $fileName;
-                $newFile->url = Yii::getAlias('@webroot/uploads/')
-                    . $fileName;
-                if ($newFile->validate()) {
-                    $newFile->save();
-                    $taskFile = new TaskFiles();
-                    $taskFile->task_id = $this->id;
-                    $taskFile->file_id = $newFile->id;
-
-                    if (!$taskFile->save()) {
-                        var_dump($this->id);
-                        exit("Не вышло");
-                    }
-                }
-            }
         }
     }
 }
