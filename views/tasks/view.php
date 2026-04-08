@@ -1,5 +1,7 @@
 <?php
 
+use yii\helpers\Html;
+
 /**
  * @var $task
  */
@@ -9,13 +11,13 @@
 <main class="main-content container">
     <div class="left-column">
         <div class="head-wrapper">
-            <h3 class="head-main"><?= htmlspecialchars($task->name); ?></h3>
-            <p class="price price--big"><?= htmlspecialchars($task->budget); ?>
+            <h3 class="head-main"><?= Html::encode($task->name); ?></h3>
+            <p class="price price--big"><?= Html::encode($task->budget); ?>
                 ₽</p>
         </div>
-        <p class="task-description"><?= htmlspecialchars(
-                $task->description
-            ); ?></p>
+        <p class="task-description"><?= Html::encode(
+            $task->description,
+        ); ?></p>
         <a href="#" class="button button--blue action-btn"
            data-action="act_response">Откликнуться на задание</a>
         <a href="#" class="button button--orange action-btn"
@@ -24,9 +26,9 @@
            data-action="completion">Завершить задание</a>
         <div class="task-map">
             <img class="map" src="img/map.png" width="725" height="346"
-                 alt="<?= htmlspecialchars($task->location); ?>">
+                 alt="<?= Html::encode($task->location); ?>">
             <p class="map-address town"><?= $task->city->name ?? 'Абаза'; ?></p>
-            <p class="map-address"><?= htmlspecialchars($task->location); ?></p>
+            <p class="map-address"><?= Html::encode($task->location); ?></p>
         </div>
         <h4 class="head-regular">Отклики на задание</h4>
         <div class="response-card">
@@ -101,13 +103,13 @@
                 <dd><?= $task->category->name; ?></dd>
                 <dt>Дата публикации</dt>
                 <dd><?= Yii::$app->formatter->asRelativeTime(
-                        $task->created_at
-                    ); ?></dd>
+                    $task->created_at,
+                ); ?></dd>
                 <dt>Срок выполнения</dt>
                 <dd><?= Yii::$app->formatter->asDatetime(
-                        $task->expire_date,
-                        'php:d.m.Y, H:i'
-                    ); ?></dd>
+                    $task->expire_date,
+                    'php:d.m.Y, H:i',
+                ); ?></dd>
                 <dt>Статус</dt>
                 <dd><?= $task->status ?></dd>
             </dl>

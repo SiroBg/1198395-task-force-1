@@ -6,7 +6,9 @@
  * @var $tasksFrom
  */
 
+use app\models\TasksForm;
 use yii\helpers\ArrayHelper;
+use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 ?>
@@ -19,21 +21,21 @@ use yii\widgets\ActiveForm;
             <div class="task-card">
                 <div class="header-task">
                     <a href="/tasks/view/<?= $task->id; ?>"
-                       class="link link--block link--big"><?= htmlspecialchars(
-                            $task->name
-                        ); ?></a>
+                       class="link link--block link--big"><?= Html::encode(
+                           $task->name,
+                       ); ?></a>
                     <p class="price price--task"><?= $task->budget; ?> ₽</p>
                 </div>
                 <p class="info-text"><span class="current-time">
                 <?= Yii::$app->formatter->asRelativeTime($task->created_at); ?>
             </span>
                 </p>
-                <p class="task-text"><?= htmlspecialchars(
-                        $task->description
-                    ); ?></p>
+                <p class="task-text"><?= Html::encode(
+                    $task->description,
+                ); ?></p>
                 <div class="footer-task">
                     <p class="info-text town-text"><?= $task->city->name ??
-                            'Абаза'; ?></p>
+                        'Абаза'; ?></p>
                     <p class="info-text category-text"><?= $task->category->name; ?></p>
                     <a href="#" class="button button--black">Смотреть
                         Задание</a>
@@ -71,38 +73,27 @@ use yii\widgets\ActiveForm;
                 ]); ?>
 
                 <h4 class="head-card">Категории</h4>
-                <div class="form-group">
                     <div class="checkbox-wrapper">
-
                         <?= $form->field($tasksForm, 'categories')
                             ->checkboxList(
                                 ArrayHelper::map($categories, 'id', 'name'),
                                 [
                                     'separator' => '<br>',
-                                    'class'     => 'control-label',
+                                    'class' => 'control-label',
                                 ],
                             )->error(['tag' => false])->label(false); ?>
                     </div>
-                </div>
                 <h4 class="head-card">Дополнительно</h4>
-                <div class="form-group">
                     <?= $form->field($tasksForm, 'noResponds')->checkbox([
                         'labelOptions' => ['class' => 'control-label'],
                     ])->error(['tag' => false]); ?>
-                </div>
                 <h4 class="head-card">Период</h4>
-                <div class="form-group">
                     <?= $form->field($tasksForm, 'period')->dropDownList(
-                        [
-                            ''      => 'Любой',
-                            'PT1H'  => '1 час',
-                            'PT12H' => '12 часов',
-                            'PT24H' => '24 часа',
-                        ],
-                    ); ?>
-                </div>
-                <input type="submit" class="button button--blue" value="Искать">
-
+                        TasksForm::PERIODS_OPTIONS,
+                    )->label(false); ?>
+                    
+                    <?= Html::submitInput('Искать', ['class' => 'button button--blue']) ?>
+                
                 <?php
                 ActiveForm::end(); ?>
 

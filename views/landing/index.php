@@ -3,6 +3,7 @@
  * @var $loginForm ;
  */
 
+use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 ?>
@@ -106,20 +107,22 @@ use yii\widgets\ActiveForm;
         $form = ActiveForm::begin(
             [
                 'enableAjaxValidation' => true,
-                'method'               => 'post',
-                'fieldConfig'          => ['labelOptions' => ['class' => 'form-modal-description'],]
-            ]
+                'method' => 'post',
+                'fieldConfig' => ['labelOptions' => ['class' => 'form-modal-description'],],
+            ],
         ); ?>
         <?= $form->field($loginForm, 'email', [
             'template' => "<p>{label}\n{input}\n{hint}\n{error}</p>",
-        ])->input('email', ['class' => 'enter-form-email input input-middle']
+        ])->input(
+            'email',
+            ['class' => 'enter-form-email input input-middle'],
         ) ?>
         <?= $form->field($loginForm, 'password', [
             'template' => "<p>{label}\n{input}\n{hint}\n{error}</p>",
         ])->passwordInput(['class' => 'enter-form-email input input-middle']) ?>
-        <button class="button" type="submit">Войти</button>
+        <?= Html::submitButton('Войти', ['class' => 'button']); ?>
         <?php
         ActiveForm::end(); ?>
-        <button class="form-modal-close" type="button">Закрыть</button>
+        <?= Html::button('Закрыть', ['class' => 'form-modal-close']); ?>
     </section>
 </main>

@@ -7,9 +7,17 @@ use yii\base\Model;
 
 class TasksForm extends Model
 {
-    public $categories = [];
+    public array|string $categories = [];
     public $noResponds = false;
     public $period = '';
+
+    public const array PERIODS_OPTIONS =
+        [
+            '' => 'Любой',
+            'PT1H' => '1 час',
+            'PT12H' => '12 часов',
+            'PT24H' => '24 часа',
+        ];
 
     public function attributeLabels(): array
     {

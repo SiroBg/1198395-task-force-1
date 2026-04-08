@@ -49,3 +49,4 @@ vendor
 fixtures/data/*
 uploads/*
 web/uploads/*
+!web/uploads/.gitkeep
