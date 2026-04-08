@@ -18,5 +18,5 @@
 
 # Создание фикстур
 
-`./yii fixture/generate-all --count-20`
+`./yii fixture/generate-all --count=20`
 `./yii fixture/load '*'`

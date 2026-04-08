@@ -10,6 +10,7 @@ use app\models\TasksForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
+use yii\widgets\LinkPager;
 
 ?>
 
@@ -43,25 +44,21 @@ use yii\widgets\ActiveForm;
             </div>
         <?php
         endforeach; ?>
-        <div class="pagination-wrapper">
-            <ul class="pagination-list">
-                <li class="pagination-item mark">
-                    <a href="#" class="link link--page"></a>
-                </li>
-                <li class="pagination-item">
-                    <a href="#" class="link link--page">1</a>
-                </li>
-                <li class="pagination-item pagination-item--active">
-                    <a href="#" class="link link--page">2</a>
-                </li>
-                <li class="pagination-item">
-                    <a href="#" class="link link--page">3</a>
-                </li>
-                <li class="pagination-item mark">
-                    <a href="#" class="link link--page"></a>
-                </li>
-            </ul>
-        </div>
+        <?php if ($pagination->pageCount > 1): ?>
+            <?= LinkPager::widget([
+                'pagination' => $pagination,
+                'options' => ['class' => 'pagination-list'],
+                'linkContainerOptions' => ['class' => 'pagination-item'],
+                'linkOptions' => ['class' => 'link link--page'],
+                'activePageCssClass' => 'pagination-item--active',
+                'disabledPageCssClass' => 'mark',
+                'prevPageLabel' => '',
+                'nextPageLabel' => '',
+                'prevPageCssClass' => 'pagination-item mark',
+                'nextPageCssClass' => 'pagination-item mark',
+                'maxButtonCount' => 3,
+            ]) ?>
+        <?php endif; ?>
     </div>
     <div class="right-column">
         <div class="right-card black">

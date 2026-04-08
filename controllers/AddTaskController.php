@@ -18,11 +18,11 @@ class AddTaskController extends Controller
     {
         return [
             'access' => [
-                'class'        => \yii\filters\AccessControl::class,
+                'class' => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules'        => [
+                'rules' => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
@@ -58,7 +58,7 @@ class AddTaskController extends Controller
             try {
                 if (!$task->save() || !$this->uploadTaskFiles($task)) {
                     throw new \Exception(
-                        'Ошибка при сохранении задания на сервер.'
+                        'Ошибка при сохранении задания на сервер.',
                     );
                 }
 
@@ -70,7 +70,7 @@ class AddTaskController extends Controller
             }
         }
         return $this->render('index', [
-            'task'       => $task,
+            'task' => $task,
             'categories' => $categories,
         ]);
     }
@@ -85,9 +85,10 @@ class AddTaskController extends Controller
                 $file->saveAs('@webroot/uploads/' . $fileName);
 
                 $newFile = new Files();
-                $newFile->file_path = $file->name;
-                $newFile->url = Yii::getAlias('@webroot/uploads/')
+                $newFile->file_path = Yii::getAlias('@webroot/uploads/')
                     . $fileName;
+                $newFile->url = '/uploads/' . $fileName;
+                $newFile->name = $file->name;
 
                 if ($newFile->save()) {
                     $taskFile = new TaskFiles();

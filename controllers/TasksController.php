@@ -3,6 +3,8 @@
 namespace app\controllers;
 
 use app\models\Categories;
+use app\models\Responds;
+use app\models\TaskFiles;
 use app\models\Tasks;
 use app\models\TasksForm;
 use DateInterval;
@@ -72,8 +74,9 @@ class TasksController extends Controller
         ]);
 
         $tasks = $provider->getModels();
+        $pagination = $provider->pagination;
 
-        return $this->render('index', ['tasks' => $tasks, 'categories' => $categories, 'tasksForm' => $tasksForm]);
+        return $this->render('index', ['tasks' => $tasks, 'categories' => $categories, 'tasksForm' => $tasksForm, 'pagination' => $pagination]);
     }
 
     public function actionView(int $id)
@@ -84,6 +87,9 @@ class TasksController extends Controller
             throw new NotFoundHttpException('Страница не найдена');
         }
 
-        return $this->render('view', ['task' => $task]);
+        $responds = Responds::find()->where(['task_id' => $task->id])->all();
+        $taskFiles = TaskFiles::find()->where(['task_id' => $task->id])->all();
+
+        return $this->render('view', ['task' => $task, 'responds' => $responds, 'taskFiles' => $taskFiles]);
     }
 }

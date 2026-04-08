@@ -1,9 +1,11 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /**
  * @var $task
+ * @var $responds
  */
 
 ?>
@@ -31,6 +33,41 @@ use yii\helpers\Html;
             <p class="map-address"><?= Html::encode($task->location); ?></p>
         </div>
         <h4 class="head-regular">Отклики на задание</h4>
+        <?php foreach ($responds as $respond): ?>
+            <div class="response-card">
+                <img class="customer-photo" src="img/man-glasses.png" width="146"
+                    height="156" alt="Фото заказчиков">
+                <div class="feedback-wrapper">
+                    <a href="<?= Url::toRoute(['users/view', 'id' => $respond->executor->id]); ?>" class="link link--block link--big"><?= Html::encode($respond->executor->name); ?></a>
+                    <div class="response-wrapper">
+                        <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span
+                                    class="fill-star">&nbsp;</span><span
+                                    class="fill-star">&nbsp;</span><span
+                                    class="fill-star">&nbsp;</span><span>&nbsp;</span>
+                        </div>
+                        <p class="reviews">2 отзыва</p>
+                    </div>
+                    <?php if ($respond->comment): ?>
+                        <p class="response-message">
+                            <?= $respond->comment; ?>
+                        </p>
+                    <?php endif; ?>
+                </div>
+                <div class="feedback-wrapper">
+                    <p class="info-text"><span class="current-time"><?= Yii::$app->formatter->asRelativeTime($respond->created_at); ?></span>
+                    </p>
+                    <?php if ($respond->price): ?>
+                        <p class="price price--small"><?= $respond->price; ?> ₽</p>
+                    <?php endif; ?>
+                </div>
+                <div class="button-popup">
+                    <a href="#"
+                    class="button button--blue button--small">Принять</a>
+                    <a href="#"
+                    class="button button--orange button--small">Отказать</a>
+                </div>
+            </div>
+        <?php endforeach; ?>
         <div class="response-card">
             <img class="customer-photo" src="img/man-glasses.png" width="146"
                  height="156" alt="Фото заказчиков">
@@ -111,22 +148,27 @@ use yii\helpers\Html;
                     'php:d.m.Y, H:i',
                 ); ?></dd>
                 <dt>Статус</dt>
-                <dd><?= $task->status ?></dd>
+                <dd><?= $task->displayStatus() ?></dd>
             </dl>
         </div>
-        <div class="right-card white file-card">
-            <h4 class="head-card">Файлы задания</h4>
-            <ul class="enumeration-list">
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--clip">my_picture.jpg</a>
-                    <p class="file-size">356 Кб</p>
-                </li>
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--clip">information.docx</a>
-                    <p class="file-size">12 Кб</p>
-                </li>
-            </ul>
-        </div>
+        <?php if (!empty($taskFiles)): ?>
+            <div class="right-card white file-card">
+                <h4 class="head-card">Файлы задания</h4>
+                <ul class="enumeration-list">
+                    <?php foreach ($taskFiles as $file): ?>
+                        <?php if (file_exists(Yii::getAlias('@webroot/') . $file->file->url)): ?>
+                        <li class="enumeration-item">
+                            <?= Html::a($file->file->name, Url::to($file->file->url), [
+    'target' => '_blank',
+    'class' => 'link link--block link--clip',
+]); ?>
+                            <p class="file-size"><?= Yii::$app->formatter->asShortSize(filesize(Yii::getAlias('@webroot/') . $file->file->url)); ?></p>
+                        </li>
+                        <?php endif; ?>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endif; ?>
     </div>
 </main>
 <section class="pop-up pop-up--refusal pop-up--close">

@@ -5,6 +5,7 @@
  * @var $index integer
  */
 return [
-    'url' => $faker->url,
+    'url' => '/uploads/' . $faker->file(__DIR__ . '/../../web/img', __DIR__ . '/../../web/uploads', false),
     'file_path' => $faker->url,
+    'name' => $faker->word . '.' . $faker->fileExtension,
 ];

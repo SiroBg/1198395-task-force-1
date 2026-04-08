@@ -241,11 +241,11 @@ class Tasks extends \yii\db\ActiveRecord
     public static function optsStatus()
     {
         return [
-            self::STATUS_STATUS_NEW => 'status_new',
-            self::STATUS_STATUS_CANCELED => 'status_canceled',
-            self::STATUS_STATUS_ACTIVE => 'status_active',
-            self::STATUS_STATUS_FINISHED => 'status_finished',
-            self::STATUS_STATUS_FAILED => 'status_failed',
+            self::STATUS_STATUS_NEW => 'Новое',
+            self::STATUS_STATUS_CANCELED => 'Отменено',
+            self::STATUS_STATUS_ACTIVE => 'Выполняется',
+            self::STATUS_STATUS_FINISHED => 'Завершено',
+            self::STATUS_STATUS_FAILED => 'Провалено',
         ];
     }
 
