@@ -1,5 +1,7 @@
 <?php
 
+use yii\helpers\Html;
+
 /**
  * @var $task
  */
@@ -9,61 +11,87 @@
 <main class="main-content container">
     <div class="left-column">
         <div class="head-wrapper">
-            <h3 class="head-main"><?= htmlspecialchars($task->name); ?></h3>
-            <p class="price price--big"><?= htmlspecialchars($task->budget); ?> ₽</p>
+            <h3 class="head-main"><?= Html::encode($task->name); ?></h3>
+            <p class="price price--big"><?= Html::encode($task->budget); ?>
+                ₽</p>
         </div>
-        <p class="task-description"><?= htmlspecialchars($task->description); ?></p>
-        <a href="#" class="button button--blue action-btn" data-action="act_response">Откликнуться на задание</a>
-        <a href="#" class="button button--orange action-btn" data-action="refusal">Отказаться от задания</a>
-        <a href="#" class="button button--pink action-btn" data-action="completion">Завершить задание</a>
+        <p class="task-description"><?= Html::encode(
+            $task->description,
+        ); ?></p>
+        <a href="#" class="button button--blue action-btn"
+           data-action="act_response">Откликнуться на задание</a>
+        <a href="#" class="button button--orange action-btn"
+           data-action="refusal">Отказаться от задания</a>
+        <a href="#" class="button button--pink action-btn"
+           data-action="completion">Завершить задание</a>
         <div class="task-map">
-            <img class="map" src="img/map.png"  width="725" height="346" alt="<?= htmlspecialchars($task->location); ?>">
-            <p class="map-address town"><?= $task->city->name; ?></p>
-            <p class="map-address"><?= htmlspecialchars($task->location); ?></p>
+            <img class="map" src="img/map.png" width="725" height="346"
+                 alt="<?= Html::encode($task->location); ?>">
+            <p class="map-address town"><?= $task->city->name ?? 'Абаза'; ?></p>
+            <p class="map-address"><?= Html::encode($task->location); ?></p>
         </div>
         <h4 class="head-regular">Отклики на задание</h4>
         <div class="response-card">
-            <img class="customer-photo" src="img/man-glasses.png" width="146" height="156" alt="Фото заказчиков">
+            <img class="customer-photo" src="img/man-glasses.png" width="146"
+                 height="156" alt="Фото заказчиков">
             <div class="feedback-wrapper">
                 <a href="#" class="link link--block link--big">Астахов Павел</a>
                 <div class="response-wrapper">
-                    <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
+                    <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span
+                                class="fill-star">&nbsp;</span><span
+                                class="fill-star">&nbsp;</span><span
+                                class="fill-star">&nbsp;</span><span>&nbsp;</span>
+                    </div>
                     <p class="reviews">2 отзыва</p>
                 </div>
                 <p class="response-message">
-                    Могу сделать всё в лучшем виде. У меня есть необходимый опыт и инструменты.
+                    Могу сделать всё в лучшем виде. У меня есть необходимый опыт
+                    и инструменты.
                 </p>
 
             </div>
             <div class="feedback-wrapper">
-                <p class="info-text"><span class="current-time">25 минут </span>назад</p>
+                <p class="info-text"><span class="current-time">25 минут </span>назад
+                </p>
                 <p class="price price--small">3700 ₽</p>
             </div>
             <div class="button-popup">
-                <a href="#" class="button button--blue button--small">Принять</a>
-                <a href="#" class="button button--orange button--small">Отказать</a>
+                <a href="#"
+                   class="button button--blue button--small">Принять</a>
+                <a href="#"
+                   class="button button--orange button--small">Отказать</a>
             </div>
         </div>
         <div class="response-card">
-            <img class="customer-photo" src="img/man-sweater.png" width="146" height="156" alt="Фото заказчиков">
+            <img class="customer-photo" src="img/man-sweater.png" width="146"
+                 height="156" alt="Фото заказчиков">
             <div class="feedback-wrapper">
-                <a href="#" class="link link--block link--big">Дмитриев Андрей</a>
+                <a href="#" class="link link--block link--big">Дмитриев
+                    Андрей</a>
                 <div class="response-wrapper">
-                    <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span class="fill-star">&nbsp;</span><span>&nbsp;</span></div>
+                    <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span
+                                class="fill-star">&nbsp;</span><span
+                                class="fill-star">&nbsp;</span><span
+                                class="fill-star">&nbsp;</span><span>&nbsp;</span>
+                    </div>
                     <p class="reviews">8 отзывов</p>
                 </div>
                 <p class="response-message">
-                    Примусь за выполнение задания в течение часа, сделаю быстро и качественно.
+                    Примусь за выполнение задания в течение часа, сделаю быстро
+                    и качественно.
                 </p>
 
             </div>
             <div class="feedback-wrapper">
-                <p class="info-text"><span class="current-time">2 часа </span>назад</p>
+                <p class="info-text"><span class="current-time">2 часа </span>назад
+                </p>
                 <p class="price price--small">1999 ₽</p>
             </div>
             <div class="button-popup">
-                <a href="#" class="button button--blue button--small">Принять</a>
-                <a href="#" class="button button--orange button--small">Отказать</a>
+                <a href="#"
+                   class="button button--blue button--small">Принять</a>
+                <a href="#"
+                   class="button button--orange button--small">Отказать</a>
             </div>
         </div>
     </div>
@@ -74,9 +102,14 @@
                 <dt>Категория</dt>
                 <dd><?= $task->category->name; ?></dd>
                 <dt>Дата публикации</dt>
-                <dd><?= Yii::$app->formatter->asRelativeTime($task->created_at); ?></dd>
+                <dd><?= Yii::$app->formatter->asRelativeTime(
+                    $task->created_at,
+                ); ?></dd>
                 <dt>Срок выполнения</dt>
-                <dd><?= Yii::$app->formatter->asDatetime($task->expire_date, 'php:d.m.Y, H:i'); ?></dd>
+                <dd><?= Yii::$app->formatter->asDatetime(
+                    $task->expire_date,
+                    'php:d.m.Y, H:i',
+                ); ?></dd>
                 <dt>Статус</dt>
                 <dd><?= $task->status ?></dd>
             </dl>
@@ -102,7 +135,8 @@
         <p class="pop-up-text">
             <b>Внимание!</b><br>
             Вы собираетесь отказаться от выполнения этого задания.<br>
-            Это действие плохо скажется на вашем рейтинге и увеличит счетчик проваленных заданий.
+            Это действие плохо скажется на вашем рейтинге и увеличит счетчик
+            проваленных заданий.
         </p>
         <a class="button button--pop-up button--orange">Отказаться</a>
         <div class="button-container">
@@ -115,17 +149,22 @@
         <h4>Завершение задания</h4>
         <p class="pop-up-text">
             Вы собираетесь отметить это задание как выполненное.
-            Пожалуйста, оставьте отзыв об исполнителе и отметьте отдельно, если возникли проблемы.
+            Пожалуйста, оставьте отзыв об исполнителе и отметьте отдельно, если
+            возникли проблемы.
         </p>
         <div class="completion-form pop-up--form regular-form">
             <form>
                 <div class="form-group">
-                    <label class="control-label" for="completion-comment">Ваш комментарий</label>
+                    <label class="control-label" for="completion-comment">Ваш
+                        комментарий</label>
                     <textarea id="completion-comment"></textarea>
                 </div>
                 <p class="completion-head control-label">Оценка работы</p>
-                <div class="stars-rating big active-stars"><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span></div>
-                <input type="submit" class="button button--pop-up button--blue" value="Завершить">
+                <div class="stars-rating big active-stars">
+                    <span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span>
+                </div>
+                <input type="submit" class="button button--pop-up button--blue"
+                       value="Завершить">
             </form>
         </div>
         <div class="button-container">
@@ -138,19 +177,23 @@
         <h4>Добавление отклика к заданию</h4>
         <p class="pop-up-text">
             Вы собираетесь оставить свой отклик к этому заданию.
-            Пожалуйста, укажите стоимость работы и добавьте комментарий, если необходимо.
+            Пожалуйста, укажите стоимость работы и добавьте комментарий, если
+            необходимо.
         </p>
         <div class="addition-form pop-up--form regular-form">
             <form>
                 <div class="form-group">
-                    <label class="control-label" for="addition-comment">Ваш комментарий</label>
+                    <label class="control-label" for="addition-comment">Ваш
+                        комментарий</label>
                     <textarea id="addition-comment"></textarea>
                 </div>
                 <div class="form-group">
-                    <label class="control-label" for="addition-price">Стоимость</label>
+                    <label class="control-label"
+                           for="addition-price">Стоимость</label>
                     <input id="addition-price" type="text">
                 </div>
-                <input type="submit" class="button button--pop-up button--blue" value="Завершить">
+                <input type="submit" class="button button--pop-up button--blue"
+                       value="Завершить">
             </form>
         </div>
         <div class="button-container">

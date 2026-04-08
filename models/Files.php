@@ -7,13 +7,13 @@ use Yii;
 /**
  * This is the model class for table "files".
  *
- * @property int $id
+ * @property int         $id
  * @property string|null $created_at
- * @property string $url
- * @property string $file_path
+ * @property string      $url
+ * @property string      $file_path
  *
  * @property TaskFiles[] $taskFiles
- * @property Users[] $users
+ * @property Users[]     $users
  */
 class Files extends \yii\db\ActiveRecord
 {
@@ -45,10 +45,10 @@ class Files extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
+            'id'         => 'ID',
             'created_at' => 'Created At',
-            'url' => 'Url',
-            'file_path' => 'File Path',
+            'url'        => 'Url',
+            'file_path'  => 'File Path',
         ];
     }
 
@@ -70,6 +70,11 @@ class Files extends \yii\db\ActiveRecord
     public function getUsers()
     {
         return $this->hasMany(Users::class, ['profile_img_file_id' => 'id']);
+    }
+
+    public function getId(): int
+    {
+        return $this->id;
     }
 
 }

@@ -2,30 +2,32 @@
 
 namespace app\models;
 
+use yii\db\ActiveQuery;
+
 /**
  * This is the model class for table "tasks".
  *
- * @property int $id
+ * @property int         $id
  * @property string|null $created_at
- * @property int $author_id
- * @property int|null $executor_id
- * @property string $name
- * @property string $description
- * @property int $category_id
- * @property string $location
- * @property float|null $lat
- * @property float|null $long
- * @property int|null $city_id
- * @property int|null $budget
+ * @property int         $author_id
+ * @property int|null    $executor_id
+ * @property string      $name
+ * @property string      $description
+ * @property int         $category_id
+ * @property string      $location
+ * @property float|null  $lat
+ * @property float|null  $long
+ * @property int|null    $city_id
+ * @property int|null    $budget
  * @property string|null $expire_date
  * @property string|null $status
  *
- * @property Users $author
- * @property Categories $category
- * @property Cities $city
- * @property Users $executor
- * @property Responds[] $responds
- * @property Reviews[] $reviews
+ * @property Users       $author
+ * @property Categories  $category
+ * @property Cities      $city
+ * @property Users       $executor
+ * @property Responds[]  $responds
+ * @property Reviews[]   $reviews
  * @property TaskFiles[] $taskFiles
  */
 class Tasks extends \yii\db\ActiveRecord
@@ -38,6 +40,8 @@ class Tasks extends \yii\db\ActiveRecord
     public const STATUS_STATUS_ACTIVE = 'status_active';
     public const STATUS_STATUS_FINISHED = 'status_finished';
     public const STATUS_STATUS_FAILED = 'status_failed';
+
+    public array $task_files = [];
 
     /**
      * {@inheritdoc}
@@ -53,50 +57,118 @@ class Tasks extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['executor_id', 'lat', 'long', 'city_id', 'budget', 'expire_date', 'status'], 'default', 'value' => null],
+            [
+                [
+                    'executor_id',
+                    'lat',
+                    'long',
+                    'city_id',
+                    'budget',
+                    'expire_date',
+                    'status',
+                ],
+                'default',
+                'value' => null,
+            ],
             [['created_at', 'expire_date'], 'safe'],
-            [['author_id', 'name', 'description', 'category_id', 'location'], 'required'],
-            [['author_id', 'executor_id', 'category_id', 'city_id', 'budget'], 'integer'],
+            [
+                'expire_date',
+                'date',
+                'format' => 'php:Y-m-d',
+                'min' => date('Y-m-d'),
+                'tooSmall' => 'Выберите дату позже ' . date('d.m.Y'),
+            ],
+            [
+                ['author_id', 'name', 'description', 'category_id', 'location'],
+                'required',
+            ],
+            [
+                [
+                    'author_id',
+                    'executor_id',
+                    'category_id',
+                    'city_id',
+                    'budget',
+                ],
+                'integer',
+                'min' => 0,
+            ],
             [['description', 'status'], 'string'],
+            [
+                'description',
+                'validateStringLengthNoSpaces',
+                'params' => ['length' => 30],
+            ],
             [['lat', 'long'], 'number'],
             [['name', 'location'], 'string', 'max' => 256],
+            [
+                'name',
+                'validateStringLengthNoSpaces',
+                'params' => ['length' => 10],
+            ],
             ['status', 'in', 'range' => array_keys(self::optsStatus())],
-            [['author_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['author_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['executor_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => Cities::class, 'targetAttribute' => ['city_id' => 'id']],
+            [
+                ['author_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Users::class,
+                'targetAttribute' => ['author_id' => 'id'],
+            ],
+            [
+                ['executor_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Users::class,
+                'targetAttribute' => ['executor_id' => 'id'],
+            ],
+            [
+                ['category_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Categories::class,
+                'targetAttribute' => ['category_id' => 'id'],
+            ],
+            [
+                ['city_id'],
+                'exist',
+                'skipOnError' => true,
+                'targetClass' => Cities::class,
+                'targetAttribute' => ['city_id' => 'id'],
+            ],
+            ['task_files', 'file', 'maxFiles' => 0, 'skipOnEmpty' => true],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id' => 'ID',
             'created_at' => 'Created At',
             'author_id' => 'Author ID',
             'executor_id' => 'Executor ID',
-            'name' => 'Name',
-            'description' => 'Description',
-            'category_id' => 'Category ID',
-            'location' => 'Location',
+            'name' => 'Опишите суть работы',
+            'description' => 'Подробности задания',
+            'category_id' => 'Категория',
+            'location' => 'Локация',
             'lat' => 'Lat',
             'long' => 'Long',
             'city_id' => 'City ID',
-            'budget' => 'Budget',
-            'expire_date' => 'Expire Date',
+            'budget' => 'Бюджет',
+            'expire_date' => 'Срок исполнения',
             'status' => 'Status',
+            'task_files' => 'Файлы',
         ];
     }
 
     /**
      * Gets query for [[Author]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getAuthor()
+    public function getAuthor(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'author_id']);
     }
@@ -104,9 +176,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Category]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCategory()
+    public function getCategory(): ActiveQuery
     {
         return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
@@ -114,9 +186,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[City]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getCity()
+    public function getCity(): ActiveQuery
     {
         return $this->hasOne(Cities::class, ['id' => 'city_id']);
     }
@@ -124,9 +196,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Executor]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getExecutor()
+    public function getExecutor(): ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'executor_id']);
     }
@@ -134,9 +206,9 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Responds]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
-    public function getResponds()
+    public function getResponds(): ActiveQuery
     {
         return $this->hasMany(Responds::class, ['task_id' => 'id']);
     }
@@ -144,7 +216,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[Reviews]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getReviews()
     {
@@ -154,7 +226,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * Gets query for [[TaskFiles]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return ActiveQuery
      */
     public function getTaskFiles()
     {
@@ -163,6 +235,7 @@ class Tasks extends \yii\db\ActiveRecord
 
     /**
      * column status ENUM value labels
+     *
      * @return string[]
      */
     public static function optsStatus()
@@ -247,5 +320,17 @@ class Tasks extends \yii\db\ActiveRecord
     public function setStatusToStatusfailed()
     {
         $this->status = self::STATUS_STATUS_FAILED;
+    }
+
+    public function validateStringLengthNoSpaces($attribute, $params): void
+    {
+        if (mb_strlen(trim($this->$attribute)) < $params['length']) {
+            $this->addError(
+                $attribute,
+                'Длина поля должна быть не меньше '
+                . $params['length']
+                . ' символов.',
+            );
+        }
     }
 }
