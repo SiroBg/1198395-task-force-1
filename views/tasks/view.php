@@ -4,8 +4,8 @@ use yii\helpers\Html;
 use yii\helpers\Url;
 
 /**
- * @var $task
- * @var $responds
+ * @var \app\models\Tasks    $task     ;
+ * @var \app\models\Responds $responds ;
  */
 
 ?>
@@ -14,12 +14,16 @@ use yii\helpers\Url;
     <div class="left-column">
         <div class="head-wrapper">
             <h3 class="head-main"><?= Html::encode($task->name); ?></h3>
-            <p class="price price--big"><?= Html::encode($task->budget); ?>
-                ₽</p>
+            <?php
+            if ($task->budget): ?>
+                <p class="price price--big"><?= Html::encode($task->budget); ?>
+                    ₽</p>
+            <?php
+            endif; ?>
         </div>
         <p class="task-description"><?= Html::encode(
-            $task->description,
-        ); ?></p>
+                $task->description,
+            ); ?></p>
         <a href="#" class="button button--blue action-btn"
            data-action="act_response">Откликнуться на задание</a>
         <a href="#" class="button button--orange action-btn"
@@ -32,42 +36,112 @@ use yii\helpers\Url;
             <p class="map-address town"><?= $task->city->name ?? 'Абаза'; ?></p>
             <p class="map-address"><?= Html::encode($task->location); ?></p>
         </div>
-        <h4 class="head-regular">Отклики на задание</h4>
-        <?php foreach ($responds as $respond): ?>
-            <div class="response-card">
-                <img class="customer-photo" src="img/man-glasses.png" width="146"
-                    height="156" alt="Фото заказчиков">
-                <div class="feedback-wrapper">
-                    <a href="<?= Url::toRoute(['users/view', 'id' => $respond->executor->id]); ?>" class="link link--block link--big"><?= Html::encode($respond->executor->name); ?></a>
-                    <div class="response-wrapper">
-                        <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span
-                                    class="fill-star">&nbsp;</span><span
-                                    class="fill-star">&nbsp;</span><span
-                                    class="fill-star">&nbsp;</span><span>&nbsp;</span>
+        <?php
+        if ($task->author_id === Yii::$app->user->identity->id): ?>
+            <h4 class="head-regular">Отклики на задание</h4>
+            <?php
+            foreach ($responds as $respond): ?>
+                <div class="response-card">
+                    <img class="customer-photo" src="img/man-glasses.png"
+                         width="146"
+                         height="156" alt="Фото заказчиков">
+                    <div class="feedback-wrapper">
+                        <a href="<?= Url::toRoute(
+                            ['users/view', 'id' => $respond->executor->id]
+                        ); ?>"
+                           class="link link--block link--big"><?= Html::encode(
+                                $respond->executor->name
+                            ); ?></a>
+                        <div class="response-wrapper">
+                            <div class="stars-rating small"><span
+                                        class="fill-star">&nbsp;</span><span
+                                        class="fill-star">&nbsp;</span><span
+                                        class="fill-star">&nbsp;</span><span
+                                        class="fill-star">&nbsp;</span><span>&nbsp;</span>
+                            </div>
+                            <p class="reviews">2 отзыва</p>
                         </div>
-                        <p class="reviews">2 отзыва</p>
+                        <?php
+                        if ($respond->comment): ?>
+                            <p class="response-message">
+                                <?= $respond->comment; ?>
+                            </p>
+                        <?php
+                        endif; ?>
                     </div>
-                    <?php if ($respond->comment): ?>
-                        <p class="response-message">
-                            <?= $respond->comment; ?>
+                    <div class="feedback-wrapper">
+                        <p class="info-text"><span
+                                    class="current-time"><?= Yii::$app->formatter->asRelativeTime(
+                                    $respond->created_at
+                                ); ?></span>
                         </p>
-                    <?php endif; ?>
+                        <?php
+                        if ($respond->price): ?>
+                            <p class="price price--small"><?= $respond->price; ?>
+                                ₽</p>
+                        <?php
+                        endif; ?>
+                    </div>
+                    <div class="button-popup">
+                        <a href="#"
+                           class="button button--blue button--small">Принять</a>
+                        <a href="#"
+                           class="button button--orange button--small">Отказать</a>
+                    </div>
                 </div>
-                <div class="feedback-wrapper">
-                    <p class="info-text"><span class="current-time"><?= Yii::$app->formatter->asRelativeTime($respond->created_at); ?></span>
-                    </p>
-                    <?php if ($respond->price): ?>
-                        <p class="price price--small"><?= $respond->price; ?> ₽</p>
-                    <?php endif; ?>
+            <?php
+            endforeach; ?>
+        <?php
+        elseif ($task->executor_id === Yii::$app->user->identity->id): ?>
+            <h4 class="head-regular">Ваш отклик</h4>
+            <?php
+            foreach ($responds as $respond): ?>
+                <div class="response-card">
+                    <img class="customer-photo" src="img/man-glasses.png"
+                         width="146"
+                         height="156" alt="Фото заказчиков">
+                    <div class="feedback-wrapper">
+                        <a href="<?= Url::toRoute(
+                            ['users/view', 'id' => $respond->executor->id]
+                        ); ?>"
+                           class="link link--block link--big"><?= Html::encode(
+                                $respond->executor->name
+                            ); ?></a>
+                        <div class="response-wrapper">
+                            <div class="stars-rating small"><span
+                                        class="fill-star">&nbsp;</span><span
+                                        class="fill-star">&nbsp;</span><span
+                                        class="fill-star">&nbsp;</span><span
+                                        class="fill-star">&nbsp;</span><span>&nbsp;</span>
+                            </div>
+                            <p class="reviews">2 отзыва</p>
+                        </div>
+                        <?php
+                        if ($respond->comment): ?>
+                            <p class="response-message">
+                                <?= $respond->comment; ?>
+                            </p>
+                        <?php
+                        endif; ?>
+                    </div>
+                    <div class="feedback-wrapper">
+                        <p class="info-text"><span
+                                    class="current-time"><?= Yii::$app->formatter->asRelativeTime(
+                                    $respond->created_at
+                                ); ?></span>
+                        </p>
+                        <?php
+                        if ($respond->price): ?>
+                            <p class="price price--small"><?= $respond->price; ?>
+                                ₽</p>
+                        <?php
+                        endif; ?>
+                    </div>
                 </div>
-                <div class="button-popup">
-                    <a href="#"
-                    class="button button--blue button--small">Принять</a>
-                    <a href="#"
-                    class="button button--orange button--small">Отказать</a>
-                </div>
-            </div>
-        <?php endforeach; ?>
+            <?php
+            endforeach; ?>
+        <?php
+        endif; ?>
         <div class="response-card">
             <img class="customer-photo" src="img/man-glasses.png" width="146"
                  height="156" alt="Фото заказчиков">
@@ -140,35 +214,53 @@ use yii\helpers\Url;
                 <dd><?= $task->category->name; ?></dd>
                 <dt>Дата публикации</dt>
                 <dd><?= Yii::$app->formatter->asRelativeTime(
-                    $task->created_at,
-                ); ?></dd>
+                        $task->created_at,
+                    ); ?></dd>
                 <dt>Срок выполнения</dt>
                 <dd><?= Yii::$app->formatter->asDatetime(
-                    $task->expire_date,
-                    'php:d.m.Y, H:i',
-                ); ?></dd>
+                        $task->expire_date,
+                        'php:d.m.Y, H:i',
+                    ); ?></dd>
                 <dt>Статус</dt>
                 <dd><?= $task->displayStatus() ?></dd>
             </dl>
         </div>
-        <?php if (!empty($taskFiles)): ?>
+        <?php
+        if (!empty($taskFiles)): ?>
             <div class="right-card white file-card">
                 <h4 class="head-card">Файлы задания</h4>
                 <ul class="enumeration-list">
-                    <?php foreach ($taskFiles as $file): ?>
-                        <?php if (file_exists(Yii::getAlias('@webroot/') . $file->file->url)): ?>
-                        <li class="enumeration-item">
-                            <?= Html::a($file->file->name, Url::to($file->file->url), [
-    'target' => '_blank',
-    'class' => 'link link--block link--clip',
-]); ?>
-                            <p class="file-size"><?= Yii::$app->formatter->asShortSize(filesize(Yii::getAlias('@webroot/') . $file->file->url)); ?></p>
-                        </li>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
+                    <?php
+                    foreach ($taskFiles as $file): ?>
+                        <?php
+                        if (file_exists(
+                            Yii::getAlias('@webroot/') . $file->file->url
+                        )
+                        ): ?>
+                            <li class="enumeration-item">
+                                <?= Html::a(
+                                    $file->file->name,
+                                    Url::to($file->file->url),
+                                    [
+                                        'target' => '_blank',
+                                        'class'  => 'link link--block link--clip',
+                                    ]
+                                ); ?>
+                                <p class="file-size"><?= Yii::$app->formatter->asShortSize(
+                                        filesize(
+                                            Yii::getAlias('@webroot/')
+                                            . $file->file->url
+                                        )
+                                    ); ?></p>
+                            </li>
+                        <?php
+                        endif; ?>
+                    <?php
+                    endforeach; ?>
                 </ul>
             </div>
-        <?php endif; ?>
+        <?php
+        endif; ?>
     </div>
 </main>
 <section class="pop-up pop-up--refusal pop-up--close">
@@ -244,4 +336,4 @@ use yii\helpers\Url;
     </div>
 </section>
 <div class="overlay"></div>
-<script src="js/main.js"></script>
+

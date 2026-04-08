@@ -8,13 +8,13 @@ use yii\base\Model;
 class TasksForm extends Model
 {
     public array|string $categories = [];
-    public $noResponds = false;
-    public $period = '';
+    public bool $noResponds = false;
+    public string $period = '';
 
-    public const array PERIODS_OPTIONS =
-        [
-            '' => 'Любой',
-            'PT1H' => '1 час',
+    public const array PERIODS_OPTIONS
+        = [
+            ''      => 'Любой',
+            'PT1H'  => '1 час',
             'PT12H' => '12 часов',
             'PT24H' => '24 часа',
         ];
@@ -24,7 +24,7 @@ class TasksForm extends Model
         return [
             'categories' => 'Категории',
             'noResponds' => 'Без исполнителя',
-            'period' => 'Период',
+            'period'     => 'Период',
         ];
     }
 
@@ -37,7 +37,7 @@ class TasksForm extends Model
         ];
     }
 
-    public function validateIsoDuration($attribute)
+    public function validateIsoDuration($attribute): void
     {
         if (!empty($this->$attribute)) {
             try {

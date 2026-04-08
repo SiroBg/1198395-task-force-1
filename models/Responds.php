@@ -7,16 +7,16 @@ use Yii;
 /**
  * This is the model class for table "responds".
  *
- * @property int $id
+ * @property int         $id
  * @property string|null $created_at
- * @property int $task_id
- * @property int $executor_id
+ * @property int         $task_id
+ * @property int         $executor_id
  * @property string|null $comment
- * @property int|null $price
- * @property int $rejected
+ * @property int|null    $price
+ * @property int         $rejected
  *
- * @property Users $executor
- * @property Tasks $task
+ * @property Users       $executor
+ * @property Tasks       $task
  */
 class Responds extends \yii\db\ActiveRecord
 {
@@ -25,7 +25,7 @@ class Responds extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'responds';
     }
@@ -33,7 +33,7 @@ class Responds extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['comment', 'price'], 'default', 'value' => null],
@@ -42,24 +42,36 @@ class Responds extends \yii\db\ActiveRecord
             [['task_id', 'executor_id'], 'required'],
             [['task_id', 'executor_id', 'price', 'rejected'], 'integer'],
             [['comment'], 'string'],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Tasks::class, 'targetAttribute' => ['task_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['executor_id' => 'id']],
+            [
+                ['task_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Tasks::class,
+                'targetAttribute' => ['task_id' => 'id']
+            ],
+            [
+                ['executor_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Users::class,
+                'targetAttribute' => ['executor_id' => 'id']
+            ],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'id' => 'ID',
-            'created_at' => 'Created At',
-            'task_id' => 'Task ID',
+            'id'          => 'ID',
+            'created_at'  => 'Created At',
+            'task_id'     => 'Task ID',
             'executor_id' => 'Executor ID',
-            'comment' => 'Comment',
-            'price' => 'Price',
-            'rejected' => 'Rejected',
+            'comment'     => 'Comment',
+            'price'       => 'Price',
+            'rejected'    => 'Rejected',
         ];
     }
 
@@ -68,7 +80,7 @@ class Responds extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getExecutor()
+    public function getExecutor(): \yii\db\ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'executor_id']);
     }
@@ -78,7 +90,7 @@ class Responds extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTask()
+    public function getTask(): \yii\db\ActiveQuery
     {
         return $this->hasOne(Tasks::class, ['id' => 'task_id']);
     }

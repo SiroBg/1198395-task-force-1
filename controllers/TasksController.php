@@ -16,7 +16,7 @@ use yii\web\NotFoundHttpException;
 
 class TasksController extends Controller
 {
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -35,8 +35,9 @@ class TasksController extends Controller
      * Отображает страницу заданий.
      *
      * @return string
+     * @throws \DateMalformedIntervalStringException
      */
-    public function actionIndex()
+    public function actionIndex(): string
     {
         $query = Tasks::find()->where(['status' => Tasks::STATUS_STATUS_NEW]);
 
@@ -57,16 +58,18 @@ class TasksController extends Controller
                 $interval = new DateInterval($tasksForm->period);
 
                 $date = date_sub(new DateTime(), $interval);
-                $query->andWhere(['>', 'created_at', $date->format('Y-m-d H:i:s')]);
+                $query->andWhere(
+                    ['>', 'created_at', $date->format('Y-m-d H:i:s')]
+                );
             }
         }
 
         $provider = new ActiveDataProvider([
-            'query' => $query,
+            'query'      => $query,
             'pagination' => [
                 'pageSize' => 5,
             ],
-            'sort' => [
+            'sort'       => [
                 'defaultOrder' => [
                     'created_at' => SORT_DESC,
                 ],
@@ -76,10 +79,21 @@ class TasksController extends Controller
         $tasks = $provider->getModels();
         $pagination = $provider->pagination;
 
-        return $this->render('index', ['tasks' => $tasks, 'categories' => $categories, 'tasksForm' => $tasksForm, 'pagination' => $pagination]);
+        return $this->render(
+            'index',
+            [
+                'tasks'      => $tasks,
+                'categories' => $categories,
+                'tasksForm'  => $tasksForm,
+                'pagination' => $pagination
+            ]
+        );
     }
 
-    public function actionView(int $id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView(int $id): string
     {
         $task = Tasks::findOne($id);
 
@@ -90,6 +104,13 @@ class TasksController extends Controller
         $responds = Responds::find()->where(['task_id' => $task->id])->all();
         $taskFiles = TaskFiles::find()->where(['task_id' => $task->id])->all();
 
-        return $this->render('view', ['task' => $task, 'responds' => $responds, 'taskFiles' => $taskFiles]);
+        return $this->render(
+            'view',
+            [
+                'task'      => $task,
+                'responds'  => $responds,
+                'taskFiles' => $taskFiles
+            ]
+        );
     }
 }

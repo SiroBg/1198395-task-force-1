@@ -2,17 +2,15 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "categories".
  *
- * @property int $id
- * @property string|null $created_at
- * @property string $name
- * @property string $icon
+ * @property int              $id
+ * @property string|null      $created_at
+ * @property string           $name
+ * @property string           $icon
  *
- * @property Tasks[] $tasks
+ * @property Tasks[]          $tasks
  * @property UserCategories[] $userCategories
  */
 class Categories extends \yii\db\ActiveRecord
@@ -22,7 +20,7 @@ class Categories extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'categories';
     }
@@ -30,7 +28,7 @@ class Categories extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['created_at'], 'safe'],
@@ -42,13 +40,13 @@ class Categories extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'id' => 'ID',
+            'id'         => 'ID',
             'created_at' => 'Created At',
-            'name' => 'Name',
-            'icon' => 'Icon',
+            'name'       => 'Name',
+            'icon'       => 'Icon',
         ];
     }
 
@@ -57,7 +55,7 @@ class Categories extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTasks()
+    public function getTasks(): \yii\db\ActiveQuery
     {
         return $this->hasMany(Tasks::class, ['category_id' => 'id']);
     }
@@ -67,7 +65,7 @@ class Categories extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUserCategories()
+    public function getUserCategories(): \yii\db\ActiveQuery
     {
         return $this->hasMany(UserCategories::class, ['category_id' => 'id']);
     }

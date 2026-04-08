@@ -7,7 +7,7 @@ class m260408_131356_add_column_file_name_to_files_table extends Migration
     /**
      * {@inheritdoc}
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $this->addColumn('files', 'name', $this->string()->notNull());
     }

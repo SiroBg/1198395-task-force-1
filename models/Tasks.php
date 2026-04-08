@@ -35,18 +35,18 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * ENUM field values
      */
-    public const STATUS_STATUS_NEW = 'status_new';
-    public const STATUS_STATUS_CANCELED = 'status_canceled';
-    public const STATUS_STATUS_ACTIVE = 'status_active';
-    public const STATUS_STATUS_FINISHED = 'status_finished';
-    public const STATUS_STATUS_FAILED = 'status_failed';
+    public const string STATUS_STATUS_NEW = 'status_new';
+    public const string STATUS_STATUS_CANCELED = 'status_canceled';
+    public const string STATUS_STATUS_ACTIVE = 'status_active';
+    public const string STATUS_STATUS_FINISHED = 'status_finished';
+    public const string STATUS_STATUS_FAILED = 'status_failed';
 
     public array $task_files = [];
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'tasks';
     }
@@ -54,7 +54,7 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [
@@ -74,8 +74,8 @@ class Tasks extends \yii\db\ActiveRecord
             [
                 'expire_date',
                 'date',
-                'format' => 'php:Y-m-d',
-                'min' => date('Y-m-d'),
+                'format'   => 'php:Y-m-d',
+                'min'      => date('Y-m-d'),
                 'tooSmall' => 'Выберите дату позже ' . date('d.m.Y'),
             ],
             [
@@ -110,29 +110,29 @@ class Tasks extends \yii\db\ActiveRecord
             [
                 ['author_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Users::class,
+                'skipOnError'     => true,
+                'targetClass'     => Users::class,
                 'targetAttribute' => ['author_id' => 'id'],
             ],
             [
                 ['executor_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Users::class,
+                'skipOnError'     => true,
+                'targetClass'     => Users::class,
                 'targetAttribute' => ['executor_id' => 'id'],
             ],
             [
                 ['category_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Categories::class,
+                'skipOnError'     => true,
+                'targetClass'     => Categories::class,
                 'targetAttribute' => ['category_id' => 'id'],
             ],
             [
                 ['city_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Cities::class,
+                'skipOnError'     => true,
+                'targetClass'     => Cities::class,
                 'targetAttribute' => ['city_id' => 'id'],
             ],
             ['task_files', 'file', 'maxFiles' => 0, 'skipOnEmpty' => true],
@@ -145,21 +145,21 @@ class Tasks extends \yii\db\ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id' => 'ID',
-            'created_at' => 'Created At',
-            'author_id' => 'Author ID',
+            'id'          => 'ID',
+            'created_at'  => 'Created At',
+            'author_id'   => 'Author ID',
             'executor_id' => 'Executor ID',
-            'name' => 'Опишите суть работы',
+            'name'        => 'Опишите суть работы',
             'description' => 'Подробности задания',
             'category_id' => 'Категория',
-            'location' => 'Локация',
-            'lat' => 'Lat',
-            'long' => 'Long',
-            'city_id' => 'City ID',
-            'budget' => 'Бюджет',
+            'location'    => 'Локация',
+            'lat'         => 'Lat',
+            'long'        => 'Long',
+            'city_id'     => 'City ID',
+            'budget'      => 'Бюджет',
             'expire_date' => 'Срок исполнения',
-            'status' => 'Status',
-            'task_files' => 'Файлы',
+            'status'      => 'Status',
+            'task_files'  => 'Файлы',
         ];
     }
 
@@ -218,7 +218,7 @@ class Tasks extends \yii\db\ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getReviews()
+    public function getReviews(): ActiveQuery
     {
         return $this->hasMany(Reviews::class, ['task_id' => 'id']);
     }
@@ -228,7 +228,7 @@ class Tasks extends \yii\db\ActiveRecord
      *
      * @return ActiveQuery
      */
-    public function getTaskFiles()
+    public function getTaskFiles(): ActiveQuery
     {
         return $this->hasMany(TaskFiles::class, ['task_id' => 'id']);
     }
@@ -238,21 +238,21 @@ class Tasks extends \yii\db\ActiveRecord
      *
      * @return string[]
      */
-    public static function optsStatus()
+    public static function optsStatus(): array
     {
         return [
-            self::STATUS_STATUS_NEW => 'Новое',
+            self::STATUS_STATUS_NEW      => 'Новое',
             self::STATUS_STATUS_CANCELED => 'Отменено',
-            self::STATUS_STATUS_ACTIVE => 'Выполняется',
+            self::STATUS_STATUS_ACTIVE   => 'Выполняется',
             self::STATUS_STATUS_FINISHED => 'Завершено',
-            self::STATUS_STATUS_FAILED => 'Провалено',
+            self::STATUS_STATUS_FAILED   => 'Провалено',
         ];
     }
 
     /**
      * @return string
      */
-    public function displayStatus()
+    public function displayStatus(): string
     {
         return self::optsStatus()[$this->status];
     }
@@ -260,12 +260,12 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusStatusnew()
+    public function isStatusStatusnew(): bool
     {
         return $this->status === self::STATUS_STATUS_NEW;
     }
 
-    public function setStatusToStatusnew()
+    public function setStatusToStatusnew(): void
     {
         $this->status = self::STATUS_STATUS_NEW;
     }
@@ -273,12 +273,12 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusStatuscanceled()
+    public function isStatusStatuscanceled(): bool
     {
         return $this->status === self::STATUS_STATUS_CANCELED;
     }
 
-    public function setStatusToStatuscanceled()
+    public function setStatusToStatuscanceled(): void
     {
         $this->status = self::STATUS_STATUS_CANCELED;
     }
@@ -286,12 +286,12 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusStatusactive()
+    public function isStatusStatusactive(): bool
     {
         return $this->status === self::STATUS_STATUS_ACTIVE;
     }
 
-    public function setStatusToStatusactive()
+    public function setStatusToStatusactive(): void
     {
         $this->status = self::STATUS_STATUS_ACTIVE;
     }
@@ -299,12 +299,12 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusStatusfinished()
+    public function isStatusStatusfinished(): bool
     {
         return $this->status === self::STATUS_STATUS_FINISHED;
     }
 
-    public function setStatusToStatusfinished()
+    public function setStatusToStatusfinished(): void
     {
         $this->status = self::STATUS_STATUS_FINISHED;
     }
@@ -312,12 +312,12 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusStatusfailed()
+    public function isStatusStatusfailed(): bool
     {
         return $this->status === self::STATUS_STATUS_FAILED;
     }
 
-    public function setStatusToStatusfailed()
+    public function setStatusToStatusfailed(): void
     {
         $this->status = self::STATUS_STATUS_FAILED;
     }

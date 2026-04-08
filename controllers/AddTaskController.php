@@ -18,11 +18,11 @@ class AddTaskController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class'        => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules' => [
+                'rules'        => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
@@ -70,12 +70,12 @@ class AddTaskController extends Controller
             }
         }
         return $this->render('index', [
-            'task' => $task,
+            'task'       => $task,
             'categories' => $categories,
         ]);
     }
 
-    private function uploadTaskFiles(Tasks $task)
+    private function uploadTaskFiles(Tasks $task): bool
     {
         $success = true;
 

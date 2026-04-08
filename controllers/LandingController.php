@@ -14,21 +14,21 @@ class LandingController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class'        => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules' => [
-                        [
-                            'allow' => true,
-                            'roles' => ['?'],
-                        ],
+                'rules'        => [
+                    [
+                        'allow' => true,
+                        'roles' => ['?'],
                     ],
+                ],
             ],
         ];
     }
 
-    public function actionIndex()
+    public function actionIndex(): array|Response|string
     {
         $this->layout = 'landing';
         $loginForm = new LoginForm();

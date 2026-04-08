@@ -6,12 +6,12 @@ use yii\base\Model;
 
 class LoginForm extends Model
 {
-    public $email;
-    public $password;
+    public string $email;
+    public string $password;
 
-    private $_user = null;
+    private ?Users $_user = null;
 
-    public function rules()
+    public function rules(): array
     {
         return [
             [['email', 'password'], 'required'],
@@ -22,12 +22,12 @@ class LoginForm extends Model
     public function attributeLabels(): array
     {
         return [
-            'email' => 'Email',
+            'email'    => 'Email',
             'password' => 'Пароль',
         ];
     }
 
-    public function validatePassword($attribute, $params)
+    public function validatePassword($attribute, $params): void
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
@@ -37,7 +37,7 @@ class LoginForm extends Model
         }
     }
 
-    public function getUser()
+    public function getUser(): ?Users
     {
         if ($this->_user === null) {
             $this->_user = Users::findOne(['email' => $this->email]);

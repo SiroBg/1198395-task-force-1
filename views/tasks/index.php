@@ -1,9 +1,9 @@
 <?php
 
 /**
- * @var $tasks
- * @var $categories
- * @var $tasksFrom
+ * @var \app\models\Tasks      $tasks      ;
+ * @var \app\models\Categories $categories ;
+ * @var TasksForm              $tasksFrom  ;
  */
 
 use app\models\TasksForm;
@@ -23,8 +23,8 @@ use yii\widgets\LinkPager;
                 <div class="header-task">
                     <a href="/tasks/view/<?= $task->id; ?>"
                        class="link link--block link--big"><?= Html::encode(
-                           $task->name,
-                       ); ?></a>
+                            $task->name,
+                        ); ?></a>
                     <p class="price price--task"><?= $task->budget; ?> ₽</p>
                 </div>
                 <p class="info-text"><span class="current-time">
@@ -32,11 +32,11 @@ use yii\widgets\LinkPager;
             </span>
                 </p>
                 <p class="task-text"><?= Html::encode(
-                    $task->description,
-                ); ?></p>
+                        $task->description,
+                    ); ?></p>
                 <div class="footer-task">
                     <p class="info-text town-text"><?= $task->city->name ??
-                        'Абаза'; ?></p>
+                            'Абаза'; ?></p>
                     <p class="info-text category-text"><?= $task->category->name; ?></p>
                     <a href="#" class="button button--black">Смотреть
                         Задание</a>
@@ -44,21 +44,23 @@ use yii\widgets\LinkPager;
             </div>
         <?php
         endforeach; ?>
-        <?php if ($pagination->pageCount > 1): ?>
+        <?php
+        if ($pagination->pageCount > 1): ?>
             <?= LinkPager::widget([
-                'pagination' => $pagination,
-                'options' => ['class' => 'pagination-list'],
+                'pagination'           => $pagination,
+                'options'              => ['class' => 'pagination-list'],
                 'linkContainerOptions' => ['class' => 'pagination-item'],
-                'linkOptions' => ['class' => 'link link--page'],
-                'activePageCssClass' => 'pagination-item--active',
+                'linkOptions'          => ['class' => 'link link--page'],
+                'activePageCssClass'   => 'pagination-item--active',
                 'disabledPageCssClass' => 'mark',
-                'prevPageLabel' => '',
-                'nextPageLabel' => '',
-                'prevPageCssClass' => 'pagination-item mark',
-                'nextPageCssClass' => 'pagination-item mark',
-                'maxButtonCount' => 3,
+                'prevPageLabel'        => '',
+                'nextPageLabel'        => '',
+                'prevPageCssClass'     => 'pagination-item mark',
+                'nextPageCssClass'     => 'pagination-item mark',
+                'maxButtonCount'       => 3,
             ]) ?>
-        <?php endif; ?>
+        <?php
+        endif; ?>
     </div>
     <div class="right-column">
         <div class="right-card black">
@@ -70,27 +72,30 @@ use yii\widgets\LinkPager;
                 ]); ?>
 
                 <h4 class="head-card">Категории</h4>
-                    <div class="checkbox-wrapper">
-                        <?= $form->field($tasksForm, 'categories')
-                            ->checkboxList(
-                                ArrayHelper::map($categories, 'id', 'name'),
-                                [
-                                    'separator' => '<br>',
-                                    'class' => 'control-label',
-                                ],
-                            )->error(['tag' => false])->label(false); ?>
-                    </div>
+                <div class="checkbox-wrapper">
+                    <?= $form->field($tasksForm, 'categories')
+                        ->checkboxList(
+                            ArrayHelper::map($categories, 'id', 'name'),
+                            [
+                                'separator' => '<br>',
+                                'class'     => 'control-label',
+                            ],
+                        )->error(['tag' => false])->label(false); ?>
+                </div>
                 <h4 class="head-card">Дополнительно</h4>
-                    <?= $form->field($tasksForm, 'noResponds')->checkbox([
-                        'labelOptions' => ['class' => 'control-label'],
-                    ])->error(['tag' => false]); ?>
+                <?= $form->field($tasksForm, 'noResponds')->checkbox([
+                    'labelOptions' => ['class' => 'control-label'],
+                ])->error(['tag' => false]); ?>
                 <h4 class="head-card">Период</h4>
-                    <?= $form->field($tasksForm, 'period')->dropDownList(
-                        TasksForm::PERIODS_OPTIONS,
-                    )->label(false); ?>
-                    
-                    <?= Html::submitInput('Искать', ['class' => 'button button--blue']) ?>
-                
+                <?= $form->field($tasksForm, 'period')->dropDownList(
+                    TasksForm::PERIODS_OPTIONS,
+                )->label(false); ?>
+
+                <?= Html::submitInput(
+                    'Искать',
+                    ['class' => 'button button--blue']
+                ) ?>
+
                 <?php
                 ActiveForm::end(); ?>
 

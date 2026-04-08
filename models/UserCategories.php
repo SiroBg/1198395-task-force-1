@@ -2,18 +2,16 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "user_categories".
  *
- * @property int $id
+ * @property int         $id
  * @property string|null $created_at
- * @property int $user_id
- * @property int $category_id
+ * @property int         $user_id
+ * @property int         $category_id
  *
- * @property Categories $category
- * @property Users $user
+ * @property Categories  $category
+ * @property Users       $user
  */
 class UserCategories extends \yii\db\ActiveRecord
 {
@@ -22,7 +20,7 @@ class UserCategories extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'user_categories';
     }
@@ -30,26 +28,38 @@ class UserCategories extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['created_at'], 'safe'],
             [['user_id', 'category_id'], 'required'],
             [['user_id', 'category_id'], 'integer'],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Categories::class, 'targetAttribute' => ['category_id' => 'id']],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => Users::class, 'targetAttribute' => ['user_id' => 'id']],
+            [
+                ['category_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Categories::class,
+                'targetAttribute' => ['category_id' => 'id']
+            ],
+            [
+                ['user_id'],
+                'exist',
+                'skipOnError'     => true,
+                'targetClass'     => Users::class,
+                'targetAttribute' => ['user_id' => 'id']
+            ],
         ];
     }
 
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'id' => 'ID',
-            'created_at' => 'Created At',
-            'user_id' => 'User ID',
+            'id'          => 'ID',
+            'created_at'  => 'Created At',
+            'user_id'     => 'User ID',
             'category_id' => 'Category ID',
         ];
     }
@@ -59,7 +69,7 @@ class UserCategories extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory()
+    public function getCategory(): \yii\db\ActiveQuery
     {
         return $this->hasOne(Categories::class, ['id' => 'category_id']);
     }
@@ -69,7 +79,7 @@ class UserCategories extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUser()
+    public function getUser(): \yii\db\ActiveQuery
     {
         return $this->hasOne(Users::class, ['id' => 'user_id']);
     }

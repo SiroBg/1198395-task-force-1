@@ -9,7 +9,7 @@ use yii\web\NotFoundHttpException;
 
 class UsersController extends Controller
 {
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -24,7 +24,10 @@ class UsersController extends Controller
         ];
     }
 
-    public function actionView(int $id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView(int $id): string
     {
         $user = Users::findOne($id);
 
@@ -35,7 +38,7 @@ class UsersController extends Controller
         return $this->render('view', ['user' => $user]);
     }
 
-    public function actionLogout()
+    public function actionLogout(): \yii\web\Response
     {
         Yii::$app->user->logout();
 

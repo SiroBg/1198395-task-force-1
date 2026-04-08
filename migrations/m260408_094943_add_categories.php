@@ -6,8 +6,9 @@ class m260408_094943_add_categories extends Migration
 {
     /**
      * {@inheritdoc}
+     * @throws \yii\base\Exception
      */
-    public function safeUp()
+    public function safeUp(): void
     {
         $categoriesSql = __DIR__ . '/../db/categories.sql';
 
@@ -15,8 +16,10 @@ class m260408_094943_add_categories extends Migration
             $sql = file_get_contents($categoriesSql);
             $this->execute($sql);
         } else {
-            throw new \yii\base\Exception("Отсутствует sql файл: $categoriesSql. Выполните команду php sql-fill-cli.php,
-             чтобы конвертировать файлы из data.csv в sql");
+            throw new \yii\base\Exception(
+                "Отсутствует sql файл: $categoriesSql. Выполните команду php sql-fill-cli.php,
+             чтобы конвертировать файлы из data.csv в sql"
+            );
         }
     }
 

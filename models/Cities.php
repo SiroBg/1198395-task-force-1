@@ -2,28 +2,25 @@
 
 namespace app\models;
 
-use Yii;
 
 /**
  * This is the model class for table "cities".
  *
- * @property int $id
+ * @property int         $id
  * @property string|null $created_at
- * @property string $name
- * @property float $lat
- * @property float $long
+ * @property string      $name
+ * @property float       $lat
+ * @property float       $long
  *
- * @property Tasks[] $tasks
- * @property Users[] $users
+ * @property Tasks[]     $tasks
+ * @property Users[]     $users
  */
 class Cities extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'cities';
     }
@@ -31,7 +28,7 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['created_at'], 'safe'],
@@ -44,14 +41,14 @@ class Cities extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
-            'id' => 'ID',
+            'id'         => 'ID',
             'created_at' => 'Created At',
-            'name' => 'Name',
-            'lat' => 'Lat',
-            'long' => 'Long',
+            'name'       => 'Name',
+            'lat'        => 'Lat',
+            'long'       => 'Long',
         ];
     }
 
@@ -60,7 +57,7 @@ class Cities extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTasks()
+    public function getTasks(): \yii\db\ActiveQuery
     {
         return $this->hasMany(Tasks::class, ['city_id' => 'id']);
     }
@@ -70,7 +67,7 @@ class Cities extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getUsers()
+    public function getUsers(): \yii\db\ActiveQuery
     {
         return $this->hasMany(Users::class, ['city_id' => 'id']);
     }
