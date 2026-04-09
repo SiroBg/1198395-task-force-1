@@ -8,9 +8,11 @@ abstract class AbstractAction
 
     abstract public function getDescription(): string;
 
+    abstract public function getButtonColor(): string;
+
     abstract public function checkRights(
         int $executorId,
         int $authorId,
-        int $userId
+        int $userId,
     ): bool;
 }

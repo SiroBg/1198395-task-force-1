@@ -6,18 +6,23 @@ class RefuseAction extends AbstractAction
 {
     public function getName(): string
     {
-        return 'action_refuse';
+        return 'refusal';
     }
 
     public function getDescription(): string
     {
-        return 'Отказаться';
+        return 'Отказаться от задания';
+    }
+
+    public function getButtonColor(): string
+    {
+        return 'orange';
     }
 
     public function checkRights(
         ?int $executorId,
         int $authorId,
-        int $userId
+        int $userId,
     ): bool {
         return $userId === $executorId && $userId !== $authorId;
     }

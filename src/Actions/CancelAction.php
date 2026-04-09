@@ -6,7 +6,7 @@ class CancelAction extends AbstractAction
 {
     public function getName(): string
     {
-        return 'action_cancel';
+        return 'cancel';
     }
 
     public function getDescription(): string
@@ -14,10 +14,15 @@ class CancelAction extends AbstractAction
         return 'Отменить';
     }
 
+    public function getButtonColor(): string
+    {
+        return 'pink';
+    }
+
     public function checkRights(
         ?int $executorId,
         int $authorId,
-        int $userId
+        int $userId,
     ): bool {
         return is_null($executorId) && $userId === $authorId;
     }

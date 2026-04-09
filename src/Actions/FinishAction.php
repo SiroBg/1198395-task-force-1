@@ -6,18 +6,23 @@ class FinishAction extends AbstractAction
 {
     public function getName(): string
     {
-        return 'action_finish';
+        return 'completion';
     }
 
     public function getDescription(): string
     {
-        return 'Завершить';
+        return 'Завершить задание';
+    }
+
+    public function getButtonColor(): string
+    {
+        return 'pink';
     }
 
     public function checkRights(
         ?int $executorId,
         int $authorId,
-        int $userId
+        int $userId,
     ): bool {
         return $userId === $authorId && $userId !== $executorId;
     }

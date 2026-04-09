@@ -14,10 +14,15 @@ class StartAction extends AbstractAction
         return 'Начать';
     }
 
+    public function getButtonColor(): string
+    {
+        return '';
+    }
+
     public function checkRights(
         ?int $executorId,
         int $authorId,
-        int $userId
+        int $userId,
     ): bool {
         return is_null($executorId) && $userId === $authorId;
     }

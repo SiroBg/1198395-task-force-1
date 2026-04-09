@@ -6,18 +6,23 @@ class RespondAction extends AbstractAction
 {
     public function getName(): string
     {
-        return 'action_respond';
+        return 'act_response';
     }
 
     public function getDescription(): string
     {
-        return 'Откликнуться';
+        return 'Откликнуться на задание';
+    }
+
+    public function getButtonColor(): string
+    {
+        return 'blue';
     }
 
     public function checkRights(
         ?int $executorId,
         int $authorId,
-        int $userId
+        int $userId,
     ): bool {
         return is_null($executorId) && $userId !== $authorId;
     }

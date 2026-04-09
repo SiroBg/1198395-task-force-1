@@ -78,25 +78,24 @@ class Task
     public function getActions(string $status, int $userId): array
     {
         $actionsToStatus = [
-            self::STATUS_NEW      =>
+            self::STATUS_NEW =>
                 [
-                    new StartAction(),
                     new CancelAction(),
                     new RespondAction(),
                 ],
-            self::STATUS_ACTIVE   =>
+            self::STATUS_ACTIVE =>
                 [
                     new FinishAction(),
                     new RefuseAction(),
                 ],
             self::STATUS_CANCELED => [],
-            self::STATUS_FAILED   => [],
+            self::STATUS_FAILED => [],
             self::STATUS_FINISHED => [],
         ];
 
         if (!isset($actionsToStatus[$status])) {
             throw new TaskStatusException(
-                'Переданный статус задания не предусмотрен'
+                'Переданный статус задания не предусмотрен',
             );
         }
 
@@ -106,9 +105,9 @@ class Task
                 return $action->checkRights(
                     $this->executorId,
                     $this->authorId,
-                    $userId
+                    $userId,
                 );
-            }
+            },
         );
     }
 

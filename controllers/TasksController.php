@@ -9,6 +9,7 @@ use app\models\Tasks;
 use app\models\TasksForm;
 use DateInterval;
 use DateTime;
+use TaskForce\Task;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
@@ -59,17 +60,17 @@ class TasksController extends Controller
 
                 $date = date_sub(new DateTime(), $interval);
                 $query->andWhere(
-                    ['>', 'created_at', $date->format('Y-m-d H:i:s')]
+                    ['>', 'created_at', $date->format('Y-m-d H:i:s')],
                 );
             }
         }
 
         $provider = new ActiveDataProvider([
-            'query'      => $query,
+            'query' => $query,
             'pagination' => [
                 'pageSize' => 5,
             ],
-            'sort'       => [
+            'sort' => [
                 'defaultOrder' => [
                     'created_at' => SORT_DESC,
                 ],
@@ -82,11 +83,11 @@ class TasksController extends Controller
         return $this->render(
             'index',
             [
-                'tasks'      => $tasks,
+                'tasks' => $tasks,
                 'categories' => $categories,
-                'tasksForm'  => $tasksForm,
-                'pagination' => $pagination
-            ]
+                'tasksForm' => $tasksForm,
+                'pagination' => $pagination,
+            ],
         );
     }
 
@@ -95,22 +96,24 @@ class TasksController extends Controller
      */
     public function actionView(int $id): string
     {
-        $task = Tasks::findOne($id);
+        $taskModel = Tasks::findOne($id);
 
-        if ($task === null) {
+        if ($taskModel === null) {
             throw new NotFoundHttpException('Страница не найдена');
         }
 
-        $responds = Responds::find()->where(['task_id' => $task->id])->all();
-        $taskFiles = TaskFiles::find()->where(['task_id' => $task->id])->all();
+        $task = new Task($taskModel->author_id, $taskModel->status, $taskModel->executor_id);
+        $responds = Responds::find()->where(['task_id' => $taskModel->id])->all();
+        $taskFiles = TaskFiles::find()->where(['task_id' => $taskModel->id])->all();
 
         return $this->render(
             'view',
             [
-                'task'      => $task,
-                'responds'  => $responds,
-                'taskFiles' => $taskFiles
-            ]
+                'taskModel' => $taskModel,
+                'task' => $task,
+                'responds' => $responds,
+                'taskFiles' => $taskFiles,
+            ],
         );
     }
 }
