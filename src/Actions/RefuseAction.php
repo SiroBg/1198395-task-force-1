@@ -23,7 +23,8 @@ class RefuseAction extends AbstractAction
         ?int $executorId,
         int $authorId,
         int $userId,
+        bool $isExecutor
     ): bool {
-        return $userId === $executorId && $userId !== $authorId;
+        return $isExecutor && $userId === $executorId && $userId !== $authorId;
     }
 }

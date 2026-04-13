@@ -68,44 +68,47 @@ class Task
     /**
      * Получает доступные действия над заданием для пользователя по статусу задания и Id.
      *
-     * @param string $status Статус задания.
-     * @param int    $userId Id пользователя.
+     * @param int  $userId     Id пользователя.
+     * @param bool $isExecutor Является ли пользователь исполнителем.
      *
      * @return array Массив с объектами-потомками класса AbstractAction.
      * @throws TaskStatusException Исключение при непредусмотренном статусе задания.
      *
      */
-    public function getActions(string $status, int $userId): array
-    {
+    public function getActions(
+        int $userId,
+        bool $isExecutor
+    ): array {
         $actionsToStatus = [
-            self::STATUS_NEW =>
+            self::STATUS_NEW      =>
                 [
                     new CancelAction(),
                     new RespondAction(),
                 ],
-            self::STATUS_ACTIVE =>
+            self::STATUS_ACTIVE   =>
                 [
                     new FinishAction(),
                     new RefuseAction(),
                 ],
             self::STATUS_CANCELED => [],
-            self::STATUS_FAILED => [],
+            self::STATUS_FAILED   => [],
             self::STATUS_FINISHED => [],
         ];
 
-        if (!isset($actionsToStatus[$status])) {
+        if (!isset($actionsToStatus[$this->status])) {
             throw new TaskStatusException(
                 'Переданный статус задания не предусмотрен',
             );
         }
 
         return array_filter(
-            $actionsToStatus[$status],
-            function ($action) use ($userId) {
+            $actionsToStatus[$this->status],
+            function ($action) use ($userId, $isExecutor) {
                 return $action->checkRights(
                     $this->executorId,
                     $this->authorId,
                     $userId,
+                    $isExecutor
                 );
             },
         );

@@ -23,7 +23,8 @@ class CancelAction extends AbstractAction
         ?int $executorId,
         int $authorId,
         int $userId,
+        bool $isExecutor
     ): bool {
-        return is_null($executorId) && $userId === $authorId;
+        return !$isExecutor && is_null($executorId) && $userId === $authorId;
     }
 }

@@ -14,5 +14,6 @@ abstract class AbstractAction
         int $executorId,
         int $authorId,
         int $userId,
+        bool $isExecutor
     ): bool;
 }

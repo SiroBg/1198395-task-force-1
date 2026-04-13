@@ -7,6 +7,7 @@ use app\models\Responds;
 use app\models\TaskFiles;
 use app\models\Tasks;
 use app\models\TasksForm;
+use app\models\Users;
 use DateInterval;
 use DateTime;
 use TaskForce\Task;
@@ -66,11 +67,11 @@ class TasksController extends Controller
         }
 
         $provider = new ActiveDataProvider([
-            'query' => $query,
+            'query'      => $query,
             'pagination' => [
                 'pageSize' => 5,
             ],
-            'sort' => [
+            'sort'       => [
                 'defaultOrder' => [
                     'created_at' => SORT_DESC,
                 ],
@@ -83,9 +84,9 @@ class TasksController extends Controller
         return $this->render(
             'index',
             [
-                'tasks' => $tasks,
+                'tasks'      => $tasks,
                 'categories' => $categories,
-                'tasksForm' => $tasksForm,
+                'tasksForm'  => $tasksForm,
                 'pagination' => $pagination,
             ],
         );
@@ -102,17 +103,31 @@ class TasksController extends Controller
             throw new NotFoundHttpException('Страница не найдена');
         }
 
-        $task = new Task($taskModel->author_id, $taskModel->status, $taskModel->executor_id);
-        $responds = Responds::find()->where(['task_id' => $taskModel->id])->all();
-        $taskFiles = TaskFiles::find()->where(['task_id' => $taskModel->id])->all();
+        $task = new Task(
+            $taskModel->author_id,
+            $taskModel->status,
+            $taskModel->executor_id
+        );
+
+        $user = Users::find()->select(['id', 'is_executor'])->where(
+            ['id' => Yii::$app->user->id]
+        )->one();
+
+
+        $responds = Responds::find()->where(['task_id' => $taskModel->id])
+            ->all();
+
+        $taskFiles = TaskFiles::find()->where(['task_id' => $taskModel->id])
+            ->all();
 
         return $this->render(
             'view',
             [
                 'taskModel' => $taskModel,
-                'task' => $task,
-                'responds' => $responds,
+                'task'      => $task,
+                'responds'  => $responds,
                 'taskFiles' => $taskFiles,
+                'user'      => $user,
             ],
         );
     }

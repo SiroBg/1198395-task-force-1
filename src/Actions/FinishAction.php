@@ -23,7 +23,8 @@ class FinishAction extends AbstractAction
         ?int $executorId,
         int $authorId,
         int $userId,
+        bool $isExecutor
     ): bool {
-        return $userId === $authorId && $userId !== $executorId;
+        return !$isExecutor && $userId === $authorId && $userId !== $executorId;
     }
 }
