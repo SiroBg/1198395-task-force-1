@@ -1,9 +1,10 @@
 <?php
 
 /**
- * @var \app\models\Tasks      $tasks      ;
- * @var \app\models\Categories $categories ;
- * @var TasksForm              $tasksFrom  ;
+ * @var \app\models\Tasks            $tasks      ;
+ * @var \app\models\Categories       $categories ;
+ * @var TasksForm                    $tasksFrom  ;
+ * @var BaseDataProvider::Pagination $pagination ;
  */
 
 use app\models\TasksForm;
@@ -34,13 +35,16 @@ use yii\widgets\LinkPager;
                 <p class="task-text"><?= Html::encode(
                         $task->description,
                     ); ?></p>
-                <div class="footer-task">
-                    <p class="info-text town-text"><?= $task->city->name ??
-                            'Абаза'; ?></p>
-                    <p class="info-text category-text"><?= $task->category->name; ?></p>
-                    <a href="#" class="button button--black">Смотреть
-                        Задание</a>
-                </div>
+                <?php
+                if ($task->city) : ?>
+                    <div class="footer-task">
+                        <p class="info-text town-text"><?= $task->city->name; ?></p>
+                        <p class="info-text category-text"><?= $task->category->name; ?></p>
+                        <a href="#" class="button button--black">Смотреть
+                            Задание</a>
+                    </div>
+                <?php
+                endif; ?>
             </div>
         <?php
         endforeach; ?>

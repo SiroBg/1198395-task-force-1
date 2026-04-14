@@ -46,17 +46,23 @@ use yii\helpers\Url;
             ); ?>
         <?php
         endforeach; ?>
-        <div class="task-map">
-            <img class="map" src="img/map.png" width="725" height="346"
-                 alt="<?= Html::encode($taskModel->location); ?>">
-            <p class="map-address town"><?= $task->city->name ?? 'Абаза'; ?></p>
-            <p class="map-address"><?= Html::encode(
-                    $taskModel->location
-                ); ?></p>
-        </div>
         <?php
-        if (!$user->is_executor && $taskModel->author_id === $user->id): ?>
-            <h4 class="head-regular">Отклики на задание</h4>
+        if ($taskModel->location && $taskModel->city) : ?>
+            <div class="task-map">
+                <img class="map" src="img/map.png" width="725" height="346"
+                     alt="<?= Html::encode($taskModel->location); ?>">
+                <p class="map-address town"><?= $taskModel->city->name; ?></p>
+                <p class="map-address"><?= Html::encode(
+                        $taskModel->location
+                    ); ?></p>
+            </div>
+        <?php
+        endif; ?>
+        <?php
+        if (!empty($responds)): ?>
+            <h4 class="head-regular">
+                <?= $user->is_executor ? 'Ваш отклик' : 'Отклики на задание'; ?>
+            </h4>
             <?php
             foreach ($responds as $respond): ?>
                 <div class="response-card">
@@ -82,7 +88,7 @@ use yii\helpers\Url;
                         <?php
                         if ($respond->comment): ?>
                             <p class="response-message">
-                                <?= $respond->comment; ?>
+                                <?= Html::encode($respond->comment); ?>
                             </p>
                         <?php
                         endif; ?>
@@ -100,129 +106,21 @@ use yii\helpers\Url;
                         <?php
                         endif; ?>
                     </div>
-                    <div class="button-popup">
-                        <a href="#"
-                           class="button button--blue button--small">Принять</a>
-                        <a href="#"
-                           class="button button--orange button--small">Отказать</a>
-                    </div>
-                </div>
-            <?php
-            endforeach; ?>
-        <?php
-        elseif ($user->is_executor && $taskModel->executor_id === $user->id): ?>
-            <h4 class="head-regular">Ваш отклик</h4>
-            <?php
-            foreach ($responds as $respond): ?>
-                <div class="response-card">
-                    <img class="customer-photo" src="img/man-glasses.png"
-                         width="146"
-                         height="156" alt="Фото заказчиков">
-                    <div class="feedback-wrapper">
-                        <a href="<?= Url::toRoute(
-                            ['users/view', 'id' => $respond->executor->id],
-                        ); ?>"
-                           class="link link--block link--big"><?= Html::encode(
-                                $respond->executor->name,
-                            ); ?></a>
-                        <div class="response-wrapper">
-                            <div class="stars-rating small"><span
-                                        class="fill-star">&nbsp;</span><span
-                                        class="fill-star">&nbsp;</span><span
-                                        class="fill-star">&nbsp;</span><span
-                                        class="fill-star">&nbsp;</span><span>&nbsp;</span>
-                            </div>
-                            <p class="reviews">2 отзыва</p>
+                    <?php
+                    if ($taskModel->author_id === $user->id): ?>
+                        <div class="button-popup">
+                            <a href="#"
+                               class="button button--blue button--small">Принять</a>
+                            <a href="#"
+                               class="button button--orange button--small">Отказать</a>
                         </div>
-                        <?php
-                        if ($respond->comment): ?>
-                            <p class="response-message">
-                                <?= $respond->comment; ?>
-                            </p>
-                        <?php
-                        endif; ?>
-                    </div>
-                    <div class="feedback-wrapper">
-                        <p class="info-text"><span
-                                    class="current-time"><?= Yii::$app->formatter->asRelativeTime(
-                                    $respond->created_at,
-                                ); ?></span>
-                        </p>
-                        <?php
-                        if ($respond->price): ?>
-                            <p class="price price--small"><?= $respond->price; ?>
-                                ₽</p>
-                        <?php
-                        endif; ?>
-                    </div>
+                    <?php
+                    endif; ?>
                 </div>
             <?php
             endforeach; ?>
         <?php
         endif; ?>
-        <div class="response-card">
-            <img class="customer-photo" src="img/man-glasses.png" width="146"
-                 height="156" alt="Фото заказчиков">
-            <div class="feedback-wrapper">
-                <a href="#" class="link link--block link--big">Астахов Павел</a>
-                <div class="response-wrapper">
-                    <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span>&nbsp;</span>
-                    </div>
-                    <p class="reviews">2 отзыва</p>
-                </div>
-                <p class="response-message">
-                    Могу сделать всё в лучшем виде. У меня есть необходимый опыт
-                    и инструменты.
-                </p>
-
-            </div>
-            <div class="feedback-wrapper">
-                <p class="info-text"><span class="current-time">25 минут </span>назад
-                </p>
-                <p class="price price--small">3700 ₽</p>
-            </div>
-            <div class="button-popup">
-                <a href="#"
-                   class="button button--blue button--small">Принять</a>
-                <a href="#"
-                   class="button button--orange button--small">Отказать</a>
-            </div>
-        </div>
-        <div class="response-card">
-            <img class="customer-photo" src="img/man-sweater.png" width="146"
-                 height="156" alt="Фото заказчиков">
-            <div class="feedback-wrapper">
-                <a href="#" class="link link--block link--big">Дмитриев
-                    Андрей</a>
-                <div class="response-wrapper">
-                    <div class="stars-rating small"><span class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span>&nbsp;</span>
-                    </div>
-                    <p class="reviews">8 отзывов</p>
-                </div>
-                <p class="response-message">
-                    Примусь за выполнение задания в течение часа, сделаю быстро
-                    и качественно.
-                </p>
-
-            </div>
-            <div class="feedback-wrapper">
-                <p class="info-text"><span class="current-time">2 часа </span>назад
-                </p>
-                <p class="price price--small">1999 ₽</p>
-            </div>
-            <div class="button-popup">
-                <a href="#"
-                   class="button button--blue button--small">Принять</a>
-                <a href="#"
-                   class="button button--orange button--small">Отказать</a>
-            </div>
-        </div>
     </div>
     <div class="right-column">
         <div class="right-card black info-card">
@@ -290,8 +188,16 @@ use yii\helpers\Url;
             Это действие плохо скажется на вашем рейтинге и увеличит счетчик
             проваленных заданий.
         </p>
+        <?= Html::a(
+            'Отказаться',
+            ['tasks/refuse', 'taskId' => $taskModel->id],
+            [
+                'class' => 'button button--pop-up button--orange',
+            ]
+        ); ?>
         <a class="button button--pop-up button--orange">Отказаться</a>
         <div class="button-container">
+            <?= Html::button('Закрыть окно', ['class' => 'button--close']) ?>
             <button class="button--close" type="button">Закрыть окно</button>
         </div>
     </div>
