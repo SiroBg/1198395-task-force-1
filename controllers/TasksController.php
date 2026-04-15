@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Categories;
 use app\models\Responds;
+use app\models\Reviews;
 use app\models\TaskFiles;
 use app\models\Tasks;
 use app\models\TasksForm;
@@ -11,11 +12,18 @@ use app\models\Users;
 use DateInterval;
 use DateTime;
 use TaskForce\Actions\CancelAction;
+use TaskForce\Actions\FinishAction;
+use TaskForce\Actions\RefuseAction;
+use TaskForce\Actions\RespondAction;
+use TaskForce\Actions\StartAction;
 use TaskForce\Task;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
+use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
 
 class TasksController extends Controller
 {
@@ -68,11 +76,11 @@ class TasksController extends Controller
         }
 
         $provider = new ActiveDataProvider([
-            'query'      => $query,
+            'query' => $query,
             'pagination' => [
                 'pageSize' => 5,
             ],
-            'sort'       => [
+            'sort' => [
                 'defaultOrder' => [
                     'created_at' => SORT_DESC,
                 ],
@@ -85,9 +93,9 @@ class TasksController extends Controller
         return $this->render(
             'index',
             [
-                'tasks'      => $tasks,
+                'tasks' => $tasks,
                 'categories' => $categories,
-                'tasksForm'  => $tasksForm,
+                'tasksForm' => $tasksForm,
                 'pagination' => $pagination,
             ],
         );
@@ -107,19 +115,19 @@ class TasksController extends Controller
         $task = new Task(
             $taskModel->author_id,
             $taskModel->status,
-            $taskModel->executor_id
+            $taskModel->executor_id,
+            $taskModel->id,
         );
 
         $user = Users::find()->select(['id', 'is_executor'])->where(
-            ['id' => Yii::$app->user->id]
+            ['id' => Yii::$app->user->id],
         )->one();
-
 
         $responds = [];
 
         if ($user->is_executor) {
             $responds = Responds::find()->where(
-                ['executor_id' => $user->id, 'task_id' => $taskModel->id]
+                ['executor_id' => $user->id, 'task_id' => $taskModel->id],
             )->all();
         } elseif ($taskModel->author_id === $user->id) {
             $responds = Responds::find()->where(['task_id' => $taskModel->id])
@@ -129,131 +137,123 @@ class TasksController extends Controller
         $taskFiles = TaskFiles::find()->where(['task_id' => $taskModel->id])
             ->all();
 
+        $review = new Reviews();
+        $respond = new Responds();
+
         return $this->render(
             'view',
             [
                 'taskModel' => $taskModel,
-                'task'      => $task,
-                'responds'  => $responds,
+                'task' => $task,
+                'responds' => $responds,
                 'taskFiles' => $taskFiles,
-                'user'      => $user,
+                'user' => $user,
+                'review' => $review,
+                'respond' => $respond,
             ],
         );
     }
 
-    public function actionCancel($taskId): \yii\web\Response
+    public function actionCancel(Task $task, Users $user): \yii\web\Response
     {
-        if (CancelAction::checkRights()) {
-            return $this->redirect(['view', 'id' => $taskId]);
+        if (!$task->applyAction(new CancelAction(), $user->id, $user->is_executor)) {
+            throw new ForbiddenHttpException('Невозможно отменить задание');
         }
+
+        Tasks::updateAll(['status' => $task->status], ['id' => $task->id]);
+
+        return $this->redirect(['view', 'id' => $task->id]);
     }
 
-    public function actionFinish($taskId)
+    public function actionFinish(Task $task, Users $user)
     {
-        $task = Task::findOne($taskId);
-        $review = new Review();
+        $review = new Reviews();
 
-        $review->task_id = $taskId;
-        $review->customer_id = $task->customer_id;
-        $review->performer_id = $task->performer_id;
+        $review->task_id = $task->id;
+        $review->author_id = $task->authorId;
+        $review->executor_id = $task->executorId;
 
-        Offer::updateAll(
-            ['status' => OfferStatus::COMPLETED->value],
-            [
-                'and',
-                ['task_id' => $task->id],
-                ['status' => OfferStatus::CONFIRM->value],
-            ]
-        );
+        if (Yii::$app->request->getIsPost()) {
+            $review->load(Yii::$app->request->post());
 
-        $task->status = TaskStatus::COMPLETE->value;
-        $task->save(false);
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ActiveForm::validate($review);
+            }
 
+            if ($review->validate() && $task->applyAction(new FinishAction(), $user->id, $user->is_executor)) {
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    $updatedRows = Tasks::updateAll(['status' => $task->status], ['id' => $task->id]);
+                    if (!$review->save() || $updatedRows !== 1) {
+                        throw new \Exception(
+                            'Ошибка при сохранении данных на сервере.',
+                        );
+                    }
 
-        if ($review->load(Yii::$app->request->post()) && $review->validate()) {
-            if ($review->save()) {
-                Yii::$app->session->setFlash('success', 'Задание закрыто');
-                return $this->redirect(['task/view', 'id' => $taskId]);
-            } else {
-                Yii::error($review->errors);
+                    $transaction->commit();
+                } catch (\Throwable $e) {
+                    $transaction->rollBack();
+                    Yii::error($e->getMessage());
+                }
             }
         }
 
-        return $this->redirect(['view', 'id' => $taskId]);
+        return $this->redirect(['view', 'id' => $task->id]);
     }
 
-    public function actionRespond($taskId)
+    public function actionRespond(Tasks $task, Users $user)
     {
-        $newOffer = new Offer();
+        $respond = new Responds();
 
-        $newOffer->task_id = $taskId;
-        $newOffer->performer_id = Yii::$app->user->id;
-        $newOffer->status = OfferStatus::NEW->value;
+        $respond->task_id = $task->id;
+        $respond->executor_id = $user->id;
 
-        if ($newOffer->load(Yii::$app->request->post())
-            && $newOffer->validate()
-        ) {
-            if ($newOffer->save()) {
-                Yii::$app->session->setFlash('success', 'Офер создан');
-                return $this->redirect(['task/view', 'id' => $taskId]);
-            } else {
-                Yii::error($newOffer->errors);
+        if (Yii::$app->request->getIsPost()) {
+            $respond->load(Yii::$app->request->post());
+
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ActiveForm::validate($respond);
+            }
+
+            if ($respond->validate() && $task->applyAction(new RespondAction(), $user->id, $user->is_executor)) {
+                if (!$respond->save()) {
+                    throw new \Exception(
+                        'Ошибка при сохранении данных на сервере.',
+                    );
+                }
             }
         }
-
-        if (!$newOffer->save()) {
-            var_dump($newOffer->errors);
-        }
-        exit;
-
-        return $this->redirect(['task/view', 'id' => $taskId]);
+        return $this->redirect(['view', 'id' => $task->id]);
     }
 
-    public function actionStart($taskId, $offerId)
+    public function actionStart($task, $user)
     {
-        $task = Task::findOne($taskId);
-        $taskService = new TaskService;
-
-        if (!$task
-            || !$taskService->accept(
-                Yii::$app->user->id,
-                $taskId,
-                $offerId
-            )
-        ) {
-            throw new NotFoundHttpException();
+        if (!$task->applyAction(new StartAction(), $user->id, $user->is_executor)) {
+            throw new ForbiddenHttpException('Невозможно назначить исполнителя задания');
         }
 
-        return $this->redirect(['view', 'id' => $taskId]);
+        Tasks::updateAll(['status' => $task->status, 'executor_id' => $task->executorId], ['id' => $task->id]);
+
+        return $this->redirect(['view', 'id' => $task->id]);
     }
 
-    public function actionReject($taskId, $offerId)
+    public function actionReject($task, $respondId)
     {
-        $taskService = new TaskService;
+        Responds::updateAll(['rejected' => true], ['id' => $respondId]);
 
-        if (!$taskService->reject(Yii::$app->user->id, $taskId, $offerId)) {
-            Yii::$app->session->setFlash('error', 'Нельзя отказать');
+        return $this->redirect(['view', 'id' => $task->id]);
+    }
+
+    public function actionRefuse($task, $user)
+    {
+        if (!$task->applyAction(new RefuseAction(), $user->id, $user->is_executor)) {
+            throw new ForbiddenHttpException('Невозможно отказаться от задания');
         }
 
-        return $this->redirect(['view', 'id' => $taskId]);
-    }
+        Tasks::updateAll(['status' => $task->status], ['id' => $task->id]);
 
-    public function actionRefuse($taskId)
-    {
-        $task = Task::findOne($taskId);
-
-        Offer::updateAll(
-            ['status' => OfferStatus::FAILED->value],
-            [
-                'and',
-                ['task_id' => $task->id],
-                ['status' => OfferStatus::CONFIRM->value],
-            ]
-        );
-
-        $task->status = TaskStatus::FAILED->value;
-        $task->save(false);
-
-        return $this->redirect(['view', 'id' => $taskId]);
+        return $this->redirect(['view', 'id' => $task->id]);
     }
 }

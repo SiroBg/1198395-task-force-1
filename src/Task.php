@@ -25,8 +25,9 @@ class Task
     public const string STATUS_FAILED = 'status_failed';
 
     public string $status;
-    private ?int $executorId;
-    private int $authorId;
+    public ?int $executorId;
+    public int $authorId;
+    public int $id;
 
     /**
      * Создаёт экземпляр класса Task.
@@ -40,10 +41,12 @@ class Task
         int $authorId,
         string $status = self::STATUS_NEW,
         ?int $executorId = null,
+        int $id,
     ) {
         $this->authorId = $authorId;
         $this->status = $status;
         $this->executorId = $executorId;
+        $this->id = $id;
     }
 
     /**
@@ -77,21 +80,21 @@ class Task
      */
     public function getActions(
         int $userId,
-        bool $isExecutor
+        bool $isExecutor,
     ): array {
         $actionsToStatus = [
-            self::STATUS_NEW      =>
+            self::STATUS_NEW =>
                 [
                     new CancelAction(),
                     new RespondAction(),
                 ],
-            self::STATUS_ACTIVE   =>
+            self::STATUS_ACTIVE =>
                 [
                     new FinishAction(),
                     new RefuseAction(),
                 ],
             self::STATUS_CANCELED => [],
-            self::STATUS_FAILED   => [],
+            self::STATUS_FAILED => [],
             self::STATUS_FINISHED => [],
         ];
 
@@ -108,7 +111,7 @@ class Task
                     $this->executorId,
                     $this->authorId,
                     $userId,
-                    $isExecutor
+                    $isExecutor,
                 );
             },
         );
@@ -123,29 +126,25 @@ class Task
      * @return bool `true` - действие применилось, `false` - действие невозможно.
      * @throws TaskStatusException
      */
-    public function applyAction(AbstractAction $action, array $data): bool
+    public function applyAction(AbstractAction $action, int $userId, bool $isExecutor): bool
     {
         $result = false;
 
-        if (isset($data['userId'])) {
-            $currentActionsNames = array_map(
-                function ($action) {
-                    return $action->getName();
-                },
-                $this->getActions($this->status, $data['userId']),
-            );
+        $currentActionsNames = array_map(
+            function ($action) {
+                return $action->getName();
+            },
+            $this->getActions($userId, $isExecutor),
+        );
 
-            if (in_array($action->getName(), $currentActionsNames)
-            ) {
-                if ($action->getName() === new StartAction()->getName()
-                    && isset($data['executorId'])
-                ) {
-                    $this->executorId = $data['executorId'];
-                }
-
-                $this->status = $this->getNextStatus($action);
-                $result = true;
+        if (in_array($action->getName(), $currentActionsNames)
+        ) {
+            if ($action->getName() === new StartAction()->getName()) {
+                $this->executorId = $userId;
             }
+
+            $this->status = $this->getNextStatus($action);
+            $result = true;
         }
 
         return $result;

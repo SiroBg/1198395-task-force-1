@@ -2,12 +2,13 @@
 
 use yii\helpers\Html;
 use yii\helpers\Url;
+use yii\widgets\ActiveForm;
 
 /**
  * @var \app\models\Tasks    $taskModel ;
  * @var TaskForce\Task       $task      ;
  * @var \app\models\Responds $responds  ;
- * @var array                $user      ;
+ * @var \app\models\Users    $user      ;
  */
 
 ?>
@@ -19,15 +20,15 @@ use yii\helpers\Url;
             <?php
             if ($taskModel->budget): ?>
                 <p class="price price--big"><?= Html::encode(
-                        $taskModel->budget
-                    ); ?>
+                    $taskModel->budget,
+                ); ?>
                     ₽</p>
             <?php
             endif; ?>
         </div>
         <p class="task-description"><?= Html::encode(
-                $taskModel->description,
-            ); ?></p>
+            $taskModel->description,
+        ); ?></p>
         <?php
         foreach (
             $task->getActions(
@@ -38,11 +39,11 @@ use yii\helpers\Url;
             <?= Html::a(
                 $action->getDescription(),
                 options: [
-                    'class'       => 'button button--'
-                        . $action->getButtonColor()
-                        . ' action-btn',
-                    'data-action' => $action->getName(),
-                ]
+                                                                'class' => 'button button--'
+                                                                    . $action->getButtonColor()
+                                                                    . ' action-btn',
+                                                                'data-action' => $action->getName(),
+                                                            ],
             ); ?>
         <?php
         endforeach; ?>
@@ -53,8 +54,8 @@ use yii\helpers\Url;
                      alt="<?= Html::encode($taskModel->location); ?>">
                 <p class="map-address town"><?= $taskModel->city->name; ?></p>
                 <p class="map-address"><?= Html::encode(
-                        $taskModel->location
-                    ); ?></p>
+                    $taskModel->location,
+                ); ?></p>
             </div>
         <?php
         endif; ?>
@@ -74,8 +75,8 @@ use yii\helpers\Url;
                             ['users/view', 'id' => $respond->executor->id],
                         ); ?>"
                            class="link link--block link--big"><?= Html::encode(
-                                $respond->executor->name,
-                            ); ?></a>
+                               $respond->executor->name,
+                           ); ?></a>
                         <div class="response-wrapper">
                             <div class="stars-rating small"><span
                                         class="fill-star">&nbsp;</span><span
@@ -96,8 +97,8 @@ use yii\helpers\Url;
                     <div class="feedback-wrapper">
                         <p class="info-text"><span
                                     class="current-time"><?= Yii::$app->formatter->asRelativeTime(
-                                    $respond->created_at,
-                                ); ?></span>
+                                        $respond->created_at,
+                                    ); ?></span>
                         </p>
                         <?php
                         if ($respond->price): ?>
@@ -109,10 +110,20 @@ use yii\helpers\Url;
                     <?php
                     if ($taskModel->author_id === $user->id): ?>
                         <div class="button-popup">
-                            <a href="#"
-                               class="button button--blue button--small">Принять</a>
-                            <a href="#"
-                               class="button button--orange button--small">Отказать</a>
+                            <?= Html::a(
+                                'Принять',
+                                ['tasks/start', 'task' => $task, 'user' => $user],
+                                [
+                                    'class' => 'button button--blue button--small',
+                                ],
+                            ); ?>
+                            <?= Html::a(
+                                'Отказать',
+                                ['tasks/reject', 'task' => $task, 'respondId' => $respond->id],
+                                [
+                                    'class' => 'button button--orange button--small',
+                                ],
+                            ); ?>
                         </div>
                     <?php
                     endif; ?>
@@ -130,13 +141,13 @@ use yii\helpers\Url;
                 <dd><?= $taskModel->category->name; ?></dd>
                 <dt>Дата публикации</dt>
                 <dd><?= Yii::$app->formatter->asRelativeTime(
-                        $taskModel->created_at,
-                    ); ?></dd>
+                    $taskModel->created_at,
+                ); ?></dd>
                 <dt>Срок выполнения</dt>
                 <dd><?= Yii::$app->formatter->asDatetime(
-                        $taskModel->expire_date,
-                        'php:d.m.Y, H:i',
-                    ); ?></dd>
+                    $taskModel->expire_date,
+                    'php:d.m.Y, H:i',
+                ); ?></dd>
                 <dt>Статус</dt>
                 <dd><?= $taskModel->displayStatus() ?></dd>
             </dl>
@@ -147,32 +158,32 @@ use yii\helpers\Url;
                 <h4 class="head-card">Файлы задания</h4>
                 <ul class="enumeration-list">
                     <?php
-                    foreach ($taskFiles as $file): ?>
+                foreach ($taskFiles as $file): ?>
                         <?php
-                        if (file_exists(
-                            Yii::getAlias('@webroot/') . $file->file->url,
-                        )
-                        ): ?>
+                    if (file_exists(
+                        Yii::getAlias('@webroot/') . $file->file->url,
+                    )
+                    ): ?>
                             <li class="enumeration-item">
                                 <?= Html::a(
                                     $file->file->name,
                                     Url::to($file->file->url),
                                     [
                                         'target' => '_blank',
-                                        'class'  => 'link link--block link--clip',
+                                        'class' => 'link link--block link--clip',
                                     ],
                                 ); ?>
                                 <p class="file-size"><?= Yii::$app->formatter->asShortSize(
-                                        filesize(
-                                            Yii::getAlias('@webroot/')
+                                    filesize(
+                                        Yii::getAlias('@webroot/')
                                             . $file->file->url,
-                                        ),
-                                    ); ?></p>
+                                    ),
+                                ); ?></p>
                             </li>
                         <?php
-                        endif; ?>
+                    endif; ?>
                     <?php
-                    endforeach; ?>
+                endforeach; ?>
                 </ul>
             </div>
         <?php
@@ -190,15 +201,13 @@ use yii\helpers\Url;
         </p>
         <?= Html::a(
             'Отказаться',
-            ['tasks/refuse', 'taskId' => $taskModel->id],
+            ['tasks/refuse', 'task' => $task, 'user' => $user],
             [
                 'class' => 'button button--pop-up button--orange',
-            ]
+            ],
         ); ?>
-        <a class="button button--pop-up button--orange">Отказаться</a>
         <div class="button-container">
             <?= Html::button('Закрыть окно', ['class' => 'button--close']) ?>
-            <button class="button--close" type="button">Закрыть окно</button>
         </div>
     </div>
 </section>
@@ -211,19 +220,29 @@ use yii\helpers\Url;
             возникли проблемы.
         </p>
         <div class="completion-form pop-up--form regular-form">
-            <form>
-                <div class="form-group">
-                    <label class="control-label" for="completion-comment">Ваш
-                        комментарий</label>
-                    <textarea id="completion-comment"></textarea>
-                </div>
-                <p class="completion-head control-label">Оценка работы</p>
-                <div class="stars-rating big active-stars">
-                    <span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span><span>&nbsp;</span>
-                </div>
-                <input type="submit" class="button button--pop-up button--blue"
-                       value="Завершить">
-            </form>
+            <?php $form = ActiveForm::begin(
+                ['enableAjaxValidation' => true, 'method' => 'post', 'action' => ['tasks/finish', 'task' => $task, 'user' => $user]],
+            ); ?>
+            <?= $form->field($review, 'comment')
+                ->textarea(
+                    ['labelOptions' => ['class' => 'control-label']],
+                )->label('Ваш комментарий') ?>
+            <?= $form->field($review, 'score')
+                ->hiddenInput(['id' => 'review-score'])
+                ->label('Оценка работы') ?>
+
+            <div class="stars-rating big" data-input="#review-score">
+                <span data-value="1">&nbsp;</span>
+                <span data-value="2">&nbsp;</span>
+                <span data-value="3">&nbsp;</span>
+                <span data-value="4">&nbsp;</span>
+                <span data-value="5">&nbsp;</span>
+            </div>
+            <?= Html::submitInput(
+                'Завершить',
+                ['class' => 'button button--pop-up button--blue'],
+            ); ?>
+            <?php ActiveForm::end(); ?>
         </div>
         <div class="button-container">
             <button class="button--close" type="button">Закрыть окно</button>
@@ -239,20 +258,22 @@ use yii\helpers\Url;
             необходимо.
         </p>
         <div class="addition-form pop-up--form regular-form">
-            <form>
-                <div class="form-group">
-                    <label class="control-label" for="addition-comment">Ваш
-                        комментарий</label>
-                    <textarea id="addition-comment"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="control-label"
-                           for="addition-price">Стоимость</label>
-                    <input id="addition-price" type="text">
-                </div>
-                <input type="submit" class="button button--pop-up button--blue"
-                       value="Завершить">
-            </form>
+            <?php $form = ActiveForm::begin(
+                ['enableAjaxValidation' => true, 'method' => 'post', 'action' => ['tasks/respond', 'task' => $task, 'user' => $user]],
+            ); ?>
+            <?= $form->field($respond, 'comment')
+                ->textarea(
+                    ['labelOptions' => ['class' => 'control-label']],
+                )->label('Ваш комментарий') ?>
+            <?= $form->field($respond, 'price')
+                ->textInput(
+                    ['labelOptions' => ['class' => 'control-label']],
+                )->label('Стоимость') ?>
+            <?= Html::submitInput(
+                'Завершить',
+                ['class' => 'button button--pop-up button--blue'],
+            ); ?>
+            <?php ActiveForm::end(); ?>                                                          
         </div>
         <div class="button-container">
             <button class="button--close" type="button">Закрыть окно</button>
