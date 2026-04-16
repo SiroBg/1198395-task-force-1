@@ -1,14 +1,19 @@
 <?php
 
+use kartik\rating\StarRating;
+use TaskForce\Task;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /**
- * @var \app\models\Tasks    $taskModel ;
- * @var TaskForce\Task       $task      ;
+ * @var \app\models\Tasks    $task      ;
+ * @var TaskForce\Task       $taskHelper;
  * @var \app\models\Responds $responds  ;
+ * @var \app\models\TaskFiles $taskFiles;
  * @var \app\models\Users    $user      ;
+ * @var \app\models\Reviews $review     ;
+ * @var \app\models\Responds $respond   ;
  */
 
 ?>
@@ -16,45 +21,50 @@ use yii\widgets\ActiveForm;
 <main class="main-content container">
     <div class="left-column">
         <div class="head-wrapper">
-            <h3 class="head-main"><?= Html::encode($taskModel->name); ?></h3>
+            <h3 class="head-main"><?= Html::encode($task->name); ?></h3>
             <?php
-            if ($taskModel->budget): ?>
+            if ($task->budget): ?>
                 <p class="price price--big"><?= Html::encode(
-                    $taskModel->budget,
-                ); ?>
-                    ₽</p>
+                    $task->budget,
+                ); ?>₽</p>
             <?php
             endif; ?>
         </div>
         <p class="task-description"><?= Html::encode(
-            $taskModel->description,
+            $task->description,
         ); ?></p>
         <?php
         foreach (
-            $task->getActions(
+            $taskHelper->getActions(
                 $user->id,
                 $user->is_executor,
             ) as $action
         ): ?>
+            <?php if (
+                $action->getName() !== 'action_start'
+                || ($action->getName() === 'act_response'
+                && !array_any($responds, function ($respond) use ($user) {return $respond->executor->id === $user->id;}))
+            ): ?>
             <?= Html::a(
                 $action->getDescription(),
                 options: [
-                                                                'class' => 'button button--'
-                                                                    . $action->getButtonColor()
-                                                                    . ' action-btn',
-                                                                'data-action' => $action->getName(),
-                                                            ],
+                            'class' => 'button button--'
+                                . $action->getButtonColor()
+                                . ' action-btn',
+                            'data-action' => $action->getName(),
+                        ],
             ); ?>
+            <?php endif; ?>
         <?php
         endforeach; ?>
         <?php
-        if ($taskModel->location && $taskModel->city) : ?>
+        if ($task->location && $task->city) : ?>
             <div class="task-map">
                 <img class="map" src="img/map.png" width="725" height="346"
-                     alt="<?= Html::encode($taskModel->location); ?>">
-                <p class="map-address town"><?= $taskModel->city->name; ?></p>
+                     alt="<?= Html::encode($task->location); ?>">
+                <p class="map-address town"><?= $task->city->name; ?></p>
                 <p class="map-address"><?= Html::encode(
-                    $taskModel->location,
+                    $task->location,
                 ); ?></p>
             </div>
         <?php
@@ -108,18 +118,18 @@ use yii\widgets\ActiveForm;
                         endif; ?>
                     </div>
                     <?php
-                    if ($taskModel->author_id === $user->id): ?>
+                    if ($taskHelper->status === Task::STATUS_NEW && $task->author_id === $user->id && !$respond->rejected): ?>
                         <div class="button-popup">
                             <?= Html::a(
                                 'Принять',
-                                ['tasks/start', 'task' => $task, 'user' => $user],
+                                ['tasks/start', 'taskId' => $task->id, 'executorId' => $respond->executor_id],
                                 [
                                     'class' => 'button button--blue button--small',
                                 ],
                             ); ?>
                             <?= Html::a(
                                 'Отказать',
-                                ['tasks/reject', 'task' => $task, 'respondId' => $respond->id],
+                                ['tasks/reject', 'taskId' => $task->id, 'respondId' => $respond->id],
                                 [
                                     'class' => 'button button--orange button--small',
                                 ],
@@ -138,18 +148,18 @@ use yii\widgets\ActiveForm;
             <h4 class="head-card">Информация о задании</h4>
             <dl class="black-list">
                 <dt>Категория</dt>
-                <dd><?= $taskModel->category->name; ?></dd>
+                <dd><?= $task->category->name; ?></dd>
                 <dt>Дата публикации</dt>
                 <dd><?= Yii::$app->formatter->asRelativeTime(
-                    $taskModel->created_at,
+                    $task->created_at,
                 ); ?></dd>
                 <dt>Срок выполнения</dt>
                 <dd><?= Yii::$app->formatter->asDatetime(
-                    $taskModel->expire_date,
+                    $task->expire_date,
                     'php:d.m.Y, H:i',
                 ); ?></dd>
                 <dt>Статус</dt>
-                <dd><?= $taskModel->displayStatus() ?></dd>
+                <dd><?= $task->displayStatus() ?></dd>
             </dl>
         </div>
         <?php
@@ -190,6 +200,25 @@ use yii\widgets\ActiveForm;
         endif; ?>
     </div>
 </main>
+<section class="pop-up pop-up--cancel pop-up--close">
+    <div class="pop-up--wrapper">
+        <h4>Отмена задания.</h4>
+        <p class="pop-up-text">
+            <b>Внимание!</b><br>
+            Вы собираетесь отменить задание.<br>
+        </p>
+        <?= Html::a(
+            'Отменить',
+            ['tasks/cancel', 'taskId' => $task->id],
+            [
+                'class' => 'button button--pop-up button--pink',
+            ],
+        ); ?>
+        <div class="button-container">
+            <?= Html::button('Закрыть окно', ['class' => 'button--close']) ?>
+        </div>
+    </div>
+</section>
 <section class="pop-up pop-up--refusal pop-up--close">
     <div class="pop-up--wrapper">
         <h4>Отказ от задания</h4>
@@ -221,23 +250,27 @@ use yii\widgets\ActiveForm;
         </p>
         <div class="completion-form pop-up--form regular-form">
             <?php $form = ActiveForm::begin(
-                ['enableAjaxValidation' => true, 'method' => 'post', 'action' => ['tasks/finish', 'task' => $task, 'user' => $user]],
+                ['enableAjaxValidation' => true, 'method' => 'post', 'action' => ['tasks/finish', 'taskId' => $task->id]],
             ); ?>
             <?= $form->field($review, 'comment')
                 ->textarea(
                     ['labelOptions' => ['class' => 'control-label']],
                 )->label('Ваш комментарий') ?>
-            <?= $form->field($review, 'score')
+            <?= $form->field($review, 'rating')
                 ->hiddenInput(['id' => 'review-score'])
                 ->label('Оценка работы') ?>
 
-            <div class="stars-rating big" data-input="#review-score">
-                <span data-value="1">&nbsp;</span>
-                <span data-value="2">&nbsp;</span>
-                <span data-value="3">&nbsp;</span>
-                <span data-value="4">&nbsp;</span>
-                <span data-value="5">&nbsp;</span>
-            </div>
+            <?= $form->field($review, 'rating')->widget(StarRating::class, [
+                'pluginOptions' => [
+                    'size' => 'sm',
+                    'stars' => 5,
+                    'min' => 0,
+                    'max' => 5,
+                    'step' => 1,
+                    'showClear' => false,
+                    'showCaption' => false,
+                ],
+            ]); ?>
             <?= Html::submitInput(
                 'Завершить',
                 ['class' => 'button button--pop-up button--blue'],
@@ -259,16 +292,16 @@ use yii\widgets\ActiveForm;
         </p>
         <div class="addition-form pop-up--form regular-form">
             <?php $form = ActiveForm::begin(
-                ['enableAjaxValidation' => true, 'method' => 'post', 'action' => ['tasks/respond', 'task' => $task, 'user' => $user]],
+                ['enableAjaxValidation' => true, 'method' => 'post', 'action' => ['tasks/respond', 'taskId' => $task->id]],
             ); ?>
             <?= $form->field($respond, 'comment')
                 ->textarea(
                     ['labelOptions' => ['class' => 'control-label']],
-                )->label('Ваш комментарий') ?>
+                ) ?>
             <?= $form->field($respond, 'price')
                 ->textInput(
                     ['labelOptions' => ['class' => 'control-label']],
-                )->label('Стоимость') ?>
+                ) ?>
             <?= Html::submitInput(
                 'Завершить',
                 ['class' => 'button button--pop-up button--blue'],

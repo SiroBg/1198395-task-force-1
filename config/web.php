@@ -53,6 +53,13 @@ $config = [
                 'users/view/<id:\d+>' => 'users/view/',
             ],
         ],
+        'assetManager' => [
+            'bundles' => [
+                'yii\bootstrap\BootstrapAsset' => [
+                    'css' => [], // This removes the default CSS file
+                ],
+            ],
+        ],
     ],
     'params' => $params,
 ];

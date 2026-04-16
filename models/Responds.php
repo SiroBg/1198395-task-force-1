@@ -2,8 +2,6 @@
 
 namespace app\models;
 
-use Yii;
-
 /**
  * This is the model class for table "responds".
  *
@@ -20,8 +18,6 @@ use Yii;
  */
 class Responds extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -45,16 +41,16 @@ class Responds extends \yii\db\ActiveRecord
             [
                 ['task_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Tasks::class,
-                'targetAttribute' => ['task_id' => 'id']
+                'skipOnError' => true,
+                'targetClass' => Tasks::class,
+                'targetAttribute' => ['task_id' => 'id'],
             ],
             [
                 ['executor_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Users::class,
-                'targetAttribute' => ['executor_id' => 'id']
+                'skipOnError' => true,
+                'targetClass' => Users::class,
+                'targetAttribute' => ['executor_id' => 'id'],
             ],
         ];
     }
@@ -65,13 +61,13 @@ class Responds extends \yii\db\ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id'          => 'ID',
-            'created_at'  => 'Created At',
-            'task_id'     => 'Task ID',
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'task_id' => 'Task ID',
             'executor_id' => 'Executor ID',
-            'comment'     => 'Comment',
-            'price'       => 'Price',
-            'rejected'    => 'Rejected',
+            'comment' => 'Ваш комментарий',
+            'price' => 'Стоимость',
+            'rejected' => 'Rejected',
         ];
     }
 

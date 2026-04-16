@@ -41,7 +41,7 @@ class Task
         int $authorId,
         string $status = self::STATUS_NEW,
         ?int $executorId = null,
-        int $id,
+        ?int $id = null,
     ) {
         $this->authorId = $authorId;
         $this->status = $status;
@@ -87,6 +87,7 @@ class Task
                 [
                     new CancelAction(),
                     new RespondAction(),
+                    new StartAction(),
                 ],
             self::STATUS_ACTIVE =>
                 [
@@ -126,7 +127,7 @@ class Task
      * @return bool `true` - действие применилось, `false` - действие невозможно.
      * @throws TaskStatusException
      */
-    public function applyAction(AbstractAction $action, int $userId, bool $isExecutor): bool
+    public function applyAction(AbstractAction $action, int $userId, bool $isExecutor, ?int $executor_id = null): bool
     {
         $result = false;
 
@@ -140,7 +141,7 @@ class Task
         if (in_array($action->getName(), $currentActionsNames)
         ) {
             if ($action->getName() === new StartAction()->getName()) {
-                $this->executorId = $userId;
+                $this->executorId = $executor_id;
             }
 
             $this->status = $this->getNextStatus($action);
