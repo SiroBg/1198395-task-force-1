@@ -77,8 +77,8 @@ class Reviews extends \yii\db\ActiveRecord
             'author_id'   => 'Author ID',
             'executor_id' => 'Executor ID',
             'task_id'     => 'Task ID',
-            'comment'     => 'Comment',
-            'rating'      => 'Rating',
+            'comment'     => 'Ваш комментарий',
+            'rating'      => 'Оценка работы',
         ];
     }
 

@@ -7,13 +7,13 @@ use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /**
- * @var \app\models\Tasks    $task      ;
- * @var TaskForce\Task       $taskHelper;
- * @var \app\models\Responds $responds  ;
- * @var \app\models\TaskFiles $taskFiles;
- * @var \app\models\Users    $user      ;
- * @var \app\models\Reviews $review     ;
- * @var \app\models\Responds $respond   ;
+ * @var \app\models\Tasks     $task       ;
+ * @var TaskForce\Task        $taskHelper ;
+ * @var \app\models\Responds  $responds   ;
+ * @var \app\models\TaskFiles $taskFiles  ;
+ * @var \app\models\Users     $user       ;
+ * @var \app\models\Reviews   $review     ;
+ * @var \app\models\Responds  $respond    ;
  */
 
 ?>
@@ -25,14 +25,14 @@ use yii\widgets\ActiveForm;
             <?php
             if ($task->budget): ?>
                 <p class="price price--big"><?= Html::encode(
-                    $task->budget,
-                ); ?>₽</p>
+                        $task->budget,
+                    ); ?>₽</p>
             <?php
             endif; ?>
         </div>
         <p class="task-description"><?= Html::encode(
-            $task->description,
-        ); ?></p>
+                $task->description,
+            ); ?></p>
         <?php
         foreach (
             $taskHelper->getActions(
@@ -40,21 +40,19 @@ use yii\widgets\ActiveForm;
                 $user->is_executor,
             ) as $action
         ): ?>
-            <?php if (
-                $action->getName() !== 'action_start'
-                || ($action->getName() === 'act_response'
-                && !array_any($responds, function ($respond) use ($user) {return $respond->executor->id === $user->id;}))
-            ): ?>
-            <?= Html::a(
-                $action->getDescription(),
-                options: [
-                            'class' => 'button button--'
-                                . $action->getButtonColor()
-                                . ' action-btn',
-                            'data-action' => $action->getName(),
-                        ],
-            ); ?>
-            <?php endif; ?>
+            <?php
+            if ($action->getName() !== 'action_start'): ?>
+                <?= Html::a(
+                    $action->getDescription(),
+                    options: [
+                        'class'       => 'button button--'
+                            . $action->getButtonColor()
+                            . ' action-btn',
+                        'data-action' => $action->getName(),
+                    ],
+                ); ?>
+            <?php
+            endif; ?>
         <?php
         endforeach; ?>
         <?php
@@ -64,8 +62,8 @@ use yii\widgets\ActiveForm;
                      alt="<?= Html::encode($task->location); ?>">
                 <p class="map-address town"><?= $task->city->name; ?></p>
                 <p class="map-address"><?= Html::encode(
-                    $task->location,
-                ); ?></p>
+                        $task->location,
+                    ); ?></p>
             </div>
         <?php
         endif; ?>
@@ -85,8 +83,8 @@ use yii\widgets\ActiveForm;
                             ['users/view', 'id' => $respond->executor->id],
                         ); ?>"
                            class="link link--block link--big"><?= Html::encode(
-                               $respond->executor->name,
-                           ); ?></a>
+                                $respond->executor->name,
+                            ); ?></a>
                         <div class="response-wrapper">
                             <div class="stars-rating small"><span
                                         class="fill-star">&nbsp;</span><span
@@ -107,8 +105,8 @@ use yii\widgets\ActiveForm;
                     <div class="feedback-wrapper">
                         <p class="info-text"><span
                                     class="current-time"><?= Yii::$app->formatter->asRelativeTime(
-                                        $respond->created_at,
-                                    ); ?></span>
+                                    $respond->created_at,
+                                ); ?></span>
                         </p>
                         <?php
                         if ($respond->price): ?>
@@ -118,18 +116,29 @@ use yii\widgets\ActiveForm;
                         endif; ?>
                     </div>
                     <?php
-                    if ($taskHelper->status === Task::STATUS_NEW && $task->author_id === $user->id && !$respond->rejected): ?>
+                    if ($taskHelper->status === Task::STATUS_NEW
+                        && $task->author_id === $user->id
+                        && !$respond->rejected
+                    ): ?>
                         <div class="button-popup">
                             <?= Html::a(
                                 'Принять',
-                                ['tasks/start', 'taskId' => $task->id, 'executorId' => $respond->executor_id],
+                                [
+                                    'tasks/start',
+                                    'taskId'     => $task->id,
+                                    'executorId' => $respond->executor_id
+                                ],
                                 [
                                     'class' => 'button button--blue button--small',
                                 ],
                             ); ?>
                             <?= Html::a(
                                 'Отказать',
-                                ['tasks/reject', 'taskId' => $task->id, 'respondId' => $respond->id],
+                                [
+                                    'tasks/reject',
+                                    'taskId'    => $task->id,
+                                    'respondId' => $respond->id
+                                ],
                                 [
                                     'class' => 'button button--orange button--small',
                                 ],
@@ -151,13 +160,13 @@ use yii\widgets\ActiveForm;
                 <dd><?= $task->category->name; ?></dd>
                 <dt>Дата публикации</dt>
                 <dd><?= Yii::$app->formatter->asRelativeTime(
-                    $task->created_at,
-                ); ?></dd>
+                        $task->created_at,
+                    ); ?></dd>
                 <dt>Срок выполнения</dt>
                 <dd><?= Yii::$app->formatter->asDatetime(
-                    $task->expire_date,
-                    'php:d.m.Y, H:i',
-                ); ?></dd>
+                        $task->expire_date,
+                        'php:d.m.Y, H:i',
+                    ); ?></dd>
                 <dt>Статус</dt>
                 <dd><?= $task->displayStatus() ?></dd>
             </dl>
@@ -168,32 +177,32 @@ use yii\widgets\ActiveForm;
                 <h4 class="head-card">Файлы задания</h4>
                 <ul class="enumeration-list">
                     <?php
-                foreach ($taskFiles as $file): ?>
+                    foreach ($taskFiles as $file): ?>
                         <?php
-                    if (file_exists(
-                        Yii::getAlias('@webroot/') . $file->file->url,
-                    )
-                    ): ?>
+                        if (file_exists(
+                            Yii::getAlias('@webroot/') . $file->file->url,
+                        )
+                        ): ?>
                             <li class="enumeration-item">
                                 <?= Html::a(
                                     $file->file->name,
                                     Url::to($file->file->url),
                                     [
                                         'target' => '_blank',
-                                        'class' => 'link link--block link--clip',
+                                        'class'  => 'link link--block link--clip',
                                     ],
                                 ); ?>
                                 <p class="file-size"><?= Yii::$app->formatter->asShortSize(
-                                    filesize(
-                                        Yii::getAlias('@webroot/')
+                                        filesize(
+                                            Yii::getAlias('@webroot/')
                                             . $file->file->url,
-                                    ),
-                                ); ?></p>
+                                        ),
+                                    ); ?></p>
                             </li>
                         <?php
-                    endif; ?>
+                        endif; ?>
                     <?php
-                endforeach; ?>
+                    endforeach; ?>
                 </ul>
             </div>
         <?php
@@ -230,7 +239,7 @@ use yii\widgets\ActiveForm;
         </p>
         <?= Html::a(
             'Отказаться',
-            ['tasks/refuse', 'task' => $task, 'user' => $user],
+            ['tasks/refuse', 'taskId' => $task->id],
             [
                 'class' => 'button button--pop-up button--orange',
             ],
@@ -249,25 +258,29 @@ use yii\widgets\ActiveForm;
             возникли проблемы.
         </p>
         <div class="completion-form pop-up--form regular-form">
-            <?php $form = ActiveForm::begin(
-                ['enableAjaxValidation' => true, 'method' => 'post', 'action' => ['tasks/finish', 'taskId' => $task->id]],
+            <?php
+            $form = ActiveForm::begin(
+                [
+                    'enableAjaxValidation' => true,
+                    'method'               => 'post',
+                    'action'               => [
+                        'tasks/finish',
+                        'taskId' => $task->id
+                    ]
+                ],
             ); ?>
             <?= $form->field($review, 'comment')
                 ->textarea(
                     ['labelOptions' => ['class' => 'control-label']],
                 )->label('Ваш комментарий') ?>
-            <?= $form->field($review, 'rating')
-                ->hiddenInput(['id' => 'review-score'])
-                ->label('Оценка работы') ?>
-
             <?= $form->field($review, 'rating')->widget(StarRating::class, [
                 'pluginOptions' => [
-                    'size' => 'sm',
-                    'stars' => 5,
-                    'min' => 0,
-                    'max' => 5,
-                    'step' => 1,
-                    'showClear' => false,
+                    'size'        => 'sm',
+                    'stars'       => 5,
+                    'min'         => 1,
+                    'max'         => 5,
+                    'step'        => 1,
+                    'showClear'   => false,
                     'showCaption' => false,
                 ],
             ]); ?>
@@ -275,7 +288,8 @@ use yii\widgets\ActiveForm;
                 'Завершить',
                 ['class' => 'button button--pop-up button--blue'],
             ); ?>
-            <?php ActiveForm::end(); ?>
+            <?php
+            ActiveForm::end(); ?>
         </div>
         <div class="button-container">
             <button class="button--close" type="button">Закрыть окно</button>
@@ -291,8 +305,16 @@ use yii\widgets\ActiveForm;
             необходимо.
         </p>
         <div class="addition-form pop-up--form regular-form">
-            <?php $form = ActiveForm::begin(
-                ['enableAjaxValidation' => true, 'method' => 'post', 'action' => ['tasks/respond', 'taskId' => $task->id]],
+            <?php
+            $form = ActiveForm::begin(
+                [
+                    'enableAjaxValidation' => true,
+                    'method'               => 'post',
+                    'action'               => [
+                        'tasks/respond',
+                        'taskId' => $task->id
+                    ]
+                ],
             ); ?>
             <?= $form->field($respond, 'comment')
                 ->textarea(
@@ -306,7 +328,8 @@ use yii\widgets\ActiveForm;
                 'Завершить',
                 ['class' => 'button button--pop-up button--blue'],
             ); ?>
-            <?php ActiveForm::end(); ?>                                                          
+            <?php
+            ActiveForm::end(); ?>
         </div>
         <div class="button-container">
             <button class="button--close" type="button">Закрыть окно</button>
