@@ -1,29 +1,29 @@
 <?php
 
-namespace TaskForce\Actions;
+namespace app\actions;
 
-class CancelAction extends AbstractAction
+class actionCancel extends actionAbstract
 {
-    public function getName(): string
+    public static function getName(): string
     {
         return 'cancel';
     }
 
-    public function getDescription(): string
+    public static function getDescription(): string
     {
         return 'Отменить';
     }
 
-    public function getButtonColor(): string
+    public static function getButtonColor(): string
     {
         return 'pink';
     }
 
-    public function checkRights(
+    public static function checkRights(
         ?int $executorId,
         int $authorId,
         int $userId,
-        bool $isExecutor
+        bool $isExecutor,
     ): bool {
         return !$isExecutor && is_null($executorId) && $userId === $authorId;
     }

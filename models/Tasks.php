@@ -2,6 +2,12 @@
 
 namespace app\models;
 
+use app\actions\actionAbstract;
+use app\actions\actionCancel;
+use app\actions\actionFinish;
+use app\actions\actionRefuse;
+use app\actions\actionRespond;
+use app\actions\actionStart;
 use yii\db\ActiveQuery;
 
 /**
@@ -35,11 +41,11 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * ENUM field values
      */
-    public const string STATUS_STATUS_NEW = 'status_new';
-    public const string STATUS_STATUS_CANCELED = 'status_canceled';
-    public const string STATUS_STATUS_ACTIVE = 'status_active';
-    public const string STATUS_STATUS_FINISHED = 'status_finished';
-    public const string STATUS_STATUS_FAILED = 'status_failed';
+    public const string STATUS_NEW = 'status_new';
+    public const string STATUS_CANCELED = 'status_canceled';
+    public const string STATUS_ACTIVE = 'status_active';
+    public const string STATUS_FINISHED = 'status_finished';
+    public const string STATUS_FAILED = 'status_failed';
 
     public array $task_files = [];
 
@@ -74,8 +80,8 @@ class Tasks extends \yii\db\ActiveRecord
             [
                 'expire_date',
                 'date',
-                'format'   => 'php:Y-m-d',
-                'min'      => date('Y-m-d'),
+                'format' => 'php:Y-m-d',
+                'min' => date('Y-m-d'),
                 'tooSmall' => 'Выберите дату позже ' . date('d.m.Y'),
             ],
             [
@@ -110,29 +116,29 @@ class Tasks extends \yii\db\ActiveRecord
             [
                 ['author_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Users::class,
+                'skipOnError' => true,
+                'targetClass' => Users::class,
                 'targetAttribute' => ['author_id' => 'id'],
             ],
             [
                 ['executor_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Users::class,
+                'skipOnError' => true,
+                'targetClass' => Users::class,
                 'targetAttribute' => ['executor_id' => 'id'],
             ],
             [
                 ['category_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Categories::class,
+                'skipOnError' => true,
+                'targetClass' => Categories::class,
                 'targetAttribute' => ['category_id' => 'id'],
             ],
             [
                 ['city_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Cities::class,
+                'skipOnError' => true,
+                'targetClass' => Cities::class,
                 'targetAttribute' => ['city_id' => 'id'],
             ],
             ['task_files', 'file', 'maxFiles' => 0, 'skipOnEmpty' => true],
@@ -145,21 +151,21 @@ class Tasks extends \yii\db\ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id'          => 'ID',
-            'created_at'  => 'Created At',
-            'author_id'   => 'Author ID',
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'author_id' => 'Author ID',
             'executor_id' => 'Executor ID',
-            'name'        => 'Опишите суть работы',
+            'name' => 'Опишите суть работы',
             'description' => 'Подробности задания',
             'category_id' => 'Категория',
-            'location'    => 'Локация',
-            'lat'         => 'Lat',
-            'long'        => 'Long',
-            'city_id'     => 'City ID',
-            'budget'      => 'Бюджет',
+            'location' => 'Локация',
+            'lat' => 'Lat',
+            'long' => 'Long',
+            'city_id' => 'City ID',
+            'budget' => 'Бюджет',
             'expire_date' => 'Срок исполнения',
-            'status'      => 'Status',
-            'task_files'  => 'Файлы',
+            'status' => 'Status',
+            'task_files' => 'Файлы',
         ];
     }
 
@@ -241,11 +247,11 @@ class Tasks extends \yii\db\ActiveRecord
     public static function optsStatus(): array
     {
         return [
-            self::STATUS_STATUS_NEW      => 'Новое',
-            self::STATUS_STATUS_CANCELED => 'Отменено',
-            self::STATUS_STATUS_ACTIVE   => 'Выполняется',
-            self::STATUS_STATUS_FINISHED => 'Завершено',
-            self::STATUS_STATUS_FAILED   => 'Провалено',
+            self::STATUS_NEW => 'Новое',
+            self::STATUS_CANCELED => 'Отменено',
+            self::STATUS_ACTIVE => 'Выполняется',
+            self::STATUS_FINISHED => 'Завершено',
+            self::STATUS_FAILED => 'Провалено',
         ];
     }
 
@@ -260,66 +266,66 @@ class Tasks extends \yii\db\ActiveRecord
     /**
      * @return bool
      */
-    public function isStatusStatusnew(): bool
+    public function isStatusNew(): bool
     {
-        return $this->status === self::STATUS_STATUS_NEW;
+        return $this->status === self::STATUS_NEW;
     }
 
-    public function setStatusToStatusnew(): void
+    public function setStatusToNew(): void
     {
-        $this->status = self::STATUS_STATUS_NEW;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isStatusStatuscanceled(): bool
-    {
-        return $this->status === self::STATUS_STATUS_CANCELED;
-    }
-
-    public function setStatusToStatuscanceled(): void
-    {
-        $this->status = self::STATUS_STATUS_CANCELED;
+        $this->status = self::STATUS_NEW;
     }
 
     /**
      * @return bool
      */
-    public function isStatusStatusactive(): bool
+    public function isStatusCanceled(): bool
     {
-        return $this->status === self::STATUS_STATUS_ACTIVE;
+        return $this->status === self::STATUS_CANCELED;
     }
 
-    public function setStatusToStatusactive(): void
+    public function setStatusToCanceled(): void
     {
-        $this->status = self::STATUS_STATUS_ACTIVE;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isStatusStatusfinished(): bool
-    {
-        return $this->status === self::STATUS_STATUS_FINISHED;
-    }
-
-    public function setStatusToStatusfinished(): void
-    {
-        $this->status = self::STATUS_STATUS_FINISHED;
+        $this->status = self::STATUS_CANCELED;
     }
 
     /**
      * @return bool
      */
-    public function isStatusStatusfailed(): bool
+    public function isStatusActive(): bool
     {
-        return $this->status === self::STATUS_STATUS_FAILED;
+        return $this->status === self::STATUS_ACTIVE;
     }
 
-    public function setStatusToStatusfailed(): void
+    public function setStatusToActive(): void
     {
-        $this->status = self::STATUS_STATUS_FAILED;
+        $this->status = self::STATUS_ACTIVE;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusFinished(): bool
+    {
+        return $this->status === self::STATUS_FINISHED;
+    }
+
+    public function setStatusToFinished(): void
+    {
+        $this->status = self::STATUS_FINISHED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatusFailed(): bool
+    {
+        return $this->status === self::STATUS_FAILED;
+    }
+
+    public function setStatusToFailed(): void
+    {
+        $this->status = self::STATUS_FAILED;
     }
 
     public function validateStringLengthNoSpaces($attribute, $params): void
@@ -332,5 +338,107 @@ class Tasks extends \yii\db\ActiveRecord
                 . ' символов.',
             );
         }
+    }
+
+    /**
+     * Получает статус, в который перейдёт задание после примененного действия.
+     *
+     * @param actionAbstract $action Объект класса AbstractAction
+     *
+     * @return string Статус задания.
+     */
+    public function getNextStatus(
+        actionAbstract $action,
+    ): string {
+        return match ($action->getName()) {
+            actionRespond::getName() => self::STATUS_NEW,
+            actionStart::getName() => self::STATUS_ACTIVE,
+            actionCancel::getName() => self::STATUS_CANCELED,
+            actionFinish::getName() => self::STATUS_FINISHED,
+            actionRefuse::getName() => self::STATUS_FAILED,
+        };
+    }
+
+    /**
+     * Получает доступные действия над заданием для пользователя по статусу задания и Id.
+     *
+     * @param int  $userId     Id пользователя.
+     * @param bool $isExecutor Является ли пользователь исполнителем.
+     *
+     * @return array Массив с объектами-потомками класса AbstractAction.
+     * @throws TaskStatusException Исключение при непредусмотренном статусе задания.
+     *
+     */
+    public function getActions(
+        int $userId,
+        bool $isExecutor,
+    ): array {
+        $actionsToStatus = [
+            self::STATUS_NEW =>
+                [
+                    new CancelAction(),
+                    new RespondAction(),
+                    new StartAction(),
+                ],
+            self::STATUS_ACTIVE =>
+                [
+                    new FinishAction(),
+                    new RefuseAction(),
+                ],
+            self::STATUS_CANCELED => [],
+            self::STATUS_FAILED => [],
+            self::STATUS_FINISHED => [],
+        ];
+
+        if (!isset($actionsToStatus[$this->status])) {
+            throw new TaskStatusException(
+                'Переданный статус задания не предусмотрен',
+            );
+        }
+
+        return array_filter(
+            $actionsToStatus[$this->status],
+            function ($action) use ($userId, $isExecutor) {
+                return $action->checkRights(
+                    $this->executorId,
+                    $this->authorId,
+                    $userId,
+                    $isExecutor,
+                );
+            },
+        );
+    }
+
+    /**
+     * Применяет действие к заданию, если оно возможно для текущего статуса.
+     *
+     * @param actionAbstract $action Действие.
+     * @param array          $data   Данные о пользователе, применяющем действие.
+     *
+     * @return bool `true` - действие применилось, `false` - действие невозможно.
+     * @throws TaskStatusException
+     */
+    public function applyAction(actionAbstract $action, int $userId, bool $isExecutor, ?int $executor_id = null): bool
+    {
+        $result = false;
+
+        $currentActionsNames = array_map(
+            function ($action) {
+                return $action->getName();
+            },
+            $this->getActions($userId, $isExecutor),
+        );
+
+        if (in_array($action->getName(), $currentActionsNames)
+        ) {
+            if ($action->getName() === new StartAction()->getName()) {
+                $this->executorId = $executor_id;
+            }
+
+            $this->status = $this->getNextStatus($action);
+            $result = true;
+        }
+
+        return $result;
     }
 }

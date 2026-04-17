@@ -1,29 +1,29 @@
 <?php
 
-namespace TaskForce\Actions;
+namespace app\actions;
 
-class RespondAction extends AbstractAction
+class actionRespond extends actionAbstract
 {
-    public function getName(): string
+    public static function getName(): string
     {
         return 'act_response';
     }
 
-    public function getDescription(): string
+    public static function getDescription(): string
     {
         return 'Откликнуться на задание';
     }
 
-    public function getButtonColor(): string
+    public static function getButtonColor(): string
     {
         return 'blue';
     }
 
-    public function checkRights(
+    public static function checkRights(
         ?int $executorId,
         int $authorId,
         int $userId,
-        bool $isExecutor
+        bool $isExecutor,
     ): bool {
         return $isExecutor && is_null($executorId) && $userId !== $authorId;
     }
