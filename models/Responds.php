@@ -52,6 +52,9 @@ class Responds extends \yii\db\ActiveRecord
                 'targetClass' => Users::class,
                 'targetAttribute' => ['executor_id' => 'id'],
             ],
+            [
+                ['executor_id', 'task_id'], 'unique', 'targetAttribute' => ['executor_id', 'task_id'],
+            ],
         ];
     }
 

@@ -4,6 +4,7 @@ namespace app\actions;
 
 use app\models\Tasks;
 use app\models\Users;
+use yii\web\ForbiddenHttpException;
 
 class actionRefuse extends actionAbstract
 {
@@ -31,10 +32,10 @@ class actionRefuse extends actionAbstract
         return $isExecutor && $userId === $executorId && $userId !== $authorId;
     }
 
-    public static function execute(Tasks $task, Users $user)
+    public static function execute(Tasks $task, Users $user): bool
     {
         if (!$task->applyAction(
-            new RefuseAction(),
+            new actionRefuse(),
             $user->id,
             $user->is_executor,
         )
@@ -44,9 +45,6 @@ class actionRefuse extends actionAbstract
             );
         }
 
-        Tasks::updateAll(
-            ['status' => $task->status],
-            ['id' => $task->id],
-        );
+        return $task->save();
     }
 }

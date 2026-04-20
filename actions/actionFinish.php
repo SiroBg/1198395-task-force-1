@@ -2,6 +2,10 @@
 
 namespace app\actions;
 
+use Yii;
+use yii\web\Response;
+use yii\widgets\ActiveForm;
+
 class actionFinish extends actionAbstract
 {
     public static function getName(): string
@@ -26,5 +30,43 @@ class actionFinish extends actionAbstract
         bool $isExecutor,
     ): bool {
         return !$isExecutor && $userId === $authorId && $userId !== $executorId;
+    }
+
+    public static function execute($task, $user, $review)
+    {
+        $result = false;
+
+        if (Yii::$app->request->getIsPost()) {
+            $review->load(Yii::$app->request->post());
+
+            if (Yii::$app->request->isAjax) {
+                Yii::$app->response->format = Response::FORMAT_JSON;
+                return ActiveForm::validate($review);
+            }
+
+            if ($review->validate()
+                && $task->applyAction(
+                    new actionFinish(),
+                    $user->id,
+                    $user->is_executor,
+                )
+            ) {
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    if (!$task->save || !$review->save()) {
+                        throw new \Exception(
+                            'Ошибка при сохранении данных на сервере.',
+                        );
+                    }
+
+                    $transaction->commit();
+                    $result = true;
+                } catch (\Throwable $e) {
+                    $transaction->rollBack();
+                    Yii::error($e->getMessage());
+                }
+            }
+        }
+        return $result;
     }
 }

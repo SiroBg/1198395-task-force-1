@@ -1,14 +1,13 @@
 <?php
 
+use app\models\Tasks;
 use kartik\rating\StarRating;
-use TaskForce\Task;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /**
  * @var \app\models\Tasks     $task       ;
- * @var TaskForce\Task        $taskHelper ;
  * @var \app\models\Responds  $responds   ;
  * @var \app\models\TaskFiles $taskFiles  ;
  * @var \app\models\Users     $user       ;
@@ -25,17 +24,17 @@ use yii\widgets\ActiveForm;
             <?php
             if ($task->budget): ?>
                 <p class="price price--big"><?= Html::encode(
-                        $task->budget,
-                    ); ?>₽</p>
+                    $task->budget,
+                ); ?>₽</p>
             <?php
             endif; ?>
         </div>
         <p class="task-description"><?= Html::encode(
-                $task->description,
-            ); ?></p>
+            $task->description,
+        ); ?></p>
         <?php
         foreach (
-            $taskHelper->getActions(
+            $task->getActions(
                 $user->id,
                 $user->is_executor,
             ) as $action
@@ -45,11 +44,11 @@ use yii\widgets\ActiveForm;
                 <?= Html::a(
                     $action->getDescription(),
                     options: [
-                        'class'       => 'button button--'
-                            . $action->getButtonColor()
-                            . ' action-btn',
-                        'data-action' => $action->getName(),
-                    ],
+                                        'class' => 'button button--'
+                                            . $action->getButtonColor()
+                                            . ' action-btn',
+                                        'data-action' => $action->getName(),
+                                    ],
                 ); ?>
             <?php
             endif; ?>
@@ -62,8 +61,8 @@ use yii\widgets\ActiveForm;
                      alt="<?= Html::encode($task->location); ?>">
                 <p class="map-address town"><?= $task->city->name; ?></p>
                 <p class="map-address"><?= Html::encode(
-                        $task->location,
-                    ); ?></p>
+                    $task->location,
+                ); ?></p>
             </div>
         <?php
         endif; ?>
@@ -83,8 +82,8 @@ use yii\widgets\ActiveForm;
                             ['users/view', 'id' => $respond->executor->id],
                         ); ?>"
                            class="link link--block link--big"><?= Html::encode(
-                                $respond->executor->name,
-                            ); ?></a>
+                               $respond->executor->name,
+                           ); ?></a>
                         <div class="response-wrapper">
                             <div class="stars-rating small"><span
                                         class="fill-star">&nbsp;</span><span
@@ -105,8 +104,8 @@ use yii\widgets\ActiveForm;
                     <div class="feedback-wrapper">
                         <p class="info-text"><span
                                     class="current-time"><?= Yii::$app->formatter->asRelativeTime(
-                                    $respond->created_at,
-                                ); ?></span>
+                                        $respond->created_at,
+                                    ); ?></span>
                         </p>
                         <?php
                         if ($respond->price): ?>
@@ -116,7 +115,7 @@ use yii\widgets\ActiveForm;
                         endif; ?>
                     </div>
                     <?php
-                    if ($taskHelper->status === Task::STATUS_NEW
+                    if ($task->status === Tasks::STATUS_NEW
                         && $task->author_id === $user->id
                         && !$respond->rejected
                     ): ?>
@@ -125,8 +124,8 @@ use yii\widgets\ActiveForm;
                                 'Принять',
                                 [
                                     'tasks/start',
-                                    'taskId'     => $task->id,
-                                    'executorId' => $respond->executor_id
+                                    'taskId' => $task->id,
+                                    'executorId' => $respond->executor_id,
                                 ],
                                 [
                                     'class' => 'button button--blue button--small',
@@ -136,8 +135,8 @@ use yii\widgets\ActiveForm;
                                 'Отказать',
                                 [
                                     'tasks/reject',
-                                    'taskId'    => $task->id,
-                                    'respondId' => $respond->id
+                                    'taskId' => $task->id,
+                                    'respondId' => $respond->id,
                                 ],
                                 [
                                     'class' => 'button button--orange button--small',
@@ -160,13 +159,13 @@ use yii\widgets\ActiveForm;
                 <dd><?= $task->category->name; ?></dd>
                 <dt>Дата публикации</dt>
                 <dd><?= Yii::$app->formatter->asRelativeTime(
-                        $task->created_at,
-                    ); ?></dd>
+                    $task->created_at,
+                ); ?></dd>
                 <dt>Срок выполнения</dt>
                 <dd><?= Yii::$app->formatter->asDatetime(
-                        $task->expire_date,
-                        'php:d.m.Y, H:i',
-                    ); ?></dd>
+                    $task->expire_date,
+                    'php:d.m.Y, H:i',
+                ); ?></dd>
                 <dt>Статус</dt>
                 <dd><?= $task->displayStatus() ?></dd>
             </dl>
@@ -177,32 +176,32 @@ use yii\widgets\ActiveForm;
                 <h4 class="head-card">Файлы задания</h4>
                 <ul class="enumeration-list">
                     <?php
-                    foreach ($taskFiles as $file): ?>
+                foreach ($taskFiles as $file): ?>
                         <?php
-                        if (file_exists(
-                            Yii::getAlias('@webroot/') . $file->file->url,
-                        )
-                        ): ?>
+                    if (file_exists(
+                        Yii::getAlias('@webroot/') . $file->file->url,
+                    )
+                    ): ?>
                             <li class="enumeration-item">
                                 <?= Html::a(
                                     $file->file->name,
                                     Url::to($file->file->url),
                                     [
                                         'target' => '_blank',
-                                        'class'  => 'link link--block link--clip',
+                                        'class' => 'link link--block link--clip',
                                     ],
                                 ); ?>
                                 <p class="file-size"><?= Yii::$app->formatter->asShortSize(
-                                        filesize(
-                                            Yii::getAlias('@webroot/')
+                                    filesize(
+                                        Yii::getAlias('@webroot/')
                                             . $file->file->url,
-                                        ),
-                                    ); ?></p>
+                                    ),
+                                ); ?></p>
                             </li>
                         <?php
-                        endif; ?>
+                    endif; ?>
                     <?php
-                    endforeach; ?>
+                endforeach; ?>
                 </ul>
             </div>
         <?php
@@ -262,11 +261,11 @@ use yii\widgets\ActiveForm;
             $form = ActiveForm::begin(
                 [
                     'enableAjaxValidation' => true,
-                    'method'               => 'post',
-                    'action'               => [
+                    'method' => 'post',
+                    'action' => [
                         'tasks/finish',
-                        'taskId' => $task->id
-                    ]
+                        'taskId' => $task->id,
+                    ],
                 ],
             ); ?>
             <?= $form->field($review, 'comment')
@@ -275,12 +274,12 @@ use yii\widgets\ActiveForm;
                 )->label('Ваш комментарий') ?>
             <?= $form->field($review, 'rating')->widget(StarRating::class, [
                 'pluginOptions' => [
-                    'size'        => 'sm',
-                    'stars'       => 5,
-                    'min'         => 1,
-                    'max'         => 5,
-                    'step'        => 1,
-                    'showClear'   => false,
+                    'size' => 'sm',
+                    'stars' => 5,
+                    'min' => 1,
+                    'max' => 5,
+                    'step' => 1,
+                    'showClear' => false,
                     'showCaption' => false,
                 ],
             ]); ?>
@@ -309,11 +308,11 @@ use yii\widgets\ActiveForm;
             $form = ActiveForm::begin(
                 [
                     'enableAjaxValidation' => true,
-                    'method'               => 'post',
-                    'action'               => [
+                    'method' => 'post',
+                    'action' => [
                         'tasks/respond',
-                        'taskId' => $task->id
-                    ]
+                        'taskId' => $task->id,
+                    ],
                 ],
             ); ?>
             <?= $form->field($respond, 'comment')

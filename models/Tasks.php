@@ -8,6 +8,7 @@ use app\actions\actionFinish;
 use app\actions\actionRefuse;
 use app\actions\actionRespond;
 use app\actions\actionStart;
+use app\exceptions\TaskStatusException;
 use yii\db\ActiveQuery;
 
 /**
@@ -376,14 +377,14 @@ class Tasks extends \yii\db\ActiveRecord
         $actionsToStatus = [
             self::STATUS_NEW =>
                 [
-                    new CancelAction(),
-                    new RespondAction(),
-                    new StartAction(),
+                    new actionCancel(),
+                    new actionRespond(),
+                    new actionStart(),
                 ],
             self::STATUS_ACTIVE =>
                 [
-                    new FinishAction(),
-                    new RefuseAction(),
+                    new actionFinish(),
+                    new actionRefuse(),
                 ],
             self::STATUS_CANCELED => [],
             self::STATUS_FAILED => [],
@@ -392,7 +393,7 @@ class Tasks extends \yii\db\ActiveRecord
 
         if (!isset($actionsToStatus[$this->status])) {
             throw new TaskStatusException(
-                'Переданный статус задания не предусмотрен',
+                'Статус задания не предусмотрен',
             );
         }
 
@@ -418,7 +419,7 @@ class Tasks extends \yii\db\ActiveRecord
      * @return bool `true` - действие применилось, `false` - действие невозможно.
      * @throws TaskStatusException
      */
-    public function applyAction(actionAbstract $action, int $userId, bool $isExecutor, ?int $executor_id = null): bool
+    public function applyAction(actionAbstract $action, int $userId, bool $isExecutor, ?int $executorId = null): bool
     {
         $result = false;
 
@@ -431,8 +432,8 @@ class Tasks extends \yii\db\ActiveRecord
 
         if (in_array($action->getName(), $currentActionsNames)
         ) {
-            if ($action->getName() === new StartAction()->getName()) {
-                $this->executorId = $executor_id;
+            if ($action->getName() === actionStart::getName()) {
+                $this->executor_id = $executorId;
             }
 
             $this->status = $this->getNextStatus($action);

@@ -2,6 +2,11 @@
 
 namespace app\controllers;
 
+use app\actions\actionCancel;
+use app\actions\actionFinish;
+use app\actions\actionRefuse;
+use app\actions\actionRespond;
+use app\actions\actionStart;
 use app\models\Categories;
 use app\models\Responds;
 use app\models\Reviews;
@@ -11,19 +16,12 @@ use app\models\TasksForm;
 use app\models\Users;
 use DateInterval;
 use DateTime;
-use TaskForce\Actions\CancelAction;
-use TaskForce\Actions\FinishAction;
-use TaskForce\Actions\RefuseAction;
-use TaskForce\Actions\RespondAction;
-use TaskForce\Actions\StartAction;
-use TaskForce\Task;
+use Exception;
 use Yii;
 use yii\data\ActiveDataProvider;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
-use yii\widgets\ActiveForm;
 
 class TasksController extends Controller
 {
@@ -50,7 +48,7 @@ class TasksController extends Controller
      */
     public function actionIndex(): string
     {
-        $query = Tasks::find()->where(['status' => Tasks::STATUS_STATUS_NEW]);
+        $query = Tasks::find()->where(['status' => Tasks::STATUS_NEW]);
 
         $categories = Categories::find()->select(['id', 'name'])->all();
 
@@ -76,11 +74,11 @@ class TasksController extends Controller
         }
 
         $provider = new ActiveDataProvider([
-            'query'      => $query,
+            'query' => $query,
             'pagination' => [
                 'pageSize' => 5,
             ],
-            'sort'       => [
+            'sort' => [
                 'defaultOrder' => [
                     'created_at' => SORT_DESC,
                 ],
@@ -93,9 +91,9 @@ class TasksController extends Controller
         return $this->render(
             'index',
             [
-                'tasks'      => $tasks,
+                'tasks' => $tasks,
                 'categories' => $categories,
-                'tasksForm'  => $tasksForm,
+                'tasksForm' => $tasksForm,
                 'pagination' => $pagination,
             ],
         );
@@ -111,13 +109,6 @@ class TasksController extends Controller
         if ($task === null) {
             throw new NotFoundHttpException('Страница не найдена');
         }
-
-        $taskHelper = new Task(
-            $task->author_id,
-            $task->status,
-            $task->executor_id,
-            $task->id,
-        );
 
         $user = Users::find()->select(['id', 'is_executor'])->where(
             ['id' => Yii::$app->user->id],
@@ -138,18 +129,17 @@ class TasksController extends Controller
             ->all();
 
         $review = new Reviews();
-        $respond = new Responds();
+        $respondForm = new Responds();
 
         return $this->render(
             'view',
             [
-                'task'       => $task,
-                'taskHelper' => $taskHelper,
-                'responds'   => $responds,
-                'taskFiles'  => $taskFiles,
-                'user'       => $user,
-                'review'     => $review,
-                'respond'    => $respond,
+                'task' => $task,
+                'responds' => $responds,
+                'taskFiles' => $taskFiles,
+                'user' => $user,
+                'review' => $review,
+                'respondForm' => $respondForm,
             ],
         );
     }
@@ -157,82 +147,33 @@ class TasksController extends Controller
     public function actionCancel(int $taskId): Response
     {
         $task = Tasks::find()->where(['id' => $taskId])->one();
-        $taskHelper = new Task(
-            $task->author_id,
-            $task->status,
-            $task->executor_id,
-            $task->id,
-        );
         $user = Users::find()->select(['id', 'is_executor'])->where(
             ['id' => Yii::$app->user->id],
         )->one();
 
-        if (!$taskHelper->applyAction(
-            new CancelAction(),
-            $user->id,
-            $user->is_executor
-        )
-        ) {
-            throw new ForbiddenHttpException('Невозможно отменить задание');
+        if (!actionCancel::execute($task, $user)) {
+            throw new Exception('Не удалось загрузить данные на сервер');
         }
-
-        Tasks::updateAll(['status' => $taskHelper->status], 'id = ' . $taskId);
 
         return $this->redirect(['view', 'id' => $taskId]);
     }
 
     public function actionFinish(int $taskId): array|Response
     {
-        $review = new Reviews();
-
         $task = Tasks::find()->where(['id' => $taskId])->one();
-        $taskHelper = new Task(
-            $task->author_id,
-            $task->status,
-            $task->executor_id,
-            $task->id,
-        );
+
         $user = Users::find()->select(['id', 'is_executor'])->where(
             ['id' => Yii::$app->user->id],
         )->one();
+
+        $review = new Reviews();
 
         $review->task_id = $task->id;
         $review->author_id = $task->author_id;
         $review->executor_id = $task->executor_id;
 
-        if (Yii::$app->request->getIsPost()) {
-            $review->load(Yii::$app->request->post());
-
-            if (Yii::$app->request->isAjax) {
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($review);
-            }
-
-            if ($review->validate()
-                && $taskHelper->applyAction(
-                    new FinishAction(),
-                    $user->id,
-                    $user->is_executor
-                )
-            ) {
-                $transaction = Yii::$app->db->beginTransaction();
-                try {
-                    $updatedRows = Tasks::updateAll(
-                        ['status' => $taskHelper->status],
-                        ['id' => $task->id]
-                    );
-                    if (!$review->save() || $updatedRows !== 1) {
-                        throw new \Exception(
-                            'Ошибка при сохранении данных на сервере.',
-                        );
-                    }
-
-                    $transaction->commit();
-                } catch (\Throwable $e) {
-                    $transaction->rollBack();
-                    Yii::error($e->getMessage());
-                }
-            }
+        if (!actionFinish::execute($task, $user, $review)) {
+            throw new Exception('Не удалось загрузить данные на сервер');
         }
 
         return $this->redirect(['view', 'id' => $task->id]);
@@ -240,85 +181,49 @@ class TasksController extends Controller
 
     public function actionRespond(int $taskId): array|Response
     {
-        $respond = new Responds();
+
         $task = Tasks::find()->where(['id' => $taskId])->one();
-        $taskHelper = new Task(
-            $task->author_id,
-            $task->status,
-            $task->executor_id,
-            $task->id,
-        );
+
         $user = Users::find()->select(['id', 'is_executor'])->where(
             ['id' => Yii::$app->user->id],
         )->one();
 
+        $respond = new Responds();
+
         $respond->task_id = $taskId;
         $respond->executor_id = $user->id;
 
-        if (Yii::$app->request->getIsPost()) {
-            $respond->load(Yii::$app->request->post());
-
-            if (Yii::$app->request->isAjax) {
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($respond);
-            }
-
-            if ($respond->validate()
-                && $taskHelper->applyAction(
-                    new RespondAction(),
-                    $user->id,
-                    $user->is_executor
-                )
-            ) {
-                if (!$respond->save()) {
-                    throw new \Exception(
-                        'Ошибка при сохранении данных на сервере.',
-                    );
-                }
-            }
+        if (!actionRespond::execute($task, $user, $respond)) {
+            throw new Exception('Не удалось загрузить данные на сервер');
         }
+
         return $this->redirect(['view', 'id' => $task->id]);
     }
 
     public function actionStart($taskId, $executorId): Response
     {
         $task = Tasks::find()->where(['id' => $taskId])->one();
-        $taskHelper = new Task(
-            $task->author_id,
-            $task->status,
-            $task->executor_id,
-            $task->id,
-        );
         $user = Users::find()->select(['id', 'is_executor'])->where(
             ['id' => Yii::$app->user->id],
         )->one();
 
-        if (!$taskHelper->applyAction(
-            new StartAction(),
-            $user->id,
-            $user->is_executor,
-            $executorId
-        )
-        ) {
-            throw new ForbiddenHttpException(
-                'Невозможно назначить исполнителя задания'
-            );
+        if (!actionStart::execute($task, $user, $executorId)) {
+            throw new Exception('Не удалось загрузить данные на сервер');
         }
-
-        Tasks::updateAll(
-            [
-                'status'      => $taskHelper->status,
-                'executor_id' => $taskHelper->executorId
-            ],
-            ['id' => $task->id]
-        );
 
         return $this->redirect(['view', 'id' => $task->id]);
     }
 
     public function actionReject(int $taskId, int $respondId): Response
     {
-        Responds::updateAll(['rejected' => true], ['id' => $respondId]);
+        $task = Tasks::find()->where(['id' => $taskId])->one();
+        $user = Users::find()->select(['id', 'is_executor'])->where(
+            ['id' => Yii::$app->user->id],
+        )->one();
+
+        if ($task->author_id === $user->id) {
+            Responds::updateAll(['rejected' => true], ['id' => $respondId]);
+        }
 
         return $this->redirect(['view', 'id' => $taskId]);
     }
@@ -326,29 +231,14 @@ class TasksController extends Controller
     public function actionRefuse($taskId): Response
     {
         $task = Tasks::find()->where(['id' => $taskId])->one();
-        $taskHelper = new Task(
-            $task->author_id,
-            $task->status,
-            $task->executor_id,
-            $task->id,
-        );
+
         $user = Users::find()->select(['id', 'is_executor'])->where(
             ['id' => Yii::$app->user->id],
         )->one();
 
-        if (!$taskHelper->applyAction(
-            new RefuseAction(),
-            $user->id,
-            $user->is_executor
-        )
-        ) {
-            throw new ForbiddenHttpException(
-                'Невозможно отказаться от задания'
-            );
+        if (!actionRefuse::execute($task, $user)) {
+            throw new Exception('Не удалось загрузить данные на сервер');
         }
-
-        Tasks::updateAll(['status' => $taskHelper->status], ['id' => $task->id]
-        );
 
         return $this->redirect(['view', 'id' => $task->id]);
     }
