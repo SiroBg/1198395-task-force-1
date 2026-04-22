@@ -1,6 +1,6 @@
 <?php
 
-namespace TaskForce\Exceptions;
+namespace app\exceptions;
 
 class SourceDirectoryException extends \Exception
 {

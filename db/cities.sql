@@ -1,5 +1,3 @@
-SET NAMES 'utf8mb4';
-SET CHARACTER SET 'utf8mb4';
 INSERT INTO `cities` (`name`, `lat`, `long`)
 VALUES ('Абаза', '52.6517296', '90.0885929'),
  ('Абакан', '53.7223661', '91.4437792'),

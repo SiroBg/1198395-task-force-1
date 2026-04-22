@@ -2,14 +2,14 @@
 
 namespace app\controllers;
 
-use app\models\Users;
+use app\models\User;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
 class UsersController extends Controller
 {
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
@@ -24,9 +24,12 @@ class UsersController extends Controller
         ];
     }
 
-    public function actionView(int $id)
+    /**
+     * @throws NotFoundHttpException
+     */
+    public function actionView(int $id): string
     {
-        $user = Users::findOne($id);
+        $user = User::findOne($id);
 
         if ($user === null) {
             throw new NotFoundHttpException('Страница не найдена');
@@ -35,7 +38,7 @@ class UsersController extends Controller
         return $this->render('view', ['user' => $user]);
     }
 
-    public function actionLogout()
+    public function actionLogout(): \yii\web\Response
     {
         Yii::$app->user->logout();
 

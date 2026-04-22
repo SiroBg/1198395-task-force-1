@@ -2,10 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\Categories;
-use app\models\Files;
-use app\models\TaskFiles;
-use app\models\Tasks;
+use app\models\Category;
+use app\models\File;
+use app\models\TaskFile;
+use app\models\Task;
+use app\models\User;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -34,8 +35,17 @@ class AddTaskController extends Controller
 
     public function actionIndex(): array|Response|string
     {
-        $categories = Categories::find()->select(['id', 'name'])->all();
-        $task = new Tasks();
+        $user = User::find()->select(['id', 'is_executor'])->where(
+            ['id' => Yii::$app->user->id],
+        )->one();
+
+        if ($user->is_executor) {
+            $this->redirect('/');
+        }
+
+        $categories = Category::find()->select(['id', 'name'])->all();
+
+        $task = new Task();
 
         if (Yii::$app->request->getIsPost()) {
             $task->load(Yii::$app->request->post());
@@ -45,8 +55,8 @@ class AddTaskController extends Controller
                 'task_files',
             );
 
-            $task->author_id = Yii::$app->user->id;
-            $task->status = $task::STATUS_STATUS_NEW;
+            $task->author_id = $user->id;
+            $task->status = $task::STATUS_NEW;
 
             if (Yii::$app->request->isAjax) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
@@ -58,7 +68,7 @@ class AddTaskController extends Controller
             try {
                 if (!$task->save() || !$this->uploadTaskFiles($task)) {
                     throw new \Exception(
-                        'Ошибка при сохранении задания на сервер.'
+                        'Ошибка при сохранении задания на сервер.',
                     );
                 }
 
@@ -75,7 +85,7 @@ class AddTaskController extends Controller
         ]);
     }
 
-    private function uploadTaskFiles(Tasks $task)
+    private function uploadTaskFiles(Task $task): bool
     {
         $success = true;
 
@@ -84,13 +94,14 @@ class AddTaskController extends Controller
                 $fileName = uniqid() . '.' . $file->extension;
                 $file->saveAs('@webroot/uploads/' . $fileName);
 
-                $newFile = new Files();
-                $newFile->file_path = $file->name;
-                $newFile->url = Yii::getAlias('@webroot/uploads/')
+                $newFile = new File();
+                $newFile->file_path = Yii::getAlias('@webroot/uploads/')
                     . $fileName;
+                $newFile->url = '/uploads/' . $fileName;
+                $newFile->name = $file->name;
 
                 if ($newFile->save()) {
-                    $taskFile = new TaskFiles();
+                    $taskFile = new TaskFile();
                     $taskFile->task_id = $task->id;
                     $taskFile->file_id = $newFile->id;
 

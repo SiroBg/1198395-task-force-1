@@ -1,6 +1,6 @@
 <?php
 /**
- * @var $loginForm ;
+ * @var \app\models\LoginForm $loginForm ;
  */
 
 use yii\helpers\Html;
@@ -107,8 +107,8 @@ use yii\widgets\ActiveForm;
         $form = ActiveForm::begin(
             [
                 'enableAjaxValidation' => true,
-                'method' => 'post',
-                'fieldConfig' => ['labelOptions' => ['class' => 'form-modal-description'],],
+                'method'               => 'post',
+                'fieldConfig'          => ['labelOptions' => ['class' => 'form-modal-description'],],
             ],
         ); ?>
         <?= $form->field($loginForm, 'email', [

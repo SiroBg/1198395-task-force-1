@@ -4,7 +4,7 @@ namespace TaskForce\Files;
 
 use RuntimeException;
 use SplFileObject;
-use TaskForce\Exceptions\SourceFileException;
+use app\exceptions\SourceFileException;
 
 /**
  * Класс, отвечающий за получение данных в формате CSV из файла.

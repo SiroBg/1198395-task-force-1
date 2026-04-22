@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @var $user
- * @var $cities
+ * @var \app\models\User $user ;
+ * @var \app\models\City $cities ;
  */
 
 use yii\helpers\ArrayHelper;
@@ -45,10 +45,13 @@ use yii\widgets\ActiveForm;
             <?= $form->field($user, 'is_executor')->checkbox(
                 [
                     'labelOptions' => ['class' => 'control-label checkbox-label'],
-                    'checked' => true,
+                    'checked'      => true,
                 ],
             ) ?>
-            <?= Html::submitInput('Создать аккаунт', ['class' => 'button button--blue']); ?>
+            <?= Html::submitInput(
+                'Создать аккаунт',
+                ['class' => 'button button--blue']
+            ); ?>
 
             <?php
             ActiveForm::end(); ?>

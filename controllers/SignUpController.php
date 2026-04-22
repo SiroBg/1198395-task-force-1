@@ -2,39 +2,43 @@
 
 namespace app\controllers;
 
-use app\models\Cities;
-use app\models\Users;
+use app\models\City;
+use app\models\User;
 use Yii;
+use yii\base\Exception;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
 
 class SignUpController extends Controller
 {
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class'        => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules' => [
-                        [
-                            'allow' => true,
-                            'roles' => ['?'],
-                        ],
+                'rules'        => [
+                    [
+                        'allow' => true,
+                        'roles' => ['?'],
                     ],
+                ],
             ],
         ];
     }
 
-    public function actionIndex()
+    /**
+     * @throws Exception
+     * @throws \yii\db\Exception
+     */
+    public function actionIndex(): array|Response|string
     {
+        $cities = City::find()->select(['id', 'name'])->all();
 
-        $cities = Cities::find()->select(['id', 'name'])->all();
-
-        $user = new Users();
+        $user = new User();
         if (Yii::$app->request->getIsPost()) {
             $user->load(Yii::$app->request->post());
             if (Yii::$app->request->isAjax) {
@@ -42,7 +46,9 @@ class SignUpController extends Controller
                 return ActiveForm::validate($user);
             }
             if ($user->validate()) {
-                $user->password = Yii::$app->security->generatePasswordHash($user->password);
+                $user->password = Yii::$app->security->generatePasswordHash(
+                    $user->password
+                );
 
                 if ($user->save(false)) {
                     return $this->goHome();
@@ -50,7 +56,7 @@ class SignUpController extends Controller
             }
         }
         return $this->render('index', [
-            'user' => $user,
+            'user'   => $user,
             'cities' => $cities,
         ]);
     }

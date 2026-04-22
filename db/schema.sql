@@ -1,9 +1,3 @@
-CREATE DATABASE IF NOT EXISTS `taskforce`
-    DEFAULT CHARACTER SET `utf8mb4`
-    DEFAULT COLLATE `utf8mb4_general_ci`;
-
-USE `taskforce`;
-
 CREATE TABLE IF NOT EXISTS `categories`
 (
     `id`         INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

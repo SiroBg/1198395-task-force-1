@@ -12,17 +12,17 @@ use Yii;
  * @property int         $task_id
  * @property int         $file_id
  *
- * @property Files       $file
- * @property Tasks       $task
+ * @property File        $file
+ * @property Task        $task
  */
-class TaskFiles extends \yii\db\ActiveRecord
+class TaskFile extends \yii\db\ActiveRecord
 {
 
 
     /**
      * {@inheritdoc}
      */
-    public static function tableName()
+    public static function tableName(): string
     {
         return 'task_files';
     }
@@ -30,7 +30,7 @@ class TaskFiles extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             [['created_at'], 'safe'],
@@ -40,14 +40,14 @@ class TaskFiles extends \yii\db\ActiveRecord
                 ['task_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Tasks::class,
+                'targetClass'     => Task::class,
                 'targetAttribute' => ['task_id' => 'id']
             ],
             [
                 ['file_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Files::class,
+                'targetClass'     => File::class,
                 'targetAttribute' => ['file_id' => 'id']
             ],
         ];
@@ -56,7 +56,7 @@ class TaskFiles extends \yii\db\ActiveRecord
     /**
      * {@inheritdoc}
      */
-    public function attributeLabels()
+    public function attributeLabels(): array
     {
         return [
             'id'         => 'ID',
@@ -71,9 +71,9 @@ class TaskFiles extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getFile()
+    public function getFile(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Files::class, ['id' => 'file_id']);
+        return $this->hasOne(File::class, ['id' => 'file_id']);
     }
 
     /**
@@ -81,9 +81,9 @@ class TaskFiles extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTask()
+    public function getTask(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
-    
+
 }

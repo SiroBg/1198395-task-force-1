@@ -25,8 +25,9 @@ class Task
     public const string STATUS_FAILED = 'status_failed';
 
     public string $status;
-    private ?int $executorId;
-    private int $authorId;
+    public ?int $executorId;
+    public int $authorId;
+    public int $id;
 
     /**
      * Создаёт экземпляр класса Task.
@@ -40,10 +41,12 @@ class Task
         int $authorId,
         string $status = self::STATUS_NEW,
         ?int $executorId = null,
+        ?int $id = null,
     ) {
         $this->authorId = $authorId;
         $this->status = $status;
         $this->executorId = $executorId;
+        $this->id = $id;
     }
 
     /**
@@ -68,47 +71,50 @@ class Task
     /**
      * Получает доступные действия над заданием для пользователя по статусу задания и Id.
      *
-     * @param string $status Статус задания.
-     * @param int    $userId Id пользователя.
+     * @param int  $userId     Id пользователя.
+     * @param bool $isExecutor Является ли пользователь исполнителем.
      *
      * @return array Массив с объектами-потомками класса AbstractAction.
      * @throws TaskStatusException Исключение при непредусмотренном статусе задания.
      *
      */
-    public function getActions(string $status, int $userId): array
-    {
+    public function getActions(
+        int $userId,
+        bool $isExecutor,
+    ): array {
         $actionsToStatus = [
-            self::STATUS_NEW      =>
+            self::STATUS_NEW =>
                 [
-                    new StartAction(),
                     new CancelAction(),
                     new RespondAction(),
+                    new StartAction(),
                 ],
-            self::STATUS_ACTIVE   =>
+            self::STATUS_ACTIVE =>
                 [
                     new FinishAction(),
                     new RefuseAction(),
                 ],
             self::STATUS_CANCELED => [],
-            self::STATUS_FAILED   => [],
+            self::STATUS_FAILED => [],
             self::STATUS_FINISHED => [],
         ];
 
-        if (!isset($actionsToStatus[$status])) {
+        if (!isset($actionsToStatus[$this->status])) {
             throw new TaskStatusException(
-                'Переданный статус задания не предусмотрен'
+                'Переданный статус задания не предусмотрен',
             );
         }
 
         return array_filter(
-            $actionsToStatus[$status],
-            function ($action) use ($userId) {
+            $actionsToStatus[$this->status],
+            function ($action) use ($userId, $isExecutor) {
                 return $action->checkRights(
                     $this->executorId,
                     $this->authorId,
-                    $userId
+                    $userId,
+                    $isExecutor,
                 );
-            }
+            },
         );
     }
 
@@ -121,29 +127,25 @@ class Task
      * @return bool `true` - действие применилось, `false` - действие невозможно.
      * @throws TaskStatusException
      */
-    public function applyAction(AbstractAction $action, array $data): bool
+    public function applyAction(AbstractAction $action, int $userId, bool $isExecutor, ?int $executor_id = null): bool
     {
         $result = false;
 
-        if (isset($data['userId'])) {
-            $currentActionsNames = array_map(
-                function ($action) {
-                    return $action->getName();
-                },
-                $this->getActions($this->status, $data['userId']),
-            );
+        $currentActionsNames = array_map(
+            function ($action) {
+                return $action->getName();
+            },
+            $this->getActions($userId, $isExecutor),
+        );
 
-            if (in_array($action->getName(), $currentActionsNames)
-            ) {
-                if ($action->getName() === new StartAction()->getName()
-                    && isset($data['executorId'])
-                ) {
-                    $this->executorId = $data['executorId'];
-                }
-
-                $this->status = $this->getNextStatus($action);
-                $result = true;
+        if (in_array($action->getName(), $currentActionsNames)
+        ) {
+            if ($action->getName() === new StartAction()->getName()) {
+                $this->executorId = $executor_id;
             }
+
+            $this->status = $this->getNextStatus($action);
+            $result = true;
         }
 
         return $result;

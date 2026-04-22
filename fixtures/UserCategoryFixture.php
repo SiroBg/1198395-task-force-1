@@ -6,7 +6,7 @@ use yii\test\ActiveFixture;
 
 class UserCategoryFixture extends ActiveFixture
 {
-    public $modelClass = 'app\models\UserCategories';
+    public $modelClass = 'app\models\UserCategory';
     public $dataFile = __DIR__ . '/data/userCategory.php';
 
     public $depends = ['app\fixtures\UserFixture'];
