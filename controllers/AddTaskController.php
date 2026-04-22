@@ -6,6 +6,7 @@ use app\models\Categories;
 use app\models\Files;
 use app\models\TaskFiles;
 use app\models\Tasks;
+use app\models\Users;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -34,7 +35,16 @@ class AddTaskController extends Controller
 
     public function actionIndex(): array|Response|string
     {
+        $user = Users::find()->select(['id', 'is_executor'])->where(
+            ['id' => Yii::$app->user->id],
+        )->one();
+
+        if ($user->is_executor) {
+            $this->redirect('/');
+        }
+
         $categories = Categories::find()->select(['id', 'name'])->all();
+
         $task = new Tasks();
 
         if (Yii::$app->request->getIsPost()) {
@@ -45,7 +55,7 @@ class AddTaskController extends Controller
                 'task_files',
             );
 
-            $task->author_id = Yii::$app->user->id;
+            $task->author_id = $user->id;
             $task->status = $task::STATUS_NEW;
 
             if (Yii::$app->request->isAjax) {

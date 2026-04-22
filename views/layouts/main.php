@@ -5,6 +5,7 @@
 /** @var string $content */
 
 use app\assets\AppAsset;
+use app\models\Users;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
 
@@ -13,24 +14,25 @@ AppAsset::register($this);
 $this->registerCsrfMetaTags();
 $this->registerMetaTag(['charset' => Yii::$app->charset], 'charset');
 $this->registerMetaTag(
-    ['name' => 'viewport', 'content' => 'width=device-width,initial-scale=1']
+    ['name' => 'viewport', 'content' => 'width=device-width,initial-scale=1'],
 );
 $this->registerMetaTag(
     [
-        'name'    => 'description',
-        'content' => $this->params['meta_description'] ?? ''
-    ]
+        'name' => 'description',
+        'content' => $this->params['meta_description'] ?? '',
+    ],
 );
 $this->registerMetaTag(
-    ['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? '']
+    ['name' => 'keywords', 'content' => $this->params['meta_keywords'] ?? ''],
 );
 $this->registerLinkTag(
     [
-        'rel'  => 'icon',
+        'rel' => 'icon',
         'type' => 'image/x-icon',
-        'href' => Yii::getAlias('@web/favicon.ico')
-    ]
+        'href' => Yii::getAlias('@web/favicon.ico'),
+    ],
 );
+$user = Users::find()->select('is_executor')->where(['id' => Yii::$app->user->id]);
 ?>
 <?php
 $this->beginPage() ?>
@@ -55,8 +57,7 @@ $this->beginBody() ?>
         <?php
         if (Url::current() === '/sign-up/index'): ?>
     </nav>
-    <?php
-    else : ?>
+    <?php else : ?>
         <div class="nav-wrapper">
             <ul class="nav-list">
                 <li class="list-item list-item--active">
@@ -65,10 +66,12 @@ $this->beginBody() ?>
                 <li class="list-item">
                     <a href="#" class="link link--nav">Мои задания</a>
                 </li>
+                <?php if (!$user->is_executor) : ?>
                 <li class="list-item">
                     <a href="/add-task" class="link link--nav">Создать
                         задание</a>
                 </li>
+                <?php endif ; ?>
                 <li class="list-item">
                     <a href="#" class="link link--nav">Настройки</a>
                 </li>
@@ -82,8 +85,8 @@ $this->beginBody() ?>
             </a>
             <div class="user-menu">
                 <p class="user-name"><?= htmlspecialchars(
-                        Yii::$app->user->identity->name
-                    ); ?></p>
+                    Yii::$app->user->identity->name,
+                ); ?></p>
                 <div class="popup-head">
                     <ul class="popup-menu">
                         <li class="menu-item">
