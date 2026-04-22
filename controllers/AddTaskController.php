@@ -7,6 +7,7 @@ use app\models\File;
 use app\models\TaskFile;
 use app\models\Task;
 use app\models\User;
+use app\validators\LocationValidator;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -66,6 +67,13 @@ class AddTaskController extends Controller
             $transaction = Yii::$app->db->beginTransaction();
 
             try {
+                [$long, $lat] = Yii::$app->yandexGeocoder->getCoordinates(
+                    $task->location
+                );
+
+                $task->long = $long;
+                $task->lat = $lat;
+
                 if (!$task->save() || !$this->uploadTaskFiles($task)) {
                     throw new \Exception(
                         'Ошибка при сохранении задания на сервер.',

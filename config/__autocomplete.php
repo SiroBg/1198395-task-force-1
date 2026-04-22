@@ -20,11 +20,15 @@ class Yii
 }
 
 /**
- * @property yii\rbac\DbManager $authManager
+ * @property yii\rbac\DbManager      $authManager
  * @property \yii\web\User|__WebUser $user
  */
 class __Application
 {
+    /**
+     * @var mixed|object|null
+     */
+    public mixed $yandexGeocoder;
 }
 
 /**
