@@ -2,6 +2,9 @@
 
 namespace app\actions;
 
+use app\models\Responds;
+use Yii;
+
 class actionRespond extends actionAbstract
 {
     public static function getName(): string
@@ -28,16 +31,17 @@ class actionRespond extends actionAbstract
         return $isExecutor && is_null($executorId) && $userId !== $authorId;
     }
 
-    public static function execute($task, $user, $respond)
+    public static function execute($task, $user)
     {
         $result = false;
+
+        $respond = new Responds();
+
+        $respond->task_id = $task->id;
+        $respond->executor_id = $user->id;
+
         if (Yii::$app->request->getIsPost()) {
             $respond->load(Yii::$app->request->post());
-
-            if (Yii::$app->request->isAjax) {
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($respond);
-            }
 
             if ($respond->validate()
                 && $task->applyAction(

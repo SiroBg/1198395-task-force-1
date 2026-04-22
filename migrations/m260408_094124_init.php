@@ -18,7 +18,7 @@ class m260408_094124_init extends Migration
         } else {
             throw new \yii\base\Exception(
                 "Отсутствует sql файл: $schemaSql. Выполните команду php sql-fill-cli.php,
-             чтобы конвертировать файлы из data.csv в sql"
+             чтобы конвертировать файлы из data.csv в sql",
             );
         }
     }
@@ -32,19 +32,4 @@ class m260408_094124_init extends Migration
 
         return false;
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m260408_094124_init cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

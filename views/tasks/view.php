@@ -11,8 +11,9 @@ use yii\widgets\ActiveForm;
  * @var \app\models\Responds  $responds   ;
  * @var \app\models\TaskFiles $taskFiles  ;
  * @var \app\models\Users     $user       ;
- * @var \app\models\Reviews   $review     ;
- * @var \app\models\Responds  $respond    ;
+ * @var \app\models\Reviews   $reviewForm ;
+ * @var \app\models\Responds  $respondForm;
+ * @var bool $hasResponds;
  */
 
 ?>
@@ -40,15 +41,15 @@ use yii\widgets\ActiveForm;
             ) as $action
         ): ?>
             <?php
-            if ($action->getName() !== 'action_start'): ?>
+            if ($action->getName() !== 'action_start' && !$hasResponds): ?>
                 <?= Html::a(
                     $action->getDescription(),
                     options: [
-                                        'class' => 'button button--'
-                                            . $action->getButtonColor()
-                                            . ' action-btn',
-                                        'data-action' => $action->getName(),
-                                    ],
+                                                                            'class' => 'button button--'
+                                                                                . $action->getButtonColor()
+                                                                                . ' action-btn',
+        'data-action' => $action->getName(),
+        ],
                 ); ?>
             <?php
             endif; ?>
@@ -74,9 +75,9 @@ use yii\widgets\ActiveForm;
             <?php
             foreach ($responds as $respond): ?>
                 <div class="response-card">
-                    <img class="customer-photo" src="img/man-glasses.png"
+                    <img class="customer-photo" src="<?= $respond->executor->profileImgFile ? $respond->executor->profileImgFile->url : '/img/avatar-placeholder.png' ?>"
                          width="146"
-                         height="156" alt="Фото заказчиков">
+                         height="156" alt="Фото заказчика">
                     <div class="feedback-wrapper">
                         <a href="<?= Url::toRoute(
                             ['users/view', 'id' => $respond->executor->id],
@@ -85,13 +86,20 @@ use yii\widgets\ActiveForm;
                                $respond->executor->name,
                            ); ?></a>
                         <div class="response-wrapper">
-                            <div class="stars-rating small"><span
-                                        class="fill-star">&nbsp;</span><span
-                                        class="fill-star">&nbsp;</span><span
-                                        class="fill-star">&nbsp;</span><span
-                                        class="fill-star">&nbsp;</span><span>&nbsp;</span>
+                            <div>
+                            <?= StarRating::widget([
+                                'name' => 'display_rating',
+                                'value' => $respond->executor->rating,
+                                'pluginOptions' => [
+                                    'displayOnly' => true,
+                                    'disabled' => true,
+                                    'size' => 'sm',
+                                    'showClear' => false,
+                                    'showCaption' => false,
+                                ],
+                            ]); ?>
                             </div>
-                            <p class="reviews">2 отзыва</p>
+                            <p class="reviews">Отзывов: <?= count($respond->executor->reviewsAsExecutor) ?></p>
                         </div>
                         <?php
                         if ($respond->comment): ?>
@@ -260,7 +268,6 @@ use yii\widgets\ActiveForm;
             <?php
             $form = ActiveForm::begin(
                 [
-                    'enableAjaxValidation' => true,
                     'method' => 'post',
                     'action' => [
                         'tasks/finish',
@@ -268,21 +275,21 @@ use yii\widgets\ActiveForm;
                     ],
                 ],
             ); ?>
-            <?= $form->field($review, 'comment')
+            <?= $form->field($reviewForm, 'comment')
                 ->textarea(
                     ['labelOptions' => ['class' => 'control-label']],
-                )->label('Ваш комментарий') ?>
-            <?= $form->field($review, 'rating')->widget(StarRating::class, [
+                ); ?>
+            <p class="completion-head control-label">Оценка работы</p>
+            <?= $form->field($reviewForm, 'rating')->widget(StarRating::class, [
                 'pluginOptions' => [
                     'size' => 'sm',
                     'stars' => 5,
-                    'min' => 1,
-                    'max' => 5,
                     'step' => 1,
                     'showClear' => false,
                     'showCaption' => false,
                 ],
-            ]); ?>
+
+            ])->label(false); ?>
             <?= Html::submitInput(
                 'Завершить',
                 ['class' => 'button button--pop-up button--blue'],
@@ -307,7 +314,6 @@ use yii\widgets\ActiveForm;
             <?php
             $form = ActiveForm::begin(
                 [
-                    'enableAjaxValidation' => true,
                     'method' => 'post',
                     'action' => [
                         'tasks/respond',
@@ -315,11 +321,11 @@ use yii\widgets\ActiveForm;
                     ],
                 ],
             ); ?>
-            <?= $form->field($respond, 'comment')
+            <?= $form->field($respondForm, 'comment')
                 ->textarea(
                     ['labelOptions' => ['class' => 'control-label']],
                 ) ?>
-            <?= $form->field($respond, 'price')
+            <?= $form->field($respondForm, 'price')
                 ->textInput(
                     ['labelOptions' => ['class' => 'control-label']],
                 ) ?>

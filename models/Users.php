@@ -25,10 +25,11 @@ use yii\web\IdentityInterface;
  * @property Files            $profileImgFile
  * @property Responds[]       $responds
  * @property Reviews[]        $reviews
- * @property Reviews[]        $reviews0
+ * @property Reviews[]        $reviewsAsExecutor
  * @property Tasks[]          $tasks
  * @property Tasks[]          $tasks0
  * @property UserCategories[] $userCategories
+ * @property float $rating
  */
 class Users extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -60,7 +61,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return Yii::$app->security->validatePassword(
             $password,
-            $this->password
+            $this->password,
         );
     }
 
@@ -84,10 +85,10 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
                     'birthday',
                     'phone',
                     'telegram',
-                    'about'
+                    'about',
                 ],
                 'default',
-                'value' => null
+                'value' => null,
             ],
             [['created_at', 'birthday'], 'safe'],
             [
@@ -97,9 +98,9 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
                     'city_id',
                     'password',
                     'password_retype',
-                    'is_executor'
+                    'is_executor',
                 ],
-                'required'
+                'required',
             ],
             [['city_id', 'is_executor', 'profile_img_file_id'], 'integer'],
             [['about'], 'string'],
@@ -109,7 +110,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
                 'password_retype',
                 'compare',
                 'compareAttribute' => 'password',
-                'message'          => 'Пароли не совпадают'
+                'message' => 'Пароли не совпадают',
             ],
             [['phone'], 'string', 'max' => 11],
             [['telegram'], 'string', 'max' => 64],
@@ -117,16 +118,16 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
             [
                 ['profile_img_file_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Files::class,
-                'targetAttribute' => ['profile_img_file_id' => 'id']
+                'skipOnError' => true,
+                'targetClass' => Files::class,
+                'targetAttribute' => ['profile_img_file_id' => 'id'],
             ],
             [
                 ['city_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Cities::class,
-                'targetAttribute' => ['city_id' => 'id']
+                'skipOnError' => true,
+                'targetClass' => Cities::class,
+                'targetAttribute' => ['city_id' => 'id'],
             ],
         ];
     }
@@ -137,19 +138,19 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function attributeLabels(): array
     {
         return [
-            'id'                  => 'ID',
-            'created_at'          => 'Created At',
-            'email'               => 'Email',
-            'name'                => 'Ваше имя',
-            'city_id'             => 'Город',
-            'password'            => 'Пароль',
-            'password_retype'     => 'Повтор пароля',
-            'is_executor'         => 'я собираюсь откликаться на заказы',
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'email' => 'Email',
+            'name' => 'Ваше имя',
+            'city_id' => 'Город',
+            'password' => 'Пароль',
+            'password_retype' => 'Повтор пароля',
+            'is_executor' => 'я собираюсь откликаться на заказы',
             'profile_img_file_id' => 'Profile Img File ID',
-            'birthday'            => 'Birthday',
-            'phone'               => 'Phone',
-            'telegram'            => 'Telegram',
-            'about'               => 'About',
+            'birthday' => 'Birthday',
+            'phone' => 'Phone',
+            'telegram' => 'Telegram',
+            'about' => 'About',
         ];
     }
 
@@ -194,11 +195,11 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Reviews0]].
+     * Gets query for [[ReviewsAsExecutor]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getReviews0(): \yii\db\ActiveQuery
+    public function getReviewsAsExecutor(): \yii\db\ActiveQuery
     {
         return $this->hasMany(Reviews::class, ['executor_id' => 'id']);
     }
@@ -240,4 +241,12 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
         }
     }
 
+    public function getRating()
+    {
+        $ratingSum = Reviews::find()->where(['executor_id' => $this->id])->sum('rating');
+        $reviewsCount = count($this->reviewsAsExecutor);
+        $failedTasks = count(Tasks::find()->where(['executor_id' => $this->id, 'status' => Tasks::STATUS_FAILED])->all());
+
+        return $ratingSum / ($reviewsCount + $failedTasks);
+    }
 }

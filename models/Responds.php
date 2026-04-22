@@ -53,7 +53,7 @@ class Responds extends \yii\db\ActiveRecord
                 'targetAttribute' => ['executor_id' => 'id'],
             ],
             [
-                ['executor_id', 'task_id'], 'unique', 'targetAttribute' => ['executor_id', 'task_id'],
+                ['executor_id', 'task_id'], 'unique', 'targetAttribute' => ['executor_id', 'task_id'], 'message' => 'Вы уже откликнулись на это задание',
             ],
         ];
     }

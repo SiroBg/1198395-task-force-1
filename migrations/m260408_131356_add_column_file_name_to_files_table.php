@@ -21,19 +21,4 @@ class m260408_131356_add_column_file_name_to_files_table extends Migration
 
         return false;
     }
-
-    /*
-    // Use up()/down() to run migration code without a transaction.
-    public function up()
-    {
-
-    }
-
-    public function down()
-    {
-        echo "m260408_131356_add_column_file_name_to_files_table cannot be reverted.\n";
-
-        return false;
-    }
-    */
 }

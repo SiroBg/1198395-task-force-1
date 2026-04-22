@@ -2,9 +2,8 @@
 
 namespace app\actions;
 
+use app\models\Reviews;
 use Yii;
-use yii\web\Response;
-use yii\widgets\ActiveForm;
 
 class actionFinish extends actionAbstract
 {
@@ -32,18 +31,18 @@ class actionFinish extends actionAbstract
         return !$isExecutor && $userId === $authorId && $userId !== $executorId;
     }
 
-    public static function execute($task, $user, $review)
+    public static function execute($task, $user)
     {
         $result = false;
 
+        $review = new Reviews();
+
+        $review->task_id = $task->id;
+        $review->author_id = $task->author_id;
+        $review->executor_id = $task->executor_id;
+
         if (Yii::$app->request->getIsPost()) {
             $review->load(Yii::$app->request->post());
-
-            if (Yii::$app->request->isAjax) {
-                Yii::$app->response->format = Response::FORMAT_JSON;
-                return ActiveForm::validate($review);
-            }
-
             if ($review->validate()
                 && $task->applyAction(
                     new actionFinish(),
@@ -53,7 +52,8 @@ class actionFinish extends actionAbstract
             ) {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
-                    if (!$task->save || !$review->save()) {
+
+                    if (!$task->save() || !$review->save()) {
                         throw new \Exception(
                             'Ошибка при сохранении данных на сервере.',
                         );
@@ -67,6 +67,7 @@ class actionFinish extends actionAbstract
                 }
             }
         }
+
         return $result;
     }
 }

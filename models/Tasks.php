@@ -401,8 +401,8 @@ class Tasks extends \yii\db\ActiveRecord
             $actionsToStatus[$this->status],
             function ($action) use ($userId, $isExecutor) {
                 return $action->checkRights(
-                    $this->executorId,
-                    $this->authorId,
+                    $this->executor_id,
+                    $this->author_id,
                     $userId,
                     $isExecutor,
                 );

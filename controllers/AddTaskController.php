@@ -18,11 +18,11 @@ class AddTaskController extends Controller
     {
         return [
             'access' => [
-                'class'        => \yii\filters\AccessControl::class,
+                'class' => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules'        => [
+                'rules' => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
@@ -46,7 +46,7 @@ class AddTaskController extends Controller
             );
 
             $task->author_id = Yii::$app->user->id;
-            $task->status = $task::STATUS_STATUS_NEW;
+            $task->status = $task::STATUS_NEW;
 
             if (Yii::$app->request->isAjax) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
@@ -70,7 +70,7 @@ class AddTaskController extends Controller
             }
         }
         return $this->render('index', [
-            'task'       => $task,
+            'task' => $task,
             'categories' => $categories,
         ]);
     }

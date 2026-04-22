@@ -115,11 +115,13 @@ class TasksController extends Controller
         )->one();
 
         $responds = [];
+        $hasResponds = false;
 
         if ($user->is_executor) {
             $responds = Responds::find()->where(
                 ['executor_id' => $user->id, 'task_id' => $task->id],
             )->all();
+            $hasResponds = in_array($user->id, array_column($responds, 'executor_id')) && $task->executor_id !== $user->id;
         } elseif ($task->author_id === $user->id) {
             $responds = Responds::find()->where(['task_id' => $task->id])
                 ->all();
@@ -128,7 +130,7 @@ class TasksController extends Controller
         $taskFiles = TaskFiles::find()->where(['task_id' => $task->id])
             ->all();
 
-        $review = new Reviews();
+        $reviewForm = new Reviews();
         $respondForm = new Responds();
 
         return $this->render(
@@ -138,8 +140,9 @@ class TasksController extends Controller
                 'responds' => $responds,
                 'taskFiles' => $taskFiles,
                 'user' => $user,
-                'review' => $review,
+                'reviewForm' => $reviewForm,
                 'respondForm' => $respondForm,
+                'hasResponds' => $hasResponds,
             ],
         );
     }
@@ -166,13 +169,7 @@ class TasksController extends Controller
             ['id' => Yii::$app->user->id],
         )->one();
 
-        $review = new Reviews();
-
-        $review->task_id = $task->id;
-        $review->author_id = $task->author_id;
-        $review->executor_id = $task->executor_id;
-
-        if (!actionFinish::execute($task, $user, $review)) {
+        if (!actionFinish::execute($task, $user)) {
             throw new Exception('Не удалось загрузить данные на сервер');
         }
 
@@ -188,12 +185,7 @@ class TasksController extends Controller
             ['id' => Yii::$app->user->id],
         )->one();
 
-        $respond = new Responds();
-
-        $respond->task_id = $taskId;
-        $respond->executor_id = $user->id;
-
-        if (!actionRespond::execute($task, $user, $respond)) {
+        if (!actionRespond::execute($task, $user)) {
             throw new Exception('Не удалось загрузить данные на сервер');
         }
 
