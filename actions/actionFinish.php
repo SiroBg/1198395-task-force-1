@@ -2,7 +2,10 @@
 
 namespace app\actions;
 
-use app\models\Reviews;
+use app\exceptions\TaskStatusException;
+use app\models\Review;
+use app\models\Task;
+use app\models\User;
 use Yii;
 
 class actionFinish extends actionAbstract
@@ -31,11 +34,14 @@ class actionFinish extends actionAbstract
         return !$isExecutor && $userId === $authorId && $userId !== $executorId;
     }
 
-    public static function execute($task, $user)
+    /**
+     * @throws TaskStatusException
+     */
+    public static function execute(Task $task, User $user): bool
     {
         $result = false;
 
-        $review = new Reviews();
+        $review = new Review();
 
         $review->task_id = $task->id;
         $review->author_id = $task->author_id;
@@ -52,7 +58,6 @@ class actionFinish extends actionAbstract
             ) {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
-
                     if (!$task->save() || !$review->save()) {
                         throw new \Exception(
                             'Ошибка при сохранении данных на сервере.',

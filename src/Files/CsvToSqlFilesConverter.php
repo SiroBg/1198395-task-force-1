@@ -5,9 +5,9 @@ namespace TaskForce\Files;
 use FilesystemIterator;
 use RuntimeException;
 use SplFileInfo;
-use TaskForce\Exceptions\DestinationFileException;
-use TaskForce\Exceptions\SourceDirectoryException;
-use TaskForce\Exceptions\SourceFileException;
+use app\exceptions\DestinationFileException;
+use app\exceptions\SourceDirectoryException;
+use app\exceptions\SourceFileException;
 
 /**
  * Конвертер файлов с данными в формате CSV в SQL.

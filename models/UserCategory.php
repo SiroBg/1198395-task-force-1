@@ -10,10 +10,10 @@ namespace app\models;
  * @property int         $user_id
  * @property int         $category_id
  *
- * @property Categories  $category
- * @property Users       $user
+ * @property Category    $category
+ * @property User        $user
  */
-class UserCategories extends \yii\db\ActiveRecord
+class UserCategory extends \yii\db\ActiveRecord
 {
 
 
@@ -38,14 +38,14 @@ class UserCategories extends \yii\db\ActiveRecord
                 ['category_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Categories::class,
+                'targetClass'     => Category::class,
                 'targetAttribute' => ['category_id' => 'id']
             ],
             [
                 ['user_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Users::class,
+                'targetClass'     => User::class,
                 'targetAttribute' => ['user_id' => 'id']
             ],
         ];
@@ -71,7 +71,7 @@ class UserCategories extends \yii\db\ActiveRecord
      */
     public function getCategory(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Categories::class, ['id' => 'category_id']);
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
     /**
@@ -81,7 +81,7 @@ class UserCategories extends \yii\db\ActiveRecord
      */
     public function getUser(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Users::class, ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 
 }

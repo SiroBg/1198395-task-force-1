@@ -2,6 +2,10 @@
 
 namespace app\actions;
 
+use app\exceptions\TaskStatusException;
+use app\models\Task;
+use app\models\User;
+use yii\db\Exception;
 use yii\web\ForbiddenHttpException;
 
 class actionCancel extends actionAbstract
@@ -30,7 +34,12 @@ class actionCancel extends actionAbstract
         return !$isExecutor && is_null($executorId) && $userId === $authorId;
     }
 
-    public static function execute($task, $user): bool
+    /**
+     * @throws TaskStatusException
+     * @throws Exception
+     * @throws ForbiddenHttpException
+     */
+    public static function execute(Task $task, User $user): bool
     {
         if (!$task->applyAction(
             new actionCancel(),

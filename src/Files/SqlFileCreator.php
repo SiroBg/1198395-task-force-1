@@ -5,7 +5,7 @@ namespace TaskForce\Files;
 use RuntimeException;
 use SplFileObject;
 
-use TaskForce\Exceptions\DestinationFileException;
+use app\exceptions\DestinationFileException;
 
 /**
  * Создатель sql файла с запросами на вставку значений в таблицу базы данных.
@@ -53,15 +53,9 @@ class SqlFileCreator
         }
 
         $this->fileObj->fwrite(
-            $this->addCharSet() . $this->addInsertQuery()
+            $this->addInsertQuery()
             . $this->addColumns() . $this->addValues(),
         );
-    }
-
-    private function addCharSet(): string
-    {
-        return "SET NAMES 'utf8mb4';\n"
-            . "SET CHARACTER SET 'utf8mb4';\n";
     }
 
     /**

@@ -13,10 +13,10 @@ namespace app\models;
  * @property int|null    $price
  * @property int         $rejected
  *
- * @property Users       $executor
- * @property Tasks       $task
+ * @property User        $executor
+ * @property Task        $task
  */
-class Responds extends \yii\db\ActiveRecord
+class Respond extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
@@ -41,19 +41,22 @@ class Responds extends \yii\db\ActiveRecord
             [
                 ['task_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Tasks::class,
+                'skipOnError'     => true,
+                'targetClass'     => Task::class,
                 'targetAttribute' => ['task_id' => 'id'],
             ],
             [
                 ['executor_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Users::class,
+                'skipOnError'     => true,
+                'targetClass'     => User::class,
                 'targetAttribute' => ['executor_id' => 'id'],
             ],
             [
-                ['executor_id', 'task_id'], 'unique', 'targetAttribute' => ['executor_id', 'task_id'], 'message' => 'Вы уже откликнулись на это задание',
+                ['executor_id', 'task_id'],
+                'unique',
+                'targetAttribute' => ['executor_id', 'task_id'],
+                'message'         => 'Вы уже откликнулись на это задание',
             ],
         ];
     }
@@ -64,13 +67,13 @@ class Responds extends \yii\db\ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id' => 'ID',
-            'created_at' => 'Created At',
-            'task_id' => 'Task ID',
+            'id'          => 'ID',
+            'created_at'  => 'Created At',
+            'task_id'     => 'Task ID',
             'executor_id' => 'Executor ID',
-            'comment' => 'Ваш комментарий',
-            'price' => 'Стоимость',
-            'rejected' => 'Rejected',
+            'comment'     => 'Ваш комментарий',
+            'price'       => 'Стоимость',
+            'rejected'    => 'Rejected',
         ];
     }
 
@@ -81,7 +84,7 @@ class Responds extends \yii\db\ActiveRecord
      */
     public function getExecutor(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Users::class, ['id' => 'executor_id']);
+        return $this->hasOne(User::class, ['id' => 'executor_id']);
     }
 
     /**
@@ -91,7 +94,7 @@ class Responds extends \yii\db\ActiveRecord
      */
     public function getTask(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 
 }

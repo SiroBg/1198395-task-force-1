@@ -2,8 +2,12 @@
 
 namespace app\actions;
 
-use app\models\Responds;
+use app\exceptions\TaskStatusException;
+use app\models\Respond;
+use app\models\Task;
+use app\models\User;
 use Yii;
+use yii\db\Exception;
 
 class actionRespond extends actionAbstract
 {
@@ -31,11 +35,15 @@ class actionRespond extends actionAbstract
         return $isExecutor && is_null($executorId) && $userId !== $authorId;
     }
 
-    public static function execute($task, $user)
+    /**
+     * @throws TaskStatusException
+     * @throws Exception
+     */
+    public static function execute(Task $task, User $user)
     {
         $result = false;
 
-        $respond = new Responds();
+        $respond = new Respond();
 
         $respond->task_id = $task->id;
         $respond->executor_id = $user->id;

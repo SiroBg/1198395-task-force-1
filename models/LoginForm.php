@@ -9,7 +9,7 @@ class LoginForm extends Model
     public string $email = '';
     public string $password = '';
 
-    private ?Users $_user = null;
+    private ?User $_user = null;
 
     public function rules(): array
     {
@@ -22,7 +22,7 @@ class LoginForm extends Model
     public function attributeLabels(): array
     {
         return [
-            'email' => 'Email',
+            'email'    => 'Email',
             'password' => 'Пароль',
         ];
     }
@@ -37,10 +37,10 @@ class LoginForm extends Model
         }
     }
 
-    public function getUser(): ?Users
+    public function getUser(): ?User
     {
         if ($this->_user === null) {
-            $this->_user = Users::findOne(['email' => $this->email]);
+            $this->_user = User::findOne(['email' => $this->email]);
         }
 
         return $this->_user;

@@ -8,34 +8,34 @@ use yii\web\IdentityInterface;
 /**
  * This is the model class for table "users".
  *
- * @property int              $id
- * @property string|null      $created_at
- * @property string           $email
- * @property string           $name
- * @property int              $city_id
- * @property string           $password
- * @property int              $is_executor
- * @property int|null         $profile_img_file_id
- * @property string|null      $birthday
- * @property string|null      $phone
- * @property string|null      $telegram
- * @property string|null      $about
+ * @property int            $id
+ * @property string|null    $created_at
+ * @property string         $email
+ * @property string         $name
+ * @property int            $city_id
+ * @property string         $password
+ * @property int            $is_executor
+ * @property int|null       $profile_img_file_id
+ * @property string|null    $birthday
+ * @property string|null    $phone
+ * @property string|null    $telegram
+ * @property string|null    $about
  *
- * @property Cities           $city
- * @property Files            $profileImgFile
- * @property Responds[]       $responds
- * @property Reviews[]        $reviews
- * @property Reviews[]        $reviewsAsExecutor
- * @property Tasks[]          $tasks
- * @property Tasks[]          $tasks0
- * @property UserCategories[] $userCategories
- * @property float $rating
+ * @property City           $city
+ * @property File           $profileImgFile
+ * @property Respond[]      $responds
+ * @property Review[]       $reviews
+ * @property Review[]       $reviewsAsExecutor
+ * @property Task[]         $tasks
+ * @property Task[]         $tasks0
+ * @property UserCategory[] $userCategories
+ * @property float          $rating
  */
-class Users extends \yii\db\ActiveRecord implements IdentityInterface
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
     public string $password_retype = '';
 
-    public static function findIdentity($id)
+    public static function findIdentity($id): User|IdentityInterface|null
     {
         return self::findOne($id);
     }
@@ -110,7 +110,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
                 'password_retype',
                 'compare',
                 'compareAttribute' => 'password',
-                'message' => 'Пароли не совпадают',
+                'message'          => 'Пароли не совпадают',
             ],
             [['phone'], 'string', 'max' => 11],
             [['telegram'], 'string', 'max' => 64],
@@ -118,15 +118,15 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
             [
                 ['profile_img_file_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Files::class,
+                'skipOnError'     => true,
+                'targetClass'     => File::class,
                 'targetAttribute' => ['profile_img_file_id' => 'id'],
             ],
             [
                 ['city_id'],
                 'exist',
-                'skipOnError' => true,
-                'targetClass' => Cities::class,
+                'skipOnError'     => true,
+                'targetClass'     => City::class,
                 'targetAttribute' => ['city_id' => 'id'],
             ],
         ];
@@ -138,19 +138,19 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
     public function attributeLabels(): array
     {
         return [
-            'id' => 'ID',
-            'created_at' => 'Created At',
-            'email' => 'Email',
-            'name' => 'Ваше имя',
-            'city_id' => 'Город',
-            'password' => 'Пароль',
-            'password_retype' => 'Повтор пароля',
-            'is_executor' => 'я собираюсь откликаться на заказы',
+            'id'                  => 'ID',
+            'created_at'          => 'Created At',
+            'email'               => 'Email',
+            'name'                => 'Ваше имя',
+            'city_id'             => 'Город',
+            'password'            => 'Пароль',
+            'password_retype'     => 'Повтор пароля',
+            'is_executor'         => 'я собираюсь откликаться на заказы',
             'profile_img_file_id' => 'Profile Img File ID',
-            'birthday' => 'Birthday',
-            'phone' => 'Phone',
-            'telegram' => 'Telegram',
-            'about' => 'About',
+            'birthday'            => 'Birthday',
+            'phone'               => 'Phone',
+            'telegram'            => 'Telegram',
+            'about'               => 'About',
         ];
     }
 
@@ -161,7 +161,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getCity(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Cities::class, ['id' => 'city_id']);
+        return $this->hasOne(City::class, ['id' => 'city_id']);
     }
 
     /**
@@ -171,7 +171,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getProfileImgFile(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Files::class, ['id' => 'profile_img_file_id']);
+        return $this->hasOne(File::class, ['id' => 'profile_img_file_id']);
     }
 
     /**
@@ -181,7 +181,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getResponds(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(Responds::class, ['executor_id' => 'id']);
+        return $this->hasMany(Respond::class, ['executor_id' => 'id']);
     }
 
     /**
@@ -191,7 +191,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getReviews(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(Reviews::class, ['author_id' => 'id']);
+        return $this->hasMany(Review::class, ['author_id' => 'id']);
     }
 
     /**
@@ -201,7 +201,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getReviewsAsExecutor(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(Reviews::class, ['executor_id' => 'id']);
+        return $this->hasMany(Review::class, ['executor_id' => 'id']);
     }
 
     /**
@@ -211,7 +211,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getTasks(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(Tasks::class, ['author_id' => 'id']);
+        return $this->hasMany(Task::class, ['author_id' => 'id']);
     }
 
     /**
@@ -221,7 +221,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getTasks0(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(Tasks::class, ['executor_id' => 'id']);
+        return $this->hasMany(Task::class, ['executor_id' => 'id']);
     }
 
     /**
@@ -231,7 +231,7 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getUserCategories(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(UserCategories::class, ['user_id' => 'id']);
+        return $this->hasMany(UserCategory::class, ['user_id' => 'id']);
     }
 
     public function getName()
@@ -241,12 +241,24 @@ class Users extends \yii\db\ActiveRecord implements IdentityInterface
         }
     }
 
-    public function getRating()
+    public function getRating(): float|int
     {
-        $ratingSum = Reviews::find()->where(['executor_id' => $this->id])->sum('rating');
-        $reviewsCount = count($this->reviewsAsExecutor);
-        $failedTasks = count(Tasks::find()->where(['executor_id' => $this->id, 'status' => Tasks::STATUS_FAILED])->all());
+        $result = 0;
 
-        return $ratingSum / ($reviewsCount + $failedTasks);
+        $ratingSum = Review::find()->where(['executor_id' => $this->id])->sum(
+            'rating'
+        );
+        $reviewsCount = count($this->reviewsAsExecutor);
+        $failedTasks = count(
+            Task::find()->where(
+                ['executor_id' => $this->id, 'status' => Task::STATUS_FAILED]
+            )->all()
+        );
+
+        if ($reviewsCount + $failedTasks !== 0) {
+            $result = $ratingSum / ($reviewsCount + $failedTasks);
+        }
+
+        return $result;
     }
 }

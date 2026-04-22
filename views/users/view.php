@@ -1,7 +1,7 @@
 <?php
 
 /**
- * @var \app\models\Users $user ;
+ * @var \app\models\User $user ;
  */
 
 use yii\helpers\Html;

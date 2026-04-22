@@ -13,11 +13,11 @@ namespace app\models;
  * @property string      $comment
  * @property int         $rating
  *
- * @property Users       $author
- * @property Users       $executor
- * @property Tasks       $task
+ * @property User        $author
+ * @property User        $executor
+ * @property Task        $task
  */
-class Reviews extends \yii\db\ActiveRecord
+class Review extends \yii\db\ActiveRecord
 {
 
 
@@ -46,21 +46,21 @@ class Reviews extends \yii\db\ActiveRecord
                 ['task_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Tasks::class,
+                'targetClass'     => Task::class,
                 'targetAttribute' => ['task_id' => 'id']
             ],
             [
                 ['author_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Users::class,
+                'targetClass'     => User::class,
                 'targetAttribute' => ['author_id' => 'id']
             ],
             [
                 ['executor_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Users::class,
+                'targetClass'     => User::class,
                 'targetAttribute' => ['executor_id' => 'id']
             ],
         ];
@@ -89,7 +89,7 @@ class Reviews extends \yii\db\ActiveRecord
      */
     public function getAuthor(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Users::class, ['id' => 'author_id']);
+        return $this->hasOne(User::class, ['id' => 'author_id']);
     }
 
     /**
@@ -99,7 +99,7 @@ class Reviews extends \yii\db\ActiveRecord
      */
     public function getExecutor(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Users::class, ['id' => 'executor_id']);
+        return $this->hasOne(User::class, ['id' => 'executor_id']);
     }
 
     /**
@@ -109,7 +109,7 @@ class Reviews extends \yii\db\ActiveRecord
      */
     public function getTask(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 
 }

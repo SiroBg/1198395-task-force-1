@@ -1,8 +1,8 @@
 <?php
 
 /**
- * @var \app\models\Users  $user   ;
- * @var \app\models\Cities $cities ;
+ * @var \app\models\User $user ;
+ * @var \app\models\City $cities ;
  */
 
 use yii\helpers\ArrayHelper;

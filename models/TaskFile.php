@@ -12,10 +12,10 @@ use Yii;
  * @property int         $task_id
  * @property int         $file_id
  *
- * @property Files       $file
- * @property Tasks       $task
+ * @property File        $file
+ * @property Task        $task
  */
-class TaskFiles extends \yii\db\ActiveRecord
+class TaskFile extends \yii\db\ActiveRecord
 {
 
 
@@ -40,14 +40,14 @@ class TaskFiles extends \yii\db\ActiveRecord
                 ['task_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Tasks::class,
+                'targetClass'     => Task::class,
                 'targetAttribute' => ['task_id' => 'id']
             ],
             [
                 ['file_id'],
                 'exist',
                 'skipOnError'     => true,
-                'targetClass'     => Files::class,
+                'targetClass'     => File::class,
                 'targetAttribute' => ['file_id' => 'id']
             ],
         ];
@@ -73,7 +73,7 @@ class TaskFiles extends \yii\db\ActiveRecord
      */
     public function getFile(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Files::class, ['id' => 'file_id']);
+        return $this->hasOne(File::class, ['id' => 'file_id']);
     }
 
     /**
@@ -83,7 +83,7 @@ class TaskFiles extends \yii\db\ActiveRecord
      */
     public function getTask(): \yii\db\ActiveQuery
     {
-        return $this->hasOne(Tasks::class, ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id']);
     }
 
 }

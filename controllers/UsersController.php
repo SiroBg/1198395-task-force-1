@@ -2,7 +2,7 @@
 
 namespace app\controllers;
 
-use app\models\Users;
+use app\models\User;
 use Yii;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
@@ -29,7 +29,7 @@ class UsersController extends Controller
      */
     public function actionView(int $id): string
     {
-        $user = Users::findOne($id);
+        $user = User::findOne($id);
 
         if ($user === null) {
             throw new NotFoundHttpException('Страница не найдена');

@@ -2,26 +2,27 @@
 
 namespace app\models;
 
+
 /**
- * This is the model class for table "files".
+ * This is the model class for table "cities".
  *
  * @property int         $id
  * @property string|null $created_at
- * @property string      $url
- * @property string      $file_path
  * @property string      $name
+ * @property float       $lat
+ * @property float       $long
  *
- * @property TaskFiles[] $taskFiles
- * @property Users[]     $users
+ * @property Task[]      $tasks
+ * @property User[]      $users
  */
-class Files extends \yii\db\ActiveRecord
+class City extends \yii\db\ActiveRecord
 {
     /**
      * {@inheritdoc}
      */
     public static function tableName(): string
     {
-        return 'files';
+        return 'cities';
     }
 
     /**
@@ -31,8 +32,9 @@ class Files extends \yii\db\ActiveRecord
     {
         return [
             [['created_at'], 'safe'],
-            [['url', 'file_path', 'name'], 'required'],
-            [['url', 'file_path', 'name'], 'string', 'max' => 256],
+            [['name', 'lat', 'long'], 'required'],
+            [['lat', 'long'], 'number'],
+            [['name'], 'string', 'max' => 256],
         ];
     }
 
@@ -44,20 +46,20 @@ class Files extends \yii\db\ActiveRecord
         return [
             'id'         => 'ID',
             'created_at' => 'Created At',
-            'url'        => 'Url',
-            'file_path'  => 'File Path',
             'name'       => 'Name',
+            'lat'        => 'Lat',
+            'long'       => 'Long',
         ];
     }
 
     /**
-     * Gets query for [[TaskFiles]].
+     * Gets query for [[Tasks]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTaskFiles(): \yii\db\ActiveQuery
+    public function getTasks(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(TaskFiles::class, ['file_id' => 'id']);
+        return $this->hasMany(Task::class, ['city_id' => 'id']);
     }
 
     /**
@@ -67,12 +69,7 @@ class Files extends \yii\db\ActiveRecord
      */
     public function getUsers(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(Users::class, ['profile_img_file_id' => 'id']);
-    }
-
-    public function getId(): int
-    {
-        return $this->id;
+        return $this->hasMany(User::class, ['city_id' => 'id']);
     }
 
 }

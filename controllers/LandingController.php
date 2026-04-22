@@ -10,7 +10,7 @@ use yii\widgets\ActiveForm;
 
 class LandingController extends Controller
 {
-    public function behaviors()
+    public function behaviors(): array
     {
         return [
             'access' => [

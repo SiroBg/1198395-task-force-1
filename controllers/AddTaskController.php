@@ -2,11 +2,11 @@
 
 namespace app\controllers;
 
-use app\models\Categories;
-use app\models\Files;
-use app\models\TaskFiles;
-use app\models\Tasks;
-use app\models\Users;
+use app\models\Category;
+use app\models\File;
+use app\models\TaskFile;
+use app\models\Task;
+use app\models\User;
 use Yii;
 use yii\web\Controller;
 use yii\web\Response;
@@ -19,11 +19,11 @@ class AddTaskController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class'        => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules' => [
+                'rules'        => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
@@ -35,7 +35,7 @@ class AddTaskController extends Controller
 
     public function actionIndex(): array|Response|string
     {
-        $user = Users::find()->select(['id', 'is_executor'])->where(
+        $user = User::find()->select(['id', 'is_executor'])->where(
             ['id' => Yii::$app->user->id],
         )->one();
 
@@ -43,9 +43,9 @@ class AddTaskController extends Controller
             $this->redirect('/');
         }
 
-        $categories = Categories::find()->select(['id', 'name'])->all();
+        $categories = Category::find()->select(['id', 'name'])->all();
 
-        $task = new Tasks();
+        $task = new Task();
 
         if (Yii::$app->request->getIsPost()) {
             $task->load(Yii::$app->request->post());
@@ -80,12 +80,12 @@ class AddTaskController extends Controller
             }
         }
         return $this->render('index', [
-            'task' => $task,
+            'task'       => $task,
             'categories' => $categories,
         ]);
     }
 
-    private function uploadTaskFiles(Tasks $task): bool
+    private function uploadTaskFiles(Task $task): bool
     {
         $success = true;
 
@@ -94,14 +94,14 @@ class AddTaskController extends Controller
                 $fileName = uniqid() . '.' . $file->extension;
                 $file->saveAs('@webroot/uploads/' . $fileName);
 
-                $newFile = new Files();
+                $newFile = new File();
                 $newFile->file_path = Yii::getAlias('@webroot/uploads/')
                     . $fileName;
                 $newFile->url = '/uploads/' . $fileName;
                 $newFile->name = $file->name;
 
                 if ($newFile->save()) {
-                    $taskFile = new TaskFiles();
+                    $taskFile = new TaskFile();
                     $taskFile->task_id = $task->id;
                     $taskFile->file_id = $newFile->id;
 

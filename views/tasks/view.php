@@ -1,19 +1,19 @@
 <?php
 
-use app\models\Tasks;
+use app\models\Task;
 use kartik\rating\StarRating;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
 
 /**
- * @var \app\models\Tasks     $task       ;
- * @var \app\models\Responds  $responds   ;
- * @var \app\models\TaskFiles $taskFiles  ;
- * @var \app\models\Users     $user       ;
- * @var \app\models\Reviews   $reviewForm ;
- * @var \app\models\Responds  $respondForm;
- * @var bool $hasResponds;
+ * @var \app\models\Task     $task        ;
+ * @var \app\models\Respond  $responds    ;
+ * @var \app\models\TaskFile $taskFiles   ;
+ * @var \app\models\User     $user        ;
+ * @var \app\models\Review   $reviewForm  ;
+ * @var \app\models\Respond  $respondForm ;
+ * @var bool                 $hasResponds ;
  */
 
 ?>
@@ -25,14 +25,14 @@ use yii\widgets\ActiveForm;
             <?php
             if ($task->budget): ?>
                 <p class="price price--big"><?= Html::encode(
-                    $task->budget,
-                ); ?>₽</p>
+                        $task->budget,
+                    ); ?>₽</p>
             <?php
             endif; ?>
         </div>
         <p class="task-description"><?= Html::encode(
-            $task->description,
-        ); ?></p>
+                $task->description,
+            ); ?></p>
         <?php
         foreach (
             $task->getActions(
@@ -45,11 +45,11 @@ use yii\widgets\ActiveForm;
                 <?= Html::a(
                     $action->getDescription(),
                     options: [
-                                                                            'class' => 'button button--'
-                                                                                . $action->getButtonColor()
-                                                                                . ' action-btn',
-        'data-action' => $action->getName(),
-        ],
+                        'class'       => 'button button--'
+                            . $action->getButtonColor()
+                            . ' action-btn',
+                        'data-action' => $action->getName(),
+                    ],
                 ); ?>
             <?php
             endif; ?>
@@ -62,8 +62,8 @@ use yii\widgets\ActiveForm;
                      alt="<?= Html::encode($task->location); ?>">
                 <p class="map-address town"><?= $task->city->name; ?></p>
                 <p class="map-address"><?= Html::encode(
-                    $task->location,
-                ); ?></p>
+                        $task->location,
+                    ); ?></p>
             </div>
         <?php
         endif; ?>
@@ -75,7 +75,10 @@ use yii\widgets\ActiveForm;
             <?php
             foreach ($responds as $respond): ?>
                 <div class="response-card">
-                    <img class="customer-photo" src="<?= $respond->executor->profileImgFile ? $respond->executor->profileImgFile->url : '/img/avatar-placeholder.png' ?>"
+                    <img class="customer-photo"
+                         src="<?= $respond->executor->profileImgFile
+                             ? $respond->executor->profileImgFile->url
+                             : '/img/avatar-placeholder.png' ?>"
                          width="146"
                          height="156" alt="Фото заказчика">
                     <div class="feedback-wrapper">
@@ -83,23 +86,25 @@ use yii\widgets\ActiveForm;
                             ['users/view', 'id' => $respond->executor->id],
                         ); ?>"
                            class="link link--block link--big"><?= Html::encode(
-                               $respond->executor->name,
-                           ); ?></a>
+                                $respond->executor->name,
+                            ); ?></a>
                         <div class="response-wrapper">
                             <div>
-                            <?= StarRating::widget([
-                                'name' => 'display_rating',
-                                'value' => $respond->executor->rating,
-                                'pluginOptions' => [
-                                    'displayOnly' => true,
-                                    'disabled' => true,
-                                    'size' => 'sm',
-                                    'showClear' => false,
-                                    'showCaption' => false,
-                                ],
-                            ]); ?>
+                                <?= StarRating::widget([
+                                    'name'          => 'display_rating',
+                                    'value'         => $respond->executor->rating,
+                                    'pluginOptions' => [
+                                        'displayOnly' => true,
+                                        'disabled'    => true,
+                                        'size'        => 'sm',
+                                        'showClear'   => false,
+                                        'showCaption' => false,
+                                    ],
+                                ]); ?>
                             </div>
-                            <p class="reviews">Отзывов: <?= count($respond->executor->reviewsAsExecutor) ?></p>
+                            <p class="reviews">Отзывов: <?= count(
+                                    $respond->executor->reviewsAsExecutor
+                                ) ?></p>
                         </div>
                         <?php
                         if ($respond->comment): ?>
@@ -112,8 +117,8 @@ use yii\widgets\ActiveForm;
                     <div class="feedback-wrapper">
                         <p class="info-text"><span
                                     class="current-time"><?= Yii::$app->formatter->asRelativeTime(
-                                        $respond->created_at,
-                                    ); ?></span>
+                                    $respond->created_at,
+                                ); ?></span>
                         </p>
                         <?php
                         if ($respond->price): ?>
@@ -123,7 +128,7 @@ use yii\widgets\ActiveForm;
                         endif; ?>
                     </div>
                     <?php
-                    if ($task->status === Tasks::STATUS_NEW
+                    if ($task->status === Task::STATUS_NEW
                         && $task->author_id === $user->id
                         && !$respond->rejected
                     ): ?>
@@ -132,7 +137,7 @@ use yii\widgets\ActiveForm;
                                 'Принять',
                                 [
                                     'tasks/start',
-                                    'taskId' => $task->id,
+                                    'taskId'     => $task->id,
                                     'executorId' => $respond->executor_id,
                                 ],
                                 [
@@ -143,7 +148,7 @@ use yii\widgets\ActiveForm;
                                 'Отказать',
                                 [
                                     'tasks/reject',
-                                    'taskId' => $task->id,
+                                    'taskId'    => $task->id,
                                     'respondId' => $respond->id,
                                 ],
                                 [
@@ -167,13 +172,13 @@ use yii\widgets\ActiveForm;
                 <dd><?= $task->category->name; ?></dd>
                 <dt>Дата публикации</dt>
                 <dd><?= Yii::$app->formatter->asRelativeTime(
-                    $task->created_at,
-                ); ?></dd>
+                        $task->created_at,
+                    ); ?></dd>
                 <dt>Срок выполнения</dt>
                 <dd><?= Yii::$app->formatter->asDatetime(
-                    $task->expire_date,
-                    'php:d.m.Y, H:i',
-                ); ?></dd>
+                        $task->expire_date,
+                        'php:d.m.Y, H:i',
+                    ); ?></dd>
                 <dt>Статус</dt>
                 <dd><?= $task->displayStatus() ?></dd>
             </dl>
@@ -184,32 +189,32 @@ use yii\widgets\ActiveForm;
                 <h4 class="head-card">Файлы задания</h4>
                 <ul class="enumeration-list">
                     <?php
-                foreach ($taskFiles as $file): ?>
+                    foreach ($taskFiles as $file): ?>
                         <?php
-                    if (file_exists(
-                        Yii::getAlias('@webroot/') . $file->file->url,
-                    )
-                    ): ?>
+                        if (file_exists(
+                            Yii::getAlias('@webroot/') . $file->file->url,
+                        )
+                        ): ?>
                             <li class="enumeration-item">
                                 <?= Html::a(
                                     $file->file->name,
                                     Url::to($file->file->url),
                                     [
                                         'target' => '_blank',
-                                        'class' => 'link link--block link--clip',
+                                        'class'  => 'link link--block link--clip',
                                     ],
                                 ); ?>
                                 <p class="file-size"><?= Yii::$app->formatter->asShortSize(
-                                    filesize(
-                                        Yii::getAlias('@webroot/')
+                                        filesize(
+                                            Yii::getAlias('@webroot/')
                                             . $file->file->url,
-                                    ),
-                                ); ?></p>
+                                        ),
+                                    ); ?></p>
                             </li>
                         <?php
-                    endif; ?>
+                        endif; ?>
                     <?php
-                endforeach; ?>
+                    endforeach; ?>
                 </ul>
             </div>
         <?php
@@ -282,10 +287,10 @@ use yii\widgets\ActiveForm;
             <p class="completion-head control-label">Оценка работы</p>
             <?= $form->field($reviewForm, 'rating')->widget(StarRating::class, [
                 'pluginOptions' => [
-                    'size' => 'sm',
-                    'stars' => 5,
-                    'step' => 1,
-                    'showClear' => false,
+                    'size'        => 'sm',
+                    'stars'       => 5,
+                    'step'        => 1,
+                    'showClear'   => false,
                     'showCaption' => false,
                 ],
 

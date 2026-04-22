@@ -5,15 +5,15 @@ namespace app\models;
 /**
  * This is the model class for table "categories".
  *
- * @property int              $id
- * @property string|null      $created_at
- * @property string           $name
- * @property string           $icon
+ * @property int            $id
+ * @property string|null    $created_at
+ * @property string         $name
+ * @property string         $icon
  *
- * @property Tasks[]          $tasks
- * @property UserCategories[] $userCategories
+ * @property Task[]         $tasks
+ * @property UserCategory[] $userCategories
  */
-class Categories extends \yii\db\ActiveRecord
+class Category extends \yii\db\ActiveRecord
 {
 
 
@@ -57,7 +57,7 @@ class Categories extends \yii\db\ActiveRecord
      */
     public function getTasks(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(Tasks::class, ['category_id' => 'id']);
+        return $this->hasMany(Task::class, ['category_id' => 'id']);
     }
 
     /**
@@ -67,7 +67,7 @@ class Categories extends \yii\db\ActiveRecord
      */
     public function getUserCategories(): \yii\db\ActiveQuery
     {
-        return $this->hasMany(UserCategories::class, ['category_id' => 'id']);
+        return $this->hasMany(UserCategory::class, ['category_id' => 'id']);
     }
 
 }

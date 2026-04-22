@@ -5,7 +5,7 @@
 /** @var string $content */
 
 use app\assets\AppAsset;
-use app\models\Users;
+use app\models\User;
 use yii\bootstrap5\Html;
 use yii\helpers\Url;
 
@@ -18,7 +18,7 @@ $this->registerMetaTag(
 );
 $this->registerMetaTag(
     [
-        'name' => 'description',
+        'name'    => 'description',
         'content' => $this->params['meta_description'] ?? '',
     ],
 );
@@ -27,12 +27,14 @@ $this->registerMetaTag(
 );
 $this->registerLinkTag(
     [
-        'rel' => 'icon',
+        'rel'  => 'icon',
         'type' => 'image/x-icon',
         'href' => Yii::getAlias('@web/favicon.ico'),
     ],
 );
-$user = Users::find()->select('is_executor')->where(['id' => Yii::$app->user->id]);
+$user = User::find()->select(['is_executor', 'name'])->where(
+    ['id' => Yii::$app->user->id]
+)->one();
 ?>
 <?php
 $this->beginPage() ?>
@@ -57,7 +59,8 @@ $this->beginBody() ?>
         <?php
         if (Url::current() === '/sign-up/index'): ?>
     </nav>
-    <?php else : ?>
+    <?php
+    else : ?>
         <div class="nav-wrapper">
             <ul class="nav-list">
                 <li class="list-item list-item--active">
@@ -66,12 +69,14 @@ $this->beginBody() ?>
                 <li class="list-item">
                     <a href="#" class="link link--nav">Мои задания</a>
                 </li>
-                <?php if (!$user->is_executor) : ?>
-                <li class="list-item">
-                    <a href="/add-task" class="link link--nav">Создать
-                        задание</a>
-                </li>
-                <?php endif ; ?>
+                <?php
+                if (!$user->is_executor) : ?>
+                    <li class="list-item">
+                        <a href="/add-task" class="link link--nav">Создать
+                            задание</a>
+                    </li>
+                <?php
+                endif; ?>
                 <li class="list-item">
                     <a href="#" class="link link--nav">Настройки</a>
                 </li>
@@ -85,8 +90,8 @@ $this->beginBody() ?>
             </a>
             <div class="user-menu">
                 <p class="user-name"><?= htmlspecialchars(
-                    Yii::$app->user->identity->name,
-                ); ?></p>
+                        $user->name,
+                    ); ?></p>
                 <div class="popup-head">
                     <ul class="popup-menu">
                         <li class="menu-item">

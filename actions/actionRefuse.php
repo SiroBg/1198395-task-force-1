@@ -2,8 +2,10 @@
 
 namespace app\actions;
 
-use app\models\Tasks;
-use app\models\Users;
+use app\exceptions\TaskStatusException;
+use app\models\Task;
+use app\models\User;
+use yii\db\Exception;
 use yii\web\ForbiddenHttpException;
 
 class actionRefuse extends actionAbstract
@@ -32,7 +34,12 @@ class actionRefuse extends actionAbstract
         return $isExecutor && $userId === $executorId && $userId !== $authorId;
     }
 
-    public static function execute(Tasks $task, Users $user): bool
+    /**
+     * @throws Exception
+     * @throws TaskStatusException
+     * @throws ForbiddenHttpException
+     */
+    public static function execute(Task $task, User $user): bool
     {
         if (!$task->applyAction(
             new actionRefuse(),

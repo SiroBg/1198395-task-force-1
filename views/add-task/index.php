@@ -1,7 +1,7 @@
 <?php
 /**
- * @var \app\models\Tasks      $task       ;
- * @var \app\models\Categories $categories ;
+ * @var \app\models\Task     $task       ;
+ * @var \app\models\Category $categories ;
  *
  */
 
@@ -55,7 +55,7 @@ use yii\widgets\ActiveForm;
         <?= $form->field(
             $task,
             'task_files[]',
-            ['template' => '<label for="tasks-task_files"><div class="new-file">Добавить новый файл</div>{input}{error}</label>'],
+            ['template' => '<label for="task-task_files"><div class="new-file">Добавить новый файл</div>{input}{error}</label>'],
         )
             ->fileInput([
                 'multiple' => true,

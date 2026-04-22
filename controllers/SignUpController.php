@@ -2,9 +2,10 @@
 
 namespace app\controllers;
 
-use app\models\Cities;
-use app\models\Users;
+use app\models\City;
+use app\models\User;
 use Yii;
+use yii\base\Exception;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\widgets\ActiveForm;
@@ -29,11 +30,15 @@ class SignUpController extends Controller
         ];
     }
 
+    /**
+     * @throws Exception
+     * @throws \yii\db\Exception
+     */
     public function actionIndex(): array|Response|string
     {
-        $cities = Cities::find()->select(['id', 'name'])->all();
+        $cities = City::find()->select(['id', 'name'])->all();
 
-        $user = new Users();
+        $user = new User();
         if (Yii::$app->request->getIsPost()) {
             $user->load(Yii::$app->request->post());
             if (Yii::$app->request->isAjax) {
