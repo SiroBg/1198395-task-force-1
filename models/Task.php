@@ -81,8 +81,8 @@ class Task extends \yii\db\ActiveRecord
             [
                 'expire_date',
                 'date',
-                'format'   => 'php:Y-m-d',
-                'min'      => date('Y-m-d'),
+                'format' => 'php:Y-m-d',
+                'min' => date('Y-m-d'),
                 'tooSmall' => 'Выберите дату позже ' . date('d.m.Y'),
             ],
             [
@@ -108,6 +108,7 @@ class Task extends \yii\db\ActiveRecord
             ],
             [['lat', 'long'], 'number'],
             [['name', 'location'], 'string', 'max' => 256],
+            ['location', \app\components\LocationValidator::class, 'apiKey' => $_ENV['API_KEY']],
             [
                 'name',
                 'validateStringLengthNoSpaces',
@@ -117,29 +118,29 @@ class Task extends \yii\db\ActiveRecord
             [
                 ['author_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => User::class,
+                'skipOnError' => true,
+                'targetClass' => User::class,
                 'targetAttribute' => ['author_id' => 'id'],
             ],
             [
                 ['executor_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => User::class,
+                'skipOnError' => true,
+                'targetClass' => User::class,
                 'targetAttribute' => ['executor_id' => 'id'],
             ],
             [
                 ['category_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Category::class,
+                'skipOnError' => true,
+                'targetClass' => Category::class,
                 'targetAttribute' => ['category_id' => 'id'],
             ],
             [
                 ['city_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => City::class,
+                'skipOnError' => true,
+                'targetClass' => City::class,
                 'targetAttribute' => ['city_id' => 'id'],
             ],
             ['task_files', 'file', 'maxFiles' => 0, 'skipOnEmpty' => true],
@@ -152,21 +153,21 @@ class Task extends \yii\db\ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id'          => 'ID',
-            'created_at'  => 'Created At',
-            'author_id'   => 'Author ID',
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'author_id' => 'Author ID',
             'executor_id' => 'Executor ID',
-            'name'        => 'Опишите суть работы',
+            'name' => 'Опишите суть работы',
             'description' => 'Подробности задания',
             'category_id' => 'Категория',
-            'location'    => 'Локация',
-            'lat'         => 'Lat',
-            'long'        => 'Long',
-            'city_id'     => 'City ID',
-            'budget'      => 'Бюджет',
+            'location' => 'Локация',
+            'lat' => 'Lat',
+            'long' => 'Long',
+            'city_id' => 'City ID',
+            'budget' => 'Бюджет',
             'expire_date' => 'Срок исполнения',
-            'status'      => 'Status',
-            'task_files'  => 'Файлы',
+            'status' => 'Status',
+            'task_files' => 'Файлы',
         ];
     }
 
@@ -248,11 +249,11 @@ class Task extends \yii\db\ActiveRecord
     public static function optsStatus(): array
     {
         return [
-            self::STATUS_NEW      => 'Новое',
+            self::STATUS_NEW => 'Новое',
             self::STATUS_CANCELED => 'Отменено',
-            self::STATUS_ACTIVE   => 'Выполняется',
+            self::STATUS_ACTIVE => 'Выполняется',
             self::STATUS_FINISHED => 'Завершено',
-            self::STATUS_FAILED   => 'Провалено',
+            self::STATUS_FAILED => 'Провалено',
         ];
     }
 
@@ -375,19 +376,19 @@ class Task extends \yii\db\ActiveRecord
         bool $isExecutor,
     ): array {
         $actionsToStatus = [
-            self::STATUS_NEW      =>
+            self::STATUS_NEW =>
                 [
                     new actionCancel(),
                     new actionRespond(),
                     new actionStart(),
                 ],
-            self::STATUS_ACTIVE   =>
+            self::STATUS_ACTIVE =>
                 [
                     new actionFinish(),
                     new actionRefuse(),
                 ],
             self::STATUS_CANCELED => [],
-            self::STATUS_FAILED   => [],
+            self::STATUS_FAILED => [],
             self::STATUS_FINISHED => [],
         ];
 
@@ -423,7 +424,7 @@ class Task extends \yii\db\ActiveRecord
         actionAbstract $action,
         int $userId,
         bool $isExecutor,
-        ?int $executorId = null
+        ?int $executorId = null,
     ): bool {
         $result = false;
 
