@@ -108,7 +108,7 @@ class Task extends \yii\db\ActiveRecord
             ],
             [['lat', 'long'], 'number'],
             [['name', 'location'], 'string', 'max' => 256],
-            ['location', \app\components\LocationValidator::class, 'apiKey' => $_ENV['API_KEY']],
+            //['location', \app\components\LocationValidator::class, 'apiKey' => $_ENV['API_KEY']],
             [
                 'name',
                 'validateStringLengthNoSpaces',
