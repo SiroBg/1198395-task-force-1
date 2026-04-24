@@ -1,5 +1,4 @@
 <?php
-
 /** @var yii\web\View $this */
 
 /** @var string $content */
@@ -18,7 +17,7 @@ $this->registerMetaTag(
 );
 $this->registerMetaTag(
     [
-        'name'    => 'description',
+        'name' => 'description',
         'content' => $this->params['meta_description'] ?? '',
     ],
 );
@@ -27,13 +26,13 @@ $this->registerMetaTag(
 );
 $this->registerLinkTag(
     [
-        'rel'  => 'icon',
+        'rel' => 'icon',
         'type' => 'image/x-icon',
         'href' => Yii::getAlias('@web/favicon.ico'),
     ],
 );
 $user = User::find()->select(['is_executor', 'name'])->where(
-    ['id' => Yii::$app->user->id]
+    ['id' => Yii::$app->user->id],
 )->one();
 ?>
 <?php
@@ -59,8 +58,7 @@ $this->beginBody() ?>
         <?php
         if (Url::current() === '/sign-up/index'): ?>
     </nav>
-    <?php
-    else : ?>
+    <?php else : ?>
         <div class="nav-wrapper">
             <ul class="nav-list">
                 <li class="list-item list-item--active">
@@ -90,8 +88,8 @@ $this->beginBody() ?>
             </a>
             <div class="user-menu">
                 <p class="user-name"><?= htmlspecialchars(
-                        $user->name,
-                    ); ?></p>
+                    $user->name,
+                ); ?></p>
                 <div class="popup-head">
                     <ul class="popup-menu">
                         <li class="menu-item">

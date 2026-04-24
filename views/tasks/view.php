@@ -16,6 +16,15 @@ use yii\widgets\ActiveForm;
  * @var bool                 $hasResponds ;
  */
 
+$this->registerJsFile(
+    'https://api-maps.yandex.ru/2.1/?apikey='
+    . Yii::$app->params['yandexJsApiKey'] . '&lang=ru_RU',
+    ['position' => \yii\web\View::POS_END,]
+);
+$this->registerJsFile(
+    '/js/yandexMap.js',
+    ['position' => \yii\web\View::POS_END,]
+);
 ?>
 
 <main class="main-content container">
@@ -58,8 +67,9 @@ use yii\widgets\ActiveForm;
         <?php
         if ($task->location && $task->city) : ?>
             <div class="task-map">
-                <img class="map" src="img/map.png" width="725" height="346"
-                     alt="<?= Html::encode($task->location); ?>">
+                <div id="map" style="width: 725px; height: 346px"
+                     data-long="<?= $task->long; ?>"
+                     data-lat="<?= $task->lat; ?>"></div>
                 <p class="map-address town"><?= $task->city->name; ?></p>
                 <p class="map-address"><?= Html::encode(
                         $task->location,

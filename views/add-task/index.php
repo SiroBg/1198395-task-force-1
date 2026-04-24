@@ -2,13 +2,23 @@
 /**
  * @var \app\models\Task     $task       ;
  * @var \app\models\Category $categories ;
- *
+ * @var \app\models\City     $userCity   ;
  */
 
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
+$this->registerJsFile(
+    'https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey='
+    . Yii::$app->params['yandexJsApiKey'] . '&suggest_apikey='
+    . Yii::$app->params['yandexSuggestApiKey'],
+    ['position' => \yii\web\View::POS_END,]
+);
+$this->registerJsFile(
+    '/js/yandexSuggest.js',
+    ['position' => \yii\web\View::POS_END,]
+);
 ?>
 <main class="main-content main-content--center container">
     <div class="add-task-form regular-form">
@@ -33,10 +43,37 @@ use yii\widgets\ActiveForm;
         ) ?>
         <?= $form->field($task, 'location')->textInput(
             [
-                'labelOptions' => ['class' => 'control-label'],
-                'class'        => 'location-icon',
+                'labelOptions'      => ['class' => 'control-label'],
+                'class'             => 'location-icon',
+                'id'                => 'task-location',
+                'data-user-city'    => $userCity->name,
+                'data-user-city-id' => $userCity->id,
             ],
         ) ?>
+        <?= $form->field($task, 'yandexSuggest', ['template' => '{input}']
+        )->hiddenInput(
+            [
+                'id' => 'yandex-suggest',
+            ],
+        )->label(false) ?>
+        <?= $form->field($task, 'lat', ['template' => '{input}'])
+            ->hiddenInput(
+                [
+                    'id' => 'task-lat',
+                ],
+            )->label(false) ?>
+        <?= $form->field($task, 'long', ['template' => '{input}'])
+            ->hiddenInput(
+                [
+                    'id' => 'task-long',
+                ],
+            )->label(false) ?>
+        <?= $form->field($task, 'city_id', ['template' => '{input}'])
+            ->hiddenInput(
+                [
+                    'id' => 'task-city-id',
+                ],
+            )->label(false) ?>
         <div class="half-wrapper">
             <?= $form->field($task, 'budget')
                 ->textInput(
@@ -61,7 +98,9 @@ use yii\widgets\ActiveForm;
                 'multiple' => true,
                 'style'    => 'display:none',
             ]) ?>
-        <?= Html::submitInput('Опубликовать', ['class' => 'button button--blue']
+        <?= Html::submitInput(
+            'Опубликовать',
+            ['class' => 'button button--blue'],
         ) ?>
 
         <?php

@@ -49,6 +49,7 @@ class Task extends \yii\db\ActiveRecord
     public const string STATUS_FAILED = 'status_failed';
 
     public array $task_files = [];
+    public string $yandexSuggest = '';
 
     /**
      * {@inheritdoc}
@@ -77,7 +78,10 @@ class Task extends \yii\db\ActiveRecord
                 'default',
                 'value' => null,
             ],
-            [['created_at', 'expire_date'], 'safe'],
+            [
+                ['created_at', 'expire_date', 'location', 'yandexSuggest'],
+                'safe'
+            ],
             [
                 'expire_date',
                 'date',
@@ -86,7 +90,7 @@ class Task extends \yii\db\ActiveRecord
                 'tooSmall' => 'Выберите дату позже ' . date('d.m.Y'),
             ],
             [
-                ['author_id', 'name', 'description', 'category_id', 'location'],
+                ['author_id', 'name', 'description', 'category_id'],
                 'required',
             ],
             [
@@ -107,7 +111,14 @@ class Task extends \yii\db\ActiveRecord
                 'params' => ['length' => 30],
             ],
             [['lat', 'long'], 'number'],
+            [['lat', 'long', 'city_id'], 'clearIfEmpty'],
             [['name', 'location'], 'string', 'max' => 256],
+            [
+                'location',
+                'compare',
+                'compareAttribute' => 'yandexSuggest',
+                'message'          => 'Выберите адрес из предложенных'
+            ],
             [
                 'name',
                 'validateStringLengthNoSpaces',
@@ -341,6 +352,13 @@ class Task extends \yii\db\ActiveRecord
         }
     }
 
+    public function clearIfEmpty($attribute, $params): void
+    {
+        if (empty($this->location)) {
+            $this->$attribute = null;
+        }
+    }
+
     /**
      * Получает статус, в который перейдёт задание после примененного действия.
      *
@@ -423,7 +441,7 @@ class Task extends \yii\db\ActiveRecord
         actionAbstract $action,
         int $userId,
         bool $isExecutor,
-        ?int $executorId = null
+        ?int $executorId = null,
     ): bool {
         $result = false;
 

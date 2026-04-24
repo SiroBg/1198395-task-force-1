@@ -50,7 +50,7 @@ CREATE TABLE IF NOT EXISTS `tasks`
     `name`        VARCHAR(256)                                                                                NOT NULL,
     `description` TEXT                                                                                        NOT NULL,
     `category_id` INT UNSIGNED                                                                                NOT NULL,
-    `location`    VARCHAR(256)                                                                                NOT NULL,
+    `location`    VARCHAR(256),
     `lat`         DECIMAL(13, 10),
     `long`        DECIMAL(13, 10),
     `city_id`     INT UNSIGNED,

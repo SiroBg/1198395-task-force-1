@@ -4,8 +4,8 @@ namespace app\controllers;
 
 use app\models\Category;
 use app\models\File;
-use app\models\TaskFile;
 use app\models\Task;
+use app\models\TaskFile;
 use app\models\User;
 use Yii;
 use yii\web\Controller;
@@ -35,13 +35,14 @@ class AddTaskController extends Controller
 
     public function actionIndex(): array|Response|string
     {
-        $user = User::find()->select(['id', 'is_executor'])->where(
+        $user = User::find()->where(
             ['id' => Yii::$app->user->id],
         )->one();
 
         if ($user->is_executor) {
             $this->redirect('/');
         }
+        $userCity = $user->city;
 
         $categories = Category::find()->select(['id', 'name'])->all();
 
@@ -79,9 +80,11 @@ class AddTaskController extends Controller
                 Yii::error($e->getMessage());
             }
         }
+
         return $this->render('index', [
             'task'       => $task,
             'categories' => $categories,
+            'userCity'   => $userCity,
         ]);
     }
 
