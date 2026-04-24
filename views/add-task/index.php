@@ -2,15 +2,23 @@
 /**
  * @var \app\models\Task     $task       ;
  * @var \app\models\Category $categories ;
- *
+ * @var \app\models\City     $userCity   ;
  */
 
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
-$this->registerJsFile('https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey=' . Yii::$app->params['yandexJsApiKey'] . '&suggest_apikey=' . $Yii::$app->params['yandexSuggestApiKey'], ['position' => \yii\web\View::POS_END,]);
-$this->registerJsFile('@webroot/js/yandexAutocomplete.js', ['position' => \yii\web\View::POS_END,]);
+$this->registerJsFile(
+    'https://api-maps.yandex.ru/2.1/?lang=ru_RU&apikey='
+    . Yii::$app->params['yandexJsApiKey'] . '&suggest_apikey='
+    . Yii::$app->params['yandexSuggestApiKey'],
+    ['position' => \yii\web\View::POS_END,]
+);
+$this->registerJsFile(
+    '/js/yandexSuggest.js',
+    ['position' => \yii\web\View::POS_END,]
+);
 ?>
 <main class="main-content main-content--center container">
     <div class="add-task-form regular-form">
@@ -18,7 +26,7 @@ $this->registerJsFile('@webroot/js/yandexAutocomplete.js', ['position' => \yii\w
         $form = ActiveForm::begin(
             [
                 'enableAjaxValidation' => true,
-                'method' => 'post',
+                'method'               => 'post',
             ],
         ); ?>
         <h3 class="head-main head-main">Публикация нового задания</h3>
@@ -35,24 +43,50 @@ $this->registerJsFile('@webroot/js/yandexAutocomplete.js', ['position' => \yii\w
         ) ?>
         <?= $form->field($task, 'location')->textInput(
             [
-            'labelOptions' => ['class' => 'control-label'],
-            'class' => 'location-icon',
-            'id' => 'suggest',
+                'labelOptions'      => ['class' => 'control-label'],
+                'class'             => 'location-icon',
+                'id'                => 'task-location',
+                'data-user-city'    => $userCity->name,
+                'data-user-city-id' => $userCity->id,
             ],
         ) ?>
+        <?= $form->field($task, 'yandexSuggest', ['template' => '{input}']
+        )->hiddenInput(
+            [
+                'id' => 'yandex-suggest',
+            ],
+        )->label(false) ?>
+        <?= $form->field($task, 'lat', ['template' => '{input}'])
+            ->hiddenInput(
+                [
+                    'id' => 'task-lat',
+                ],
+            )->label(false) ?>
+        <?= $form->field($task, 'long', ['template' => '{input}'])
+            ->hiddenInput(
+                [
+                    'id' => 'task-long',
+                ],
+            )->label(false) ?>
+        <?= $form->field($task, 'city_id', ['template' => '{input}'])
+            ->hiddenInput(
+                [
+                    'id' => 'task-city-id',
+                ],
+            )->label(false) ?>
         <div class="half-wrapper">
             <?= $form->field($task, 'budget')
-        ->textInput(
-            [
-                'class' => 'budget-icon',
-                'labelOptions' => ['class' => 'control-label'],
-            ],
-        ) ?>
+                ->textInput(
+                    [
+                        'class'        => 'budget-icon',
+                        'labelOptions' => ['class' => 'control-label'],
+                    ],
+                ) ?>
             <?= $form->field($task, 'expire_date')
-        ->input(
-            'date',
-            ['labelOptions' => ['class' => 'control-label']],
-        ) ?>
+                ->input(
+                    'date',
+                    ['labelOptions' => ['class' => 'control-label']],
+                ) ?>
         </div>
         <p class="form-label">Файлы</p>
         <?= $form->field(
@@ -60,9 +94,9 @@ $this->registerJsFile('@webroot/js/yandexAutocomplete.js', ['position' => \yii\w
             'task_files[]',
             ['template' => '<label for="task-task_files"><div class="new-file">Добавить новый файл</div>{input}{error}</label>'],
         )
-        ->fileInput([
+            ->fileInput([
                 'multiple' => true,
-                'style' => 'display:none',
+                'style'    => 'display:none',
             ]) ?>
         <?= Html::submitInput(
             'Опубликовать',

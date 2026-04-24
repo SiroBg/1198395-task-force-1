@@ -19,11 +19,11 @@ class AddTaskController extends Controller
     {
         return [
             'access' => [
-                'class' => \yii\filters\AccessControl::class,
+                'class'        => \yii\filters\AccessControl::class,
                 'denyCallback' => function ($rule, $action) {
                     return Yii::$app->response->redirect(['/tasks']);
                 },
-                'rules' => [
+                'rules'        => [
                     [
                         'allow' => true,
                         'roles' => ['@'],
@@ -35,13 +35,14 @@ class AddTaskController extends Controller
 
     public function actionIndex(): array|Response|string
     {
-        $user = User::find()->select(['id', 'is_executor'])->where(
+        $user = User::find()->where(
             ['id' => Yii::$app->user->id],
         )->one();
 
         if ($user->is_executor) {
             $this->redirect('/');
         }
+        $userCity = $user->city;
 
         $categories = Category::find()->select(['id', 'name'])->all();
 
@@ -79,9 +80,11 @@ class AddTaskController extends Controller
                 Yii::error($e->getMessage());
             }
         }
+
         return $this->render('index', [
-            'task' => $task,
+            'task'       => $task,
             'categories' => $categories,
+            'userCity'   => $userCity,
         ]);
     }
 

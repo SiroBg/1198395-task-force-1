@@ -25,10 +25,6 @@ class Yii
  */
 class __Application
 {
-    /**
-     * @var mixed|object|null
-     */
-    public mixed $yandexGeocoder;
 }
 
 /**
