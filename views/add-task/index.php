@@ -1,8 +1,8 @@
 <?php
 /**
- * @var \app\models\Task     $task       ;
- * @var \app\models\Category $categories ;
- * @var \app\models\City     $userCity   ;
+ * @var \app\models\Task     $task         ;
+ * @var \app\models\Category $categories   ;
+ * @var string               $userCityName ;
  */
 
 use yii\helpers\ArrayHelper;
@@ -43,37 +43,12 @@ $this->registerJsFile(
         ) ?>
         <?= $form->field($task, 'location')->textInput(
             [
-                'labelOptions'      => ['class' => 'control-label'],
-                'class'             => 'location-icon',
-                'id'                => 'task-location',
-                'data-user-city'    => $userCity->name,
-                'data-user-city-id' => $userCity->id,
+                'labelOptions'   => ['class' => 'control-label'],
+                'class'          => 'location-icon',
+                'id'             => 'task-location',
+                'data-user-city' => $userCityName,
             ],
         ) ?>
-        <?= $form->field($task, 'yandexSuggest', ['template' => '{input}']
-        )->hiddenInput(
-            [
-                'id' => 'yandex-suggest',
-            ],
-        )->label(false) ?>
-        <?= $form->field($task, 'lat', ['template' => '{input}'])
-            ->hiddenInput(
-                [
-                    'id' => 'task-lat',
-                ],
-            )->label(false) ?>
-        <?= $form->field($task, 'long', ['template' => '{input}'])
-            ->hiddenInput(
-                [
-                    'id' => 'task-long',
-                ],
-            )->label(false) ?>
-        <?= $form->field($task, 'city_id', ['template' => '{input}'])
-            ->hiddenInput(
-                [
-                    'id' => 'task-city-id',
-                ],
-            )->label(false) ?>
         <div class="half-wrapper">
             <?= $form->field($task, 'budget')
                 ->textInput(

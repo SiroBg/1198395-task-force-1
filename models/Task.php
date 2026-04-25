@@ -9,6 +9,7 @@ use app\actions\actionRefuse;
 use app\actions\actionRespond;
 use app\actions\actionStart;
 use app\exceptions\TaskStatusException;
+use Yii;
 use yii\db\ActiveQuery;
 
 /**
@@ -49,7 +50,6 @@ class Task extends \yii\db\ActiveRecord
     public const string STATUS_FAILED = 'status_failed';
 
     public array $task_files = [];
-    public string $yandexSuggest = '';
 
     /**
      * {@inheritdoc}
@@ -79,7 +79,11 @@ class Task extends \yii\db\ActiveRecord
                 'value' => null,
             ],
             [
-                ['created_at', 'expire_date', 'location', 'yandexSuggest'],
+                [
+                    'created_at',
+                    'expire_date',
+                    'location',
+                ],
                 'safe'
             ],
             [
@@ -111,14 +115,9 @@ class Task extends \yii\db\ActiveRecord
                 'params' => ['length' => 30],
             ],
             [['lat', 'long'], 'number'],
-            [['lat', 'long', 'city_id'], 'clearIfEmpty'],
             [['name', 'location'], 'string', 'max' => 256],
-            [
-                'location',
-                'compare',
-                'compareAttribute' => 'yandexSuggest',
-                'message'          => 'Выберите адрес из предложенных'
-            ],
+            ['location', 'validateLocation'],
+            [['lat', 'long', 'city_id'], 'clearIfEmpty'],
             [
                 'name',
                 'validateStringLengthNoSpaces',
@@ -352,6 +351,34 @@ class Task extends \yii\db\ActiveRecord
         }
     }
 
+    public function validateLocation($attribute, $params): void
+    {
+        $objectData = Yii::$app->yandexGeoCoder->getObjectData(
+            $this->$attribute
+        );
+
+        $userCity = User::find()
+            ->where(['id' => Yii::$app->user->id])->one()->city;
+
+        $isRightCity = array_any(
+            $objectData['addressComponents'],
+            function ($value) use ($userCity) {
+                return in_array($userCity->name, $value);
+            }
+        );
+
+        if (!$isRightCity) {
+            $this->addError(
+                $attribute,
+                'Выберите адрес, находящийся в пределах вашего города'
+            );
+        } else {
+            $this->lat = $objectData['coordinates'][1];
+            $this->long = $objectData['coordinates'][0];
+            $this->city_id = $userCity->id;
+        }
+    }
+
     public function clearIfEmpty($attribute, $params): void
     {
         if (empty($this->location)) {
@@ -431,8 +458,10 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Применяет действие к заданию, если оно возможно для текущего статуса.
      *
-     * @param actionAbstract $action Действие.
-     * @param array          $data   Данные о пользователе, применяющем действие.
+     * @param actionAbstract $action     Действие.
+     * @param int            $userId     Id пользователя.
+     * @param bool           $isExecutor Является ли пользователь исполнителем.
+     * @param ?int           $executorId Id исполнителя (при действии "начать задание").
      *
      * @return bool `true` - действие применилось, `false` - действие невозможно.
      * @throws TaskStatusException
