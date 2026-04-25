@@ -42,7 +42,8 @@ class AddTaskController extends Controller
         if ($user->is_executor) {
             $this->redirect('/');
         }
-        $userCity = $user->city;
+
+        $userCityName = $user->city->name;
 
         $categories = Category::find()->select(['id', 'name'])->all();
 
@@ -82,9 +83,9 @@ class AddTaskController extends Controller
         }
 
         return $this->render('index', [
-            'task'       => $task,
-            'categories' => $categories,
-            'userCity'   => $userCity,
+            'task'         => $task,
+            'categories'   => $categories,
+            'userCityName' => $userCityName,
         ]);
     }
 

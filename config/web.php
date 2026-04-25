@@ -13,26 +13,26 @@ $config = [
         '@npm'   => '@vendor/npm-asset',
     ],
     'components' => [
-        'request'      => [
+        'request'        => [
             'cookieValidationKey' => 'kNljxZsXG5OQAXuDpnBX0DhbQYcUbTxp',
         ],
-        'cache'        => [
+        'cache'          => [
             'class' => 'yii\caching\FileCache',
         ],
-        'user'         => [
+        'user'           => [
             'identityClass'   => 'app\models\User',
             'enableAutoLogin' => true,
             'loginUrl'        => ['/landing'],
         ],
-        'errorHandler' => [
+        'errorHandler'   => [
             'errorAction' => 'site/error',
         ],
-        'mailer'       => [
+        'mailer'         => [
             'class'            => \yii\symfonymailer\Mailer::class,
             'viewPath'         => '@app/mail',
             'useFileTransport' => true,
         ],
-        'log'          => [
+        'log'            => [
             'traceLevel' => YII_DEBUG ? 3 : 0,
             'targets'    => [
                 [
@@ -41,8 +41,8 @@ $config = [
                 ],
             ],
         ],
-        'db'           => $db,
-        'urlManager'   => [
+        'db'             => $db,
+        'urlManager'     => [
             'enablePrettyUrl' => true,
             'showScriptName'  => false,
             'rules'           => [
@@ -51,12 +51,15 @@ $config = [
                 'users/view/<id:\d+>' => 'users/view/',
             ],
         ],
-        'assetManager' => [
+        'assetManager'   => [
             'bundles' => [
                 'yii\bootstrap\BootstrapAsset' => [
                     'css' => [],
                 ],
             ],
+        ],
+        'yandexGeoCoder' => [
+            'class' => 'app\components\yandexGeoCoder',
         ],
     ],
     'params'     => $params,
