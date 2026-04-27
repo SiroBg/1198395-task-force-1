@@ -42,7 +42,7 @@ class actionStart extends actionAbstract
     public static function execute(
         Task $task,
         User $user,
-        int $executorId
+        int $executorId,
     ): bool {
         if (!$task->applyAction(
             new actionStart(),
@@ -56,6 +56,6 @@ class actionStart extends actionAbstract
             );
         }
 
-        return $task->save();
+        return $task->save(false);
     }
 }

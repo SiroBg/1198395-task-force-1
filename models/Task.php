@@ -84,13 +84,13 @@ class Task extends \yii\db\ActiveRecord
                     'expire_date',
                     'location',
                 ],
-                'safe'
+                'safe',
             ],
             [
                 'expire_date',
                 'date',
-                'format'   => 'php:Y-m-d',
-                'min'      => date('Y-m-d'),
+                'format' => 'php:Y-m-d',
+                'min' => date('Y-m-d'),
                 'tooSmall' => 'Выберите дату позже ' . date('d.m.Y'),
             ],
             [
@@ -127,29 +127,29 @@ class Task extends \yii\db\ActiveRecord
             [
                 ['author_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => User::class,
+                'skipOnError' => true,
+                'targetClass' => User::class,
                 'targetAttribute' => ['author_id' => 'id'],
             ],
             [
                 ['executor_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => User::class,
+                'skipOnError' => true,
+                'targetClass' => User::class,
                 'targetAttribute' => ['executor_id' => 'id'],
             ],
             [
                 ['category_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => Category::class,
+                'skipOnError' => true,
+                'targetClass' => Category::class,
                 'targetAttribute' => ['category_id' => 'id'],
             ],
             [
                 ['city_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => City::class,
+                'skipOnError' => true,
+                'targetClass' => City::class,
                 'targetAttribute' => ['city_id' => 'id'],
             ],
             ['task_files', 'file', 'maxFiles' => 0, 'skipOnEmpty' => true],
@@ -162,21 +162,21 @@ class Task extends \yii\db\ActiveRecord
     public function attributeLabels(): array
     {
         return [
-            'id'          => 'ID',
-            'created_at'  => 'Created At',
-            'author_id'   => 'Author ID',
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'author_id' => 'Author ID',
             'executor_id' => 'Executor ID',
-            'name'        => 'Опишите суть работы',
+            'name' => 'Опишите суть работы',
             'description' => 'Подробности задания',
             'category_id' => 'Категория',
-            'location'    => 'Локация',
-            'lat'         => 'Lat',
-            'long'        => 'Long',
-            'city_id'     => 'City ID',
-            'budget'      => 'Бюджет',
+            'location' => 'Локация',
+            'lat' => 'Lat',
+            'long' => 'Long',
+            'city_id' => 'City ID',
+            'budget' => 'Бюджет',
             'expire_date' => 'Срок исполнения',
-            'status'      => 'Status',
-            'task_files'  => 'Файлы',
+            'status' => 'Status',
+            'task_files' => 'Файлы',
         ];
     }
 
@@ -258,11 +258,11 @@ class Task extends \yii\db\ActiveRecord
     public static function optsStatus(): array
     {
         return [
-            self::STATUS_NEW      => 'Новое',
+            self::STATUS_NEW => 'Новое',
             self::STATUS_CANCELED => 'Отменено',
-            self::STATUS_ACTIVE   => 'Выполняется',
+            self::STATUS_ACTIVE => 'Выполняется',
             self::STATUS_FINISHED => 'Завершено',
-            self::STATUS_FAILED   => 'Провалено',
+            self::STATUS_FAILED => 'Провалено',
         ];
     }
 
@@ -354,7 +354,7 @@ class Task extends \yii\db\ActiveRecord
     public function validateLocation($attribute, $params): void
     {
         $objectData = Yii::$app->yandexGeoCoder->getObjectData(
-            $this->$attribute
+            $this->$attribute,
         );
 
         $userCity = User::find()
@@ -364,13 +364,13 @@ class Task extends \yii\db\ActiveRecord
             $objectData['addressComponents'],
             function ($value) use ($userCity) {
                 return in_array($userCity->name, $value);
-            }
+            },
         );
 
         if (!$isRightCity) {
             $this->addError(
                 $attribute,
-                'Выберите адрес, находящийся в пределах вашего города'
+                'Выберите адрес, находящийся в пределах вашего города',
             );
         } else {
             $this->lat = $objectData['coordinates'][1];
@@ -420,19 +420,19 @@ class Task extends \yii\db\ActiveRecord
         bool $isExecutor,
     ): array {
         $actionsToStatus = [
-            self::STATUS_NEW      =>
+            self::STATUS_NEW =>
                 [
                     new actionCancel(),
                     new actionRespond(),
                     new actionStart(),
                 ],
-            self::STATUS_ACTIVE   =>
+            self::STATUS_ACTIVE =>
                 [
                     new actionFinish(),
                     new actionRefuse(),
                 ],
             self::STATUS_CANCELED => [],
-            self::STATUS_FAILED   => [],
+            self::STATUS_FAILED => [],
             self::STATUS_FINISHED => [],
         ];
 
@@ -483,7 +483,10 @@ class Task extends \yii\db\ActiveRecord
 
         if (in_array($action->getName(), $currentActionsNames)
         ) {
-            if ($action->getName() === actionStart::getName()) {
+            if (
+                $action->getName() === actionStart::getName()
+                && !is_null($executorId)
+            ) {
                 $this->executor_id = $executorId;
             }
 

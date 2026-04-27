@@ -52,6 +52,6 @@ class actionRefuse extends actionAbstract
             );
         }
 
-        return $task->save();
+        return $task->save(false);
     }
 }

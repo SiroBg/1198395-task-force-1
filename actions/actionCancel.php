@@ -50,6 +50,6 @@ class actionCancel extends actionAbstract
             throw new ForbiddenHttpException('Невозможно отменить задание');
         }
 
-        return $task->save();
+        return $task->save(false);
     }
 }

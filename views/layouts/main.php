@@ -65,7 +65,7 @@ $this->beginBody() ?>
                     <a class="link link--nav">Новое</a>
                 </li>
                 <li class="list-item">
-                    <a href="#" class="link link--nav">Мои задания</a>
+                    <a href="/my-tasks/" class="link link--nav">Мои задания</a>
                 </li>
                 <?php
                 if (!$user->is_executor) : ?>

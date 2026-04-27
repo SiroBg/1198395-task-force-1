@@ -58,7 +58,7 @@ class actionFinish extends actionAbstract
             ) {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
-                    if (!$task->save() || !$review->save()) {
+                    if (!$task->save(false) || !$review->save()) {
                         throw new \Exception(
                             'Ошибка при сохранении данных на сервере.',
                         );
