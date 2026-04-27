@@ -20,11 +20,11 @@ class MyTasksController extends Controller
     {
         $this->user = User::findOne(Yii::$app->user->id);
         $this->provider = new ActiveDataProvider([
-            'query' => Task::find(),
+            'query'      => Task::find(),
             'pagination' => [
                 'pageSize' => 5,
             ],
-            'sort' => [
+            'sort'       => [
                 'defaultOrder' => [
                     'created_at' => SORT_DESC,
                 ],
@@ -33,20 +33,33 @@ class MyTasksController extends Controller
 
         if ($this->user->is_executor) {
             $this->provider->query->where(['executor_id' => $this->user->id]);
-            $this->actions =
-                [
-                    'active' => ['name' => 'В процессе', 'action' => '/my-tasks/active'],
-                    'expired' => ['name' => 'Просрочено', 'action' => '/my-tasks/expired'],
-                    'closed' => ['name' => 'Закрытые', 'action' => '/my-tasks/closed'],
-                ];
+            $this->actions = [
+                'active'  => [
+                    'name'   => 'В процессе',
+                    'action' => 'my-tasks/active'
+                ],
+                'expired' => [
+                    'name'   => 'Просрочено',
+                    'action' => 'my-tasks/expired'
+                ],
+                'closed'  => [
+                    'name'   => 'Закрытые',
+                    'action' => 'my-tasks/closed'
+                ],
+            ];
         } else {
             $this->provider->query->where(['author_id' => $this->user->id]);
-            $this->actions =
-                [
-                    'new' => ['name' => 'Новые', 'action' => '/my-tasks/new'],
-                    'active' => ['name' => 'В процессе', 'action' => '/my-tasks/active'],
-                    'closed' => ['name' => 'Закрытые', 'action' => '/my-tasks/closed'],
-                ];
+            $this->actions = [
+                'new'    => ['name' => 'Новые', 'action' => 'my-tasks/new'],
+                'active' => [
+                    'name'   => 'В процессе',
+                    'action' => 'my-tasks/active'
+                ],
+                'closed' => [
+                    'name'   => 'Закрытые',
+                    'action' => 'my-tasks/closed'
+                ],
+            ];
         }
 
         parent::__construct($id, $module);
@@ -70,8 +83,8 @@ class MyTasksController extends Controller
 
         return $this->render('index', [
             'provider' => $this->provider,
-            'actions' => $this->actions,
-            'title' => $this->actionTitle,
+            'actions'  => $this->actions,
+            'title'    => $this->actionTitle,
         ]);
     }
 
@@ -82,36 +95,41 @@ class MyTasksController extends Controller
 
         return $this->render('index', [
             'provider' => $this->provider,
-            'actions' => $this->actions,
-            'title' => $this->actionTitle,
+            'actions'  => $this->actions,
+            'title'    => $this->actionTitle,
         ]);
     }
 
     public function actionClosed(): string
     {
-        $this->provider->query->andWhere(['status' => [Task::STATUS_FINISHED, Task::STATUS_FAILED]]);
+        $this->provider->query->andWhere(
+            ['status' => [Task::STATUS_FINISHED, Task::STATUS_FAILED]]
+        );
         $this->actionTitle = 'Закрытые';
 
         if (!$this->user->is_executor) {
-            $this->provider->query->orWhere(['status' => Task::STATUS_CANCELED]);
+            $this->provider->query->orWhere(['status' => Task::STATUS_CANCELED]
+            );
         }
 
         return $this->render('index', [
             'provider' => $this->provider,
-            'actions' => $this->actions,
-            'title' => $this->actionTitle,
+            'actions'  => $this->actions,
+            'title'    => $this->actionTitle,
         ]);
     }
 
     public function actionExpired(): string
     {
-        $this->provider->query->where(['status' => Task::STATUS_ACTIVE, 'expire_date' < 'CURDATE()']);
+        $this->provider->query->where(
+            ['status' => Task::STATUS_ACTIVE, 'expire_date' < 'CURDATE()']
+        );
         $this->actionTitle = 'Просрочено';
 
         return $this->render('index', [
             'provider' => $this->provider,
-            'actions' => $this->actions,
-            'title' => $this->actionTitle,
+            'actions'  => $this->actions,
+            'title'    => $this->actionTitle,
         ]);
     }
 }
