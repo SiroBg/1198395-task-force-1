@@ -1,5 +1,7 @@
 <?php
 
+use kartik\rating\StarRating;
+
 /**
  * @var \app\models\User $user ;
  */
@@ -14,16 +16,29 @@ use yii\helpers\Url;
         <h3 class="head-main"><?= Html::encode($user->name ?? ''); ?></h3>
         <div class="user-card">
             <div class="photo-rate">
-                <img class="card-photo" src="img/man-glasses.png" width="191"
-                     height="190" alt="Фото пользователя">
+                <?= Html::img(
+                    Html::encode(
+                        $user->profileImgFile->url ??
+                        '/img/avatar-placeholder.png'
+                    ),
+                    [
+                        'class' => 'card-photo',
+                        'style' => 'width: 191px; height: 190px;'
+                    ]
+                ); ?>
                 <div class="card-rate">
-                    <div class="stars-rating big"><span
-                                class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span
-                                class="fill-star">&nbsp;</span><span>&nbsp;</span>
-                    </div>
-                    <span class="current-rate">4.23</span>
+                    <?= StarRating::widget([
+                        'name'          => 'display_rating',
+                        'value'         => $user->rating,
+                        'pluginOptions' => [
+                            'displayOnly' => true,
+                            'disabled'    => true,
+                            'size'        => 'sm',
+                            'showClear'   => false,
+                            'showCaption' => false,
+                        ],
+                    ]); ?>
+                    <span class="current-rate"><?= $user->rating ?></span>
                 </div>
             </div>
             <p class="user-description"><?= Html::encode(
