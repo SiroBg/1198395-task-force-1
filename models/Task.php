@@ -357,25 +357,22 @@ class Task extends \yii\db\ActiveRecord
             $this->$attribute,
         );
 
-        $userCity = User::find()
-            ->where(['id' => Yii::$app->user->id])->one()->city;
-
-        $isRightCity = array_any(
-            $objectData['addressComponents'],
-            function ($value) use ($userCity) {
-                return in_array($userCity->name, $value);
+        $searchedCity = array_find(
+            City::find()->all(),
+            function ($city) use ($objectData) {
+                return str_contains($objectData['fullAddress'], $city->name);
             },
         );
 
-        if (!$isRightCity) {
+        if (!$searchedCity) {
             $this->addError(
                 $attribute,
-                'Выберите адрес, находящийся в пределах вашего города',
+                'Выбранного города нет в базе данных',
             );
         } else {
             $this->lat = $objectData['coordinates'][1];
             $this->long = $objectData['coordinates'][0];
-            $this->city_id = $userCity->id;
+            $this->city_id = $searchedCity->id;
         }
     }
 
