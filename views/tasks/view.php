@@ -44,13 +44,18 @@ $this->registerJsFile(
             ); ?></p>
         <?php
         foreach (
-            $task->getActions(
-                $user->id,
-                $user->is_executor,
-            ) as $action
+            $task->getActions() as $action
         ): ?>
             <?php
-            if ($action->getName() !== 'action_start' && !$hasResponds): ?>
+            if ($action->checkRights(
+                    $task->executor_id,
+                    $task->author_id,
+                    $user->id,
+                    $user->is_executor
+                )
+                && $action->getName() !== 'action_start'
+                && !$hasResponds
+            ): ?>
                 <?= Html::a(
                     $action->getDescription(),
                     options: [

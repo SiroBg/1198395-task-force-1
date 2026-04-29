@@ -2,11 +2,11 @@
 
 namespace app\controllers;
 
-use app\actions\actionCancel;
-use app\actions\actionFinish;
-use app\actions\actionRefuse;
-use app\actions\actionRespond;
-use app\actions\actionStart;
+use app\actions\ActionCancel;
+use app\actions\ActionFinish;
+use app\actions\ActionRefuse;
+use app\actions\ActionRespond;
+use app\actions\ActionStart;
 use app\models\Category;
 use app\models\Respond;
 use app\models\Review;
@@ -159,13 +159,18 @@ class TasksController extends Controller
             ['id' => Yii::$app->user->id],
         )->one();
 
-        if (!actionCancel::execute($task, $user)) {
-            throw new Exception('Не удалось загрузить данные на сервер');
+        try {
+            new ActionCancel()->applyAction($task, $user);
+        } catch (\Throwable $e) {
+            throw new Exception($e->getMessage());
         }
 
         return $this->redirect(['view', 'id' => $taskId]);
     }
 
+    /**
+     * @throws Exception
+     */
     public function actionFinish(int $taskId): array|Response
     {
         $task = Task::find()->where(['id' => $taskId])->one();
@@ -174,8 +179,10 @@ class TasksController extends Controller
             ['id' => Yii::$app->user->id],
         )->one();
 
-        if (!actionFinish::execute($task, $user)) {
-            throw new Exception('Не удалось загрузить данные на сервер');
+        try {
+            new ActionFinish()->applyAction($task, $user);
+        } catch (\Throwable $e) {
+            throw new Exception($e->getMessage());
         }
 
         return $this->redirect(['view', 'id' => $task->id]);
@@ -189,8 +196,10 @@ class TasksController extends Controller
             ['id' => Yii::$app->user->id],
         )->one();
 
-        if (!actionRespond::execute($task, $user)) {
-            throw new Exception('Не удалось загрузить данные на сервер');
+        try {
+            new ActionRespond()->applyAction($task, $user);
+        } catch (\Throwable $e) {
+            throw new Exception($e->getMessage());
         }
 
         return $this->redirect(['view', 'id' => $task->id]);
@@ -203,8 +212,10 @@ class TasksController extends Controller
             ['id' => Yii::$app->user->id],
         )->one();
 
-        if (!actionStart::execute($task, $user, $executorId)) {
-            throw new Exception('Не удалось загрузить данные на сервер');
+        try {
+            new ActionStart()->applyAction($task, $user, $executorId);
+        } catch (\Throwable $e) {
+            throw new Exception($e->getMessage());
         }
 
         return $this->redirect(['view', 'id' => $task->id]);
@@ -235,8 +246,10 @@ class TasksController extends Controller
             ['id' => Yii::$app->user->id],
         )->one();
 
-        if (!actionRefuse::execute($task, $user)) {
-            throw new Exception('Не удалось загрузить данные на сервер');
+        try {
+            new ActionRefuse()->applyAction($task, $user);
+        } catch (\Throwable $e) {
+            throw new Exception($e->getMessage());
         }
 
         return $this->redirect(['view', 'id' => $task->id]);

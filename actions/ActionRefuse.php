@@ -2,30 +2,32 @@
 
 namespace app\actions;
 
+use app\exceptions\ActionRightsException;
 use app\exceptions\TaskStatusException;
 use app\models\Task;
 use app\models\User;
 use yii\db\Exception;
 use yii\web\ForbiddenHttpException;
+use Yii;
 
-class actionRefuse extends actionAbstract
+class ActionRefuse extends ActionAbstract
 {
-    public static function getName(): string
+    public function getName(): string
     {
         return 'refusal';
     }
 
-    public static function getDescription(): string
+    public function getDescription(): string
     {
         return 'Отказаться от задания';
     }
 
-    public static function getButtonColor(): string
+    public function getButtonColor(): string
     {
         return 'orange';
     }
 
-    public static function checkRights(
+    public function checkRights(
         ?int $executorId,
         int $authorId,
         int $userId,
@@ -39,19 +41,16 @@ class actionRefuse extends actionAbstract
      * @throws TaskStatusException
      * @throws ForbiddenHttpException
      */
-    public static function execute(Task $task, User $user): bool
-    {
-        if (!$task->applyAction(
-            new actionRefuse(),
-            $user->id,
-            $user->is_executor,
-        )
-        ) {
-            throw new ForbiddenHttpException(
-                'Невозможно отказаться от задания',
-            );
+    public function applyAction(
+        Task $task,
+        User $user,
+    ): void {
+        try {
+            parent::applyAction($task, $user);
+            $task->status = $task->getNextStatus($this);
+            $task->save();
+        } catch (\Throwable $e) {
+            throw new Exception($e->getMessage());
         }
-
-        return $task->save(false);
     }
 }

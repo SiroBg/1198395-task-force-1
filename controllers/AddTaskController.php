@@ -59,6 +59,7 @@ class AddTaskController extends Controller
 
             $task->author_id = $user->id;
             $task->status = $task::STATUS_NEW;
+            $task->scenario = 'create';
 
             if (Yii::$app->request->isAjax) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
