@@ -13,8 +13,8 @@ class TaskForm extends Model
 
     public const array PERIODS_OPTIONS
         = [
-            ''      => 'Любой',
-            'PT1H'  => '1 час',
+            '' => 'Любой',
+            'PT1H' => '1 час',
             'PT12H' => '12 часов',
             'PT24H' => '24 часа',
         ];
@@ -24,7 +24,7 @@ class TaskForm extends Model
         return [
             'categories' => 'Категории',
             'noResponds' => 'Без исполнителя',
-            'period'     => 'Период',
+            'period' => 'Период',
         ];
     }
 

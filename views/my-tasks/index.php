@@ -8,6 +8,8 @@ use yii\widgets\LinkPager;
 /**
  * @var ActiveDataProvider $provider ;
  * @var \app\models\User   $user     ;
+ * @var string             $title    ;
+ * @var string             $status   ;
  */
 ?>
 <main class="main-content container">
@@ -16,52 +18,46 @@ use yii\widgets\LinkPager;
         <ul class="side-menu-list">
             <?php
             if (!$user->is_executor) : ?>
-                <li class="side-menu-item side-menu-item--active">
-                    <?= Html::a(
-                        'Новые',
-                        '/my-tasks?status=new',
-                        ['class' => 'link link--nav']
-                    ) ?>
+                <li class="side-menu-item <?= $status === 'new' ? 'side-menu-item--active' : '' ?>">
+                    <a class="link link--nav" href="<?= Url::to(['my-tasks/index', 'status' => 'new']) ?>">
+                        Новые
+                    </a>
                 </li>
             <?php
             endif; ?>
             <li class="side-menu-item">
-                <?= Html::a(
-                    'В процессе',
-                    '/my-tasks?status=active',
-                    ['class' => 'link link--nav']
-                ) ?>
+                <li class="side-menu-item <?= $status === 'active' ? 'side-menu-item--active' : '' ?>">
+                    <a class="link link--nav" href="<?= Url::to(['my-tasks/index', 'status' => 'active']) ?>">
+                        В процессе
+                    </a>
+                </li>
             </li>
             <?php
             if ($user->is_executor) : ?>
-                <li class="side-menu-item">
-                    <?= Html::a(
-                        'Просроченные',
-                        '/my-tasks?status=expired',
-                        ['class' => 'link link--nav']
-                    ) ?>
+                <li class="side-menu-item <?= $status === 'expired' ? 'side-menu-item--active' : '' ?>">
+                    <a class="link link--nav" href="<?= Url::to(['my-tasks/index', 'status' => 'expired']) ?>">
+                        Просрочено
+                    </a>
                 </li>
             <?php
             endif; ?>
-            <li class="side-menu-item">
-                <?= Html::a(
-                    'Закрытые',
-                    '/my-tasks?status=closed',
-                    ['class' => 'link link--nav']
-                ) ?>
+            <li class="side-menu-item <?= $status === 'closed' ? 'side-menu-item--active' : '' ?>">
+                <a class="link link--nav" href="<?= Url::to(['my-tasks/index', 'status' => 'closed']) ?>">
+                    Закрытые
+                </a>
             </li>
         </ul>
     </div>
     <div class="left-column left-column--task">
-        <h3 class="head-main head-regular">Задания</h3>
+        <h3 class="head-main head-regular"><?= $title ; ?></h3>
         <?php
         foreach ($provider->getModels() as $task) : ?>
             <div class="task-card">
                 <div class="header-task">
                     <a href="/tasks/view/<?= $task->id; ?>"
                        class="link link--block link--big"><?= Html::encode(
-                            $task->name,
-                        ); ?></a>
+                           $task->name,
+                       ); ?></a>
                     <?php
                     if ($task->budget): ?>
                         <p class="price price--task"><?= $task->budget; ?> ₽</p>
@@ -73,15 +69,15 @@ use yii\widgets\LinkPager;
             </span>
                 </p>
                 <p class="task-text"><?= Html::encode(
-                        $task->description,
-                    ); ?></p>
+                    $task->description,
+                ); ?></p>
 
                 <div class="footer-task">
                     <?php
-                    if ($task->city) : ?>
+                if ($task->city) : ?>
                         <p class="info-text town-text"><?= $task->city->name; ?></p>
                     <?php
-                    endif; ?>
+                endif; ?>
                     <p class="info-text category-text"><?= $task->category->name; ?></p>
                     <a href="/tasks/view/<?= $task->id; ?>"
                        class="button button--black">Смотреть

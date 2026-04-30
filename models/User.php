@@ -20,6 +20,7 @@ use yii\web\IdentityInterface;
  * @property string|null    $phone
  * @property string|null    $telegram
  * @property string|null    $about
+ * @property bool           $show_contacts
  *
  * @property City           $city
  * @property File           $profileImgFile
@@ -90,7 +91,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 'default',
                 'value' => null,
             ],
-            [['created_at', 'birthday'], 'safe'],
+            [['created_at', 'birthday', 'show_contacts'], 'safe'],
+            ['birthday', 'date', 'format' => 'php:Y-m-d'],
+            [['show_contacts'], 'boolean'],
             [
                 [
                     'email',
@@ -110,23 +113,24 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 'password_retype',
                 'compare',
                 'compareAttribute' => 'password',
-                'message'          => 'Пароли не совпадают',
+                'message' => 'Пароли не совпадают',
             ],
             [['phone'], 'string', 'max' => 11],
+            ['phone', 'match', 'pattern' => '/^[0-9]+$/'],
             [['telegram'], 'string', 'max' => 64],
             [['email'], 'unique'],
             [
                 ['profile_img_file_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => File::class,
+                'skipOnError' => true,
+                'targetClass' => File::class,
                 'targetAttribute' => ['profile_img_file_id' => 'id'],
             ],
             [
                 ['city_id'],
                 'exist',
-                'skipOnError'     => true,
-                'targetClass'     => City::class,
+                'skipOnError' => true,
+                'targetClass' => City::class,
                 'targetAttribute' => ['city_id' => 'id'],
             ],
         ];
@@ -138,19 +142,19 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function attributeLabels(): array
     {
         return [
-            'id'                  => 'ID',
-            'created_at'          => 'Created At',
-            'email'               => 'Email',
-            'name'                => 'Ваше имя',
-            'city_id'             => 'Город',
-            'password'            => 'Пароль',
-            'password_retype'     => 'Повтор пароля',
-            'is_executor'         => 'я собираюсь откликаться на заказы',
+            'id' => 'ID',
+            'created_at' => 'Created At',
+            'email' => 'Email',
+            'name' => 'Ваше имя',
+            'city_id' => 'Город',
+            'password' => 'Пароль',
+            'password_retype' => 'Повтор пароля',
+            'is_executor' => 'я собираюсь откликаться на заказы',
             'profile_img_file_id' => 'Profile Img File ID',
-            'birthday'            => 'Birthday',
-            'phone'               => 'Phone',
-            'telegram'            => 'Telegram',
-            'about'               => 'About',
+            'birthday' => 'Birthday',
+            'phone' => 'Phone',
+            'telegram' => 'Telegram',
+            'about' => 'About',
         ];
     }
 
@@ -246,13 +250,13 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         $result = 0;
 
         $ratingSum = Review::find()->where(['executor_id' => $this->id])->sum(
-            'rating'
+            'rating',
         );
         $reviewsCount = count($this->reviewsAsExecutor);
         $failedTasks = count(
             Task::find()->where(
-                ['executor_id' => $this->id, 'status' => Task::STATUS_FAILED]
-            )->all()
+                ['executor_id' => $this->id, 'status' => Task::STATUS_FAILED],
+            )->all(),
         );
 
         if ($reviewsCount + $failedTasks !== 0) {
