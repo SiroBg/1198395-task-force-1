@@ -7,8 +7,7 @@ use yii\widgets\LinkPager;
 
 /**
  * @var ActiveDataProvider $provider ;
- * @var array              $actions  ;
- * @var string             $title    ;
+ * @var \app\models\User   $user     ;
  */
 ?>
 <main class="main-content container">
@@ -16,26 +15,45 @@ use yii\widgets\LinkPager;
         <h3 class="head-main head-task">Мои задания</h3>
         <ul class="side-menu-list">
             <?php
-            foreach ($actions as $action): ?>
-                <li class="side-menu-item side-menu-item<?= Yii::$app->request->getPathInfo(
-                )
-                === $action['action'] ? '--active' : '' ?>">
+            if (!$user->is_executor) : ?>
+                <li class="side-menu-item side-menu-item--active">
                     <?= Html::a(
-                        $action['name'],
-                        [
-                            '/' . $action['action'],
-                        ],
-                        [
-                            'class' => 'link link--nav'
-                        ],
-                    ); ?>
+                        'Новые',
+                        '/my-tasks?status=new',
+                        ['class' => 'link link--nav']
+                    ) ?>
                 </li>
             <?php
-            endforeach; ?>
+            endif; ?>
+            <li class="side-menu-item">
+                <?= Html::a(
+                    'В процессе',
+                    '/my-tasks?status=active',
+                    ['class' => 'link link--nav']
+                ) ?>
+            </li>
+            <?php
+            if ($user->is_executor) : ?>
+                <li class="side-menu-item">
+                    <?= Html::a(
+                        'Просроченные',
+                        '/my-tasks?status=expired',
+                        ['class' => 'link link--nav']
+                    ) ?>
+                </li>
+            <?php
+            endif; ?>
+            <li class="side-menu-item">
+                <?= Html::a(
+                    'Закрытые',
+                    '/my-tasks?status=closed',
+                    ['class' => 'link link--nav']
+                ) ?>
+            </li>
         </ul>
     </div>
     <div class="left-column left-column--task">
-        <h3 class="head-main head-regular"><?= $title ?></h3>
+        <h3 class="head-main head-regular">Задания</h3>
         <?php
         foreach ($provider->getModels() as $task) : ?>
             <div class="task-card">
@@ -75,17 +93,17 @@ use yii\widgets\LinkPager;
         <?php
         if ($provider->pagination->pageCount > 1): ?>
             <?= LinkPager::widget([
-                'pagination'           => $provider->pagination,
-                'options'              => ['class' => 'pagination-list'],
+                'pagination' => $provider->pagination,
+                'options' => ['class' => 'pagination-list'],
                 'linkContainerOptions' => ['class' => 'pagination-item'],
-                'linkOptions'          => ['class' => 'link link--page'],
-                'activePageCssClass'   => 'pagination-item--active',
+                'linkOptions' => ['class' => 'link link--page'],
+                'activePageCssClass' => 'pagination-item--active',
                 'disabledPageCssClass' => 'mark',
-                'prevPageLabel'        => '',
-                'nextPageLabel'        => '',
-                'prevPageCssClass'     => 'pagination-item mark',
-                'nextPageCssClass'     => 'pagination-item mark',
-                'maxButtonCount'       => 3,
+                'prevPageLabel' => '',
+                'nextPageLabel' => '',
+                'prevPageCssClass' => 'pagination-item mark',
+                'nextPageCssClass' => 'pagination-item mark',
+                'maxButtonCount' => 3,
             ]) ?>
         <?php
         endif; ?>
