@@ -8,7 +8,6 @@ use yii\widgets\LinkPager;
 /**
  * @var ActiveDataProvider $provider ;
  * @var \app\models\User   $user     ;
- * @var string             $title    ;
  * @var string             $status   ;
  */
 ?>
@@ -17,7 +16,7 @@ use yii\widgets\LinkPager;
         <h3 class="head-main head-task">Мои задания</h3>
         <ul class="side-menu-list">
             <?php
-            if (!$user->is_executor) : ?>
+            if ( ! $user->is_executor) : ?>
                 <li class="side-menu-item <?= $status === 'new' ? 'side-menu-item--active' : '' ?>">
                     <a class="link link--nav" href="<?= Url::to(['my-tasks/index', 'status' => 'new']) ?>">
                         Новые
@@ -26,11 +25,11 @@ use yii\widgets\LinkPager;
             <?php
             endif; ?>
             <li class="side-menu-item">
-                <li class="side-menu-item <?= $status === 'active' ? 'side-menu-item--active' : '' ?>">
-                    <a class="link link--nav" href="<?= Url::to(['my-tasks/index', 'status' => 'active']) ?>">
-                        В процессе
-                    </a>
-                </li>
+            <li class="side-menu-item <?= $status === 'active' ? 'side-menu-item--active' : '' ?>">
+                <a class="link link--nav" href="<?= Url::to(['my-tasks/index', 'status' => 'active']) ?>">
+                    В процессе
+                </a>
+            </li>
             </li>
             <?php
             if ($user->is_executor) : ?>
@@ -49,15 +48,15 @@ use yii\widgets\LinkPager;
         </ul>
     </div>
     <div class="left-column left-column--task">
-        <h3 class="head-main head-regular"><?= $title ; ?></h3>
+        <h3 class="head-main head-regular">Список заданий</h3>
         <?php
         foreach ($provider->getModels() as $task) : ?>
             <div class="task-card">
                 <div class="header-task">
                     <a href="/tasks/view/<?= $task->id; ?>"
                        class="link link--block link--big"><?= Html::encode(
-                           $task->name,
-                       ); ?></a>
+                            $task->name,
+                        ); ?></a>
                     <?php
                     if ($task->budget): ?>
                         <p class="price price--task"><?= $task->budget; ?> ₽</p>
@@ -69,15 +68,15 @@ use yii\widgets\LinkPager;
             </span>
                 </p>
                 <p class="task-text"><?= Html::encode(
-                    $task->description,
-                ); ?></p>
+                        $task->description,
+                    ); ?></p>
 
                 <div class="footer-task">
                     <?php
-                if ($task->city) : ?>
+                    if ($task->city) : ?>
                         <p class="info-text town-text"><?= $task->city->name; ?></p>
                     <?php
-                endif; ?>
+                    endif; ?>
                     <p class="info-text category-text"><?= $task->category->name; ?></p>
                     <a href="/tasks/view/<?= $task->id; ?>"
                        class="button button--black">Смотреть
@@ -89,17 +88,17 @@ use yii\widgets\LinkPager;
         <?php
         if ($provider->pagination->pageCount > 1): ?>
             <?= LinkPager::widget([
-                'pagination' => $provider->pagination,
-                'options' => ['class' => 'pagination-list'],
+                'pagination'           => $provider->pagination,
+                'options'              => ['class' => 'pagination-list'],
                 'linkContainerOptions' => ['class' => 'pagination-item'],
-                'linkOptions' => ['class' => 'link link--page'],
-                'activePageCssClass' => 'pagination-item--active',
+                'linkOptions'          => ['class' => 'link link--page'],
+                'activePageCssClass'   => 'pagination-item--active',
                 'disabledPageCssClass' => 'mark',
-                'prevPageLabel' => '',
-                'nextPageLabel' => '',
-                'prevPageCssClass' => 'pagination-item mark',
-                'nextPageCssClass' => 'pagination-item mark',
-                'maxButtonCount' => 3,
+                'prevPageLabel'        => '',
+                'nextPageLabel'        => '',
+                'prevPageCssClass'     => 'pagination-item mark',
+                'nextPageCssClass'     => 'pagination-item mark',
+                'maxButtonCount'       => 3,
             ]) ?>
         <?php
         endif; ?>

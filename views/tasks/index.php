@@ -3,11 +3,10 @@
 /**
  * @var \app\models\Task             $tasks      ;
  * @var \app\models\Category         $categories ;
- * @var TaskForm                     $taskForm   ;
+ * @var \app\models\TaskSearch       $taskSearch ;
  * @var BaseDataProvider::Pagination $pagination ;
  */
 
-use app\models\TaskForm;
 use yii\helpers\ArrayHelper;
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
@@ -83,7 +82,7 @@ use yii\widgets\LinkPager;
 
                 <h4 class="head-card">Категории</h4>
                 <div class="checkbox-wrapper">
-                    <?= $form->field($taskForm, 'categories')
+                    <?= $form->field($taskSearch, 'categories')
                              ->checkboxList(
                                  ArrayHelper::map($categories, 'id', 'name'),
                                  [
@@ -93,15 +92,15 @@ use yii\widgets\LinkPager;
                              )->error(['tag' => false])->label(false); ?>
                 </div>
                 <h4 class="head-card">Дополнительно</h4>
-                <?= $form->field($taskForm, 'noResponds')->checkbox([
+                <?= $form->field($taskSearch, 'noResponds')->checkbox([
                     'labelOptions' => ['class' => 'control-label'],
                 ])->error(['tag' => false]); ?>
-                <?= $form->field($taskForm, 'remoteTask')->checkbox([
+                <?= $form->field($taskSearch, 'remoteTask')->checkbox([
                     'labelOptions' => ['class' => 'control-label'],
                 ])->error(['tag' => false]); ?>
                 <h4 class="head-card">Период</h4>
-                <?= $form->field($taskForm, 'period')->dropDownList(
-                    TaskForm::PERIODS_OPTIONS,
+                <?= $form->field($taskSearch, 'period')->dropDownList(
+                    \app\models\TaskSearch::PERIODS_OPTIONS,
                 )->label(false); ?>
 
                 <?= Html::submitInput(

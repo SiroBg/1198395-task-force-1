@@ -13,6 +13,7 @@ use app\models\Review;
 use app\models\TaskFile;
 use app\models\Task;
 use app\models\TaskForm;
+use app\models\TaskSearch;
 use app\models\User;
 use DateInterval;
 use DateTime;
@@ -49,46 +50,14 @@ class TasksController extends Controller
      */
     public function actionIndex(): string
     {
-        $query = Task::find()->where(['status' => Task::STATUS_NEW]);
-
         $categories = Category::find()->select(['id', 'name'])->all();
 
-        $taskForm = new TaskForm();
+        $taskSearch = new TaskSearch();
+        $provider   = $taskSearch->getNewTasksProvider();
 
-        if ($taskForm->load(Yii::$app->request->get())) {
-            if ( ! empty($taskForm->categories)) {
-                $query->andWhere(['category_id' => $taskForm->categories]);
-            }
-
-            if ($taskForm->noResponds) {
-                $query->andWhere(['executor_id' => null]);
-            }
-
-            if ($taskForm->remoteTask) {
-                $query->andWhere(['location' => '']);
-            }
-
-            if ( ! empty($taskForm->period) && $taskForm->validate()) {
-                $interval = new DateInterval($taskForm->period);
-
-                $date = date_sub(new DateTime(), $interval);
-                $query->andWhere(
-                    ['>', 'created_at', $date->format('Y-m-d H:i:s')],
-                );
-            }
+        if ($taskSearch->load(Yii::$app->request->get())) {
+            $provider = $taskSearch->getFilteredProvider();
         }
-
-        $provider = new ActiveDataProvider([
-            'query'      => $query,
-            'pagination' => [
-                'pageSize' => 5,
-            ],
-            'sort'       => [
-                'defaultOrder' => [
-                    'created_at' => SORT_DESC,
-                ],
-            ],
-        ]);
 
         $tasks      = $provider->getModels();
         $pagination = $provider->pagination;
@@ -98,7 +67,7 @@ class TasksController extends Controller
             [
                 'tasks'      => $tasks,
                 'categories' => $categories,
-                'taskForm'   => $taskForm,
+                'taskSearch' => $taskSearch,
                 'pagination' => $pagination,
             ],
         );
