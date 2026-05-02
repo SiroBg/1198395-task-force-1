@@ -3,7 +3,8 @@
 use kartik\rating\StarRating;
 
 /**
- * @var \app\models\User $user ;
+ * @var \app\models\User     $user        ;
+ * @var \app\models\Review[] $userReviews ;
  */
 
 use yii\helpers\Html;
@@ -13,7 +14,7 @@ use yii\helpers\Url;
 
 <main class="main-content container">
     <div class="left-column">
-        <h3 class="head-main"><?= Html::encode($user->name ?? ''); ?></h3>
+        <h3 class="head-main"><?= Html::encode($user->name); ?></h3>
         <div class="user-card">
             <div class="photo-rate">
                 <?= Html::img(
@@ -55,7 +56,7 @@ use yii\helpers\Url;
                             <a href="<?= Url::toRoute(
                                 [
                                     'tasks/index',
-                                    'TasksForm[categories][]' => $userCategory->category->id
+                                    'TaskForm[categories][]' => $userCategory->category->id
                                 ]
                             ); ?>"
                                class="link link--regular"><?= $userCategory->category->name; ?></a>
@@ -68,86 +69,117 @@ use yii\helpers\Url;
                 <p class="head-info">Био</p>
                 <p class="bio-info"><span class="country-info">Россия</span>,
                     <span class="town-info"><?= $user->city->name; ?></span>,
-                    <span class="age-info"><?= $user->birthday; ?></span> лет
+                    <?php
+                    if ($user->birthday): ?>
+                        <span class="age-info">День рождения: <?= Yii::$app->formatter->asDate(
+                                $user->birthday,
+                                'php:d-m-Y'
+                            ); ?></span>
+                    <?php
+                    endif; ?>
                 </p>
             </div>
         </div>
-        <h4 class="head-regular">Отзывы заказчиков</h4>
-        <div class="response-card">
-            <img class="customer-photo" src="img/man-coat.png" width="120"
-                 height="127" alt="Фото заказчиков">
-            <div class="feedback-wrapper">
-                <p class="feedback">«Кумар сделал всё в лучшем виде. Буду
-                    обращаться к нему в
-                    будущем, если возникнет такая необходимость!»</p>
-                <p class="task">Задание «<a href="#" class="link link--small">Повесить
-                        полочку</a>» выполнено</p>
-            </div>
-            <div class="feedback-wrapper">
-                <div class="stars-rating small"><span
-                            class="fill-star">&nbsp;</span><span
-                            class="fill-star">&nbsp;</span><span
-                            class="fill-star">&nbsp;</span><span
-                            class="fill-star">&nbsp;</span><span>&nbsp;</span>
+        <?php
+        if ( ! empty($userReviews)): ?>
+            <h4 class="head-regular">Отзывы заказчиков</h4>
+            <?php
+            foreach ($userReviews as $review): ?>
+                <div class="response-card">
+                    <img class="customer-photo"
+                         src="<?= $review->author->profileImgFile->url ?? '/img/avatar-placeholder.png' ?>" width="120"
+                         height="127" alt="Фото заказчика">
+                    <div class="feedback-wrapper">
+                        <p class="feedback">
+                            <?= Html::encode($review->comment) ?>
+                        </p>
+                        <p class="task">Задание «<?= Html::a(
+                                Html::encode($review->task->name),
+                                '/tasks/view'.$review->task->id,
+                                ['class' => 'link link--small']
+                            ) ?>» выполнено</p>
+                    </div>
+                    <div class="feedback-wrapper">
+                        <?= StarRating::widget([
+                            'name'          => 'display_rating',
+                            'value'         => $review->rating,
+                            'pluginOptions' => [
+                                'displayOnly' => true,
+                                'disabled'    => true,
+                                'size'        => 'sm',
+                                'showClear'   => false,
+                                'showCaption' => false,
+                            ],
+                        ]); ?>
+                        <p class="info-text"><span class="current-time"><?= Yii::$app->formatter->asRelativeTime(
+                                    $review->created_at
+                                ) ?></span>
+                        </p>
+                    </div>
                 </div>
-                <p class="info-text"><span class="current-time">25 минут </span>назад
-                </p>
-            </div>
-        </div>
-        <div class="response-card">
-            <img class="customer-photo" src="img/man-sweater.png" width="120"
-                 height="127" alt="Фото заказчиков">
-            <div class="feedback-wrapper">
-                <p class="feedback">«Кумар сделал всё в лучшем виде. Буду
-                    обращаться к нему в
-                    будущем, если возникнет такая необходимость!»</p>
-                <p class="task">Задание «<a href="#" class="link link--small">Повесить
-                        полочку</a>» выполнено</p>
-            </div>
-            <div class="feedback-wrapper">
-                <div class="stars-rating small"><span
-                            class="fill-star">&nbsp;</span><span
-                            class="fill-star">&nbsp;</span><span
-                            class="fill-star">&nbsp;</span><span
-                            class="fill-star">&nbsp;</span><span>&nbsp;</span>
-                </div>
-                <p class="info-text"><span class="current-time">25 минут </span>назад
-                </p>
-            </div>
-        </div>
+            <?php
+            endforeach; ?>
+        <?php
+        endif; ?>
     </div>
     <div class="right-column">
         <div class="right-card black">
             <h4 class="head-card">Статистика исполнителя</h4>
             <dl class="black-list">
                 <dt>Всего заказов</dt>
-                <dd>4 выполнено, 0 провалено</dd>
+                <dd><?= $user->finishedTasksAmount ?> выполнено, <?= $user->failedTasksAmount ?> провалено</dd>
                 <dt>Место в рейтинге</dt>
-                <dd>25 место</dd>
+                <dd><?= $user->ratingPlacement ?> место</dd>
                 <dt>Дата регистрации</dt>
                 <dd><?= Yii::$app->formatter->asDatetime(
                         $user->created_at,
                         'php:d.m.Y, H:i'
                     ); ?></dd>
                 <dt>Статус</dt>
-                <dd>Открыт для новых заказов</dd>
+                <dd><?= $user->isBusy ? 'Занят заказом' : 'Открыт для новых заказов' ?></dd>
             </dl>
         </div>
-        <div class="right-card white">
-            <h4 class="head-card">Контакты</h4>
-            <ul class="enumeration-list">
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--phone">+7 (906)
-                        256-06-08</a>
-                </li>
-                <li class="enumeration-item">
-                    <a href="#" class="link link--block link--email">super-pavel@mail.ru</a>
-                </li>
-                <li class="enumeration-item">
-                    <a href="#"
-                       class="link link--block link--tg">@superpasha</a>
-                </li>
-            </ul>
-        </div>
+        <?php
+        if ($user->show_contacts): ?>
+            <div class="right-card white">
+                <h4 class="head-card">Контакты</h4>
+                <ul class="enumeration-list">
+                    <?php
+                    if ($user->phone): ?>
+                        <li class="enumeration-item">
+                            <?= Html::a(
+                                Html::encode($user->phone),
+                                'tel+:'.Html::encode($user->phone),
+                                ['class' => 'link link--block link--phone']
+                            ); ?>
+                        </li>
+                    <?php
+                    endif; ?>
+                    <?php
+                    if ($user->email): ?>
+                        <li class="enumeration-item">
+                            <?= Html::a(
+                                Html::encode($user->email),
+                                'mailto:'.Html::encode($user->email),
+                                ['class' => 'link link--block link--email']
+                            ); ?>
+                        </li>
+                    <?php
+                    endif; ?>
+                    <?php
+                    if ($user->telegram): ?>
+                        <li class="enumeration-item">
+                            <?= Html::a(
+                                Html::encode($user->telegram),
+                                'https://t.me'.Html::encode($user->telegram),
+                                ['class' => 'link link--block link--tg', 'target' => '_blank']
+                            ); ?>
+                        </li>
+                    <?php
+                    endif; ?>
+                </ul>
+            </div>
+        <?php
+        endif; ?>
     </div>
 </main>

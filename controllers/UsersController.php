@@ -31,11 +31,13 @@ class UsersController extends Controller
     {
         $user = User::findOne($id);
 
-        if ($user === null) {
+        if ($user === null || ! $user->is_executor) {
             throw new NotFoundHttpException('Страница не найдена');
         }
 
-        return $this->render('view', ['user' => $user]);
+        $userReviews = $user->reviewsAsExecutor;
+
+        return $this->render('view', ['user' => $user, 'userReviews' => $userReviews]);
     }
 
     public function actionLogout(): \yii\web\Response

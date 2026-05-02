@@ -84,16 +84,19 @@ use yii\widgets\LinkPager;
                 <h4 class="head-card">Категории</h4>
                 <div class="checkbox-wrapper">
                     <?= $form->field($taskForm, 'categories')
-                        ->checkboxList(
-                            ArrayHelper::map($categories, 'id', 'name'),
-                            [
-                                'separator' => '<br>',
-                                'class'     => 'control-label',
-                            ],
-                        )->error(['tag' => false])->label(false); ?>
+                             ->checkboxList(
+                                 ArrayHelper::map($categories, 'id', 'name'),
+                                 [
+                                     'separator' => '<br>',
+                                     'class'     => 'control-label',
+                                 ],
+                             )->error(['tag' => false])->label(false); ?>
                 </div>
                 <h4 class="head-card">Дополнительно</h4>
                 <?= $form->field($taskForm, 'noResponds')->checkbox([
+                    'labelOptions' => ['class' => 'control-label'],
+                ])->error(['tag' => false]); ?>
+                <?= $form->field($taskForm, 'remoteTask')->checkbox([
                     'labelOptions' => ['class' => 'control-label'],
                 ])->error(['tag' => false]); ?>
                 <h4 class="head-card">Период</h4>

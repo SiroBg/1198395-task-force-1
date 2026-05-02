@@ -31,9 +31,13 @@ use yii\web\UploadedFile;
  * @property Review[]       $reviews
  * @property Review[]       $reviewsAsExecutor
  * @property Task[]         $tasks
- * @property Task[]         $tasks0
+ * @property Task[]         $tasksAsExecutor
+ * @property int            $finishedTasksAmount
+ * @property int            $failedTasksAmount
  * @property UserCategory[] $userCategories
  * @property float          $rating
+ * @property int|false      $ratingPlacement
+ * @property bool           $isBusy
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -247,9 +251,19 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getTasks0(): \yii\db\ActiveQuery
+    public function getTasksAsExecutor(): \yii\db\ActiveQuery
     {
         return $this->hasMany(Task::class, ['executor_id' => 'id']);
+    }
+
+    public function getFinishedTasksAmount(): int
+    {
+        return count($this->getTasksAsExecutor()->andWhere(['status' => Task::STATUS_FINISHED])->all());
+    }
+
+    public function getFailedTasksAmount(): int
+    {
+        return count($this->getTasksAsExecutor()->andWhere(['status' => Task::STATUS_FAILED])->all());
     }
 
     /**
@@ -288,5 +302,22 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         }
 
         return $result;
+    }
+
+    public function getRatingPlacement(): int|false
+    {
+        $users = User::findAll(['is_executor' => true]);
+        uasort($users, function (User $userA, User $userB) {
+            return $userB->rating - $userA->rating;
+        });
+
+        $result = array_search($this->id, array_column($users, 'id'));
+        
+        return $result ? $result++ : 1;
+    }
+
+    public function getIsBusy(): bool
+    {
+        return ! empty(Task::findAll(['executor_id' => $this->id, 'status' => Task::STATUS_ACTIVE]));
     }
 }

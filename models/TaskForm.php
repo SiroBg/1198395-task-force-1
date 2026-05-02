@@ -8,13 +8,14 @@ use yii\base\Model;
 class TaskForm extends Model
 {
     public array|string $categories = [];
-    public bool $noResponds = false;
-    public string $period = '';
+    public bool         $noResponds = false;
+    public bool         $remoteTask = false;
+    public string       $period     = '';
 
     public const array PERIODS_OPTIONS
         = [
-            '' => 'Любой',
-            'PT1H' => '1 час',
+            ''      => 'Любой',
+            'PT1H'  => '1 час',
             'PT12H' => '12 часов',
             'PT24H' => '24 часа',
         ];
@@ -24,7 +25,8 @@ class TaskForm extends Model
         return [
             'categories' => 'Категории',
             'noResponds' => 'Без исполнителя',
-            'period' => 'Период',
+            'remoteTask' => 'Удалённая работа',
+            'period'     => 'Период',
         ];
     }
 
@@ -32,14 +34,14 @@ class TaskForm extends Model
     {
         return [
             ['categories', 'each', 'rule' => ['integer']],
-            ['noResponds', 'boolean'],
+            [['noResponds', 'remoteTask'], 'boolean'],
             ['period', 'validateIsoDuration'],
         ];
     }
 
     public function validateIsoDuration($attribute): void
     {
-        if (!empty($this->$attribute)) {
+        if ( ! empty($this->$attribute)) {
             try {
                 new DateInterval($this->$attribute);
             } catch (\Exception $e) {

@@ -56,7 +56,7 @@ class TasksController extends Controller
         $taskForm = new TaskForm();
 
         if ($taskForm->load(Yii::$app->request->get())) {
-            if (!empty($taskForm->categories)) {
+            if ( ! empty($taskForm->categories)) {
                 $query->andWhere(['category_id' => $taskForm->categories]);
             }
 
@@ -64,7 +64,11 @@ class TasksController extends Controller
                 $query->andWhere(['executor_id' => null]);
             }
 
-            if (!empty($taskForm->period) && $taskForm->validate()) {
+            if ($taskForm->remoteTask) {
+                $query->andWhere(['location' => '']);
+            }
+
+            if ( ! empty($taskForm->period) && $taskForm->validate()) {
                 $interval = new DateInterval($taskForm->period);
 
                 $date = date_sub(new DateTime(), $interval);
@@ -86,7 +90,7 @@ class TasksController extends Controller
             ],
         ]);
 
-        $tasks = $provider->getModels();
+        $tasks      = $provider->getModels();
         $pagination = $provider->pagination;
 
         return $this->render(
@@ -115,27 +119,27 @@ class TasksController extends Controller
             ['id' => Yii::$app->user->id],
         )->one();
 
-        $responds = [];
+        $responds    = [];
         $hasResponds = false;
 
         if ($user->is_executor) {
-            $responds = Respond::find()->where(
+            $responds    = Respond::find()->where(
                 ['executor_id' => $user->id, 'task_id' => $task->id],
             )->all();
             $hasResponds = in_array(
-                    $user->id,
-                    array_column($responds, 'executor_id')
-                )
-                && $task->executor_id !== $user->id;
+                               $user->id,
+                               array_column($responds, 'executor_id')
+                           )
+                           && $task->executor_id !== $user->id;
         } elseif ($task->author_id === $user->id) {
             $responds = Respond::find()->where(['task_id' => $task->id])
-                ->all();
+                               ->all();
         }
 
         $taskFiles = TaskFile::find()->where(['task_id' => $task->id])
-            ->all();
+                             ->all();
 
-        $reviewForm = new Review();
+        $reviewForm  = new Review();
         $respondForm = new Respond();
 
         return $this->render(
