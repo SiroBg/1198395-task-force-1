@@ -59,16 +59,12 @@ class TasksController extends Controller
             $provider = $taskSearch->getFilteredProvider();
         }
 
-        $tasks      = $provider->getModels();
-        $pagination = $provider->pagination;
-
         return $this->render(
             'index',
             [
-                'tasks'      => $tasks,
+                'provider'   => $provider,
                 'categories' => $categories,
                 'taskSearch' => $taskSearch,
-                'pagination' => $pagination,
             ],
         );
     }
