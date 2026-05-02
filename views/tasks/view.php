@@ -16,15 +16,7 @@ use yii\widgets\ActiveForm;
  * @var bool                 $hasResponds ;
  */
 
-$this->registerJsFile(
-    'https://api-maps.yandex.ru/2.1/?apikey='
-    . Yii::$app->params['yandexJsApiKey'] . '&lang=ru_RU',
-    ['position' => \yii\web\View::POS_END,]
-);
-$this->registerJsFile(
-    '/js/yandexMap.js',
-    ['position' => \yii\web\View::POS_END,]
-);
+\app\assets\ViewTaskAsset::register($this);
 ?>
 
 <main class="main-content container">
@@ -54,14 +46,14 @@ $this->registerJsFile(
                     $user->is_executor
                 )
                 && $action->getName() !== 'action_start'
-                && !$hasResponds
+                && ! $hasResponds
             ): ?>
                 <?= Html::a(
                     $action->getDescription(),
                     options: [
                         'class'       => 'button button--'
-                            . $action->getButtonColor()
-                            . ' action-btn',
+                                         .$action->getButtonColor()
+                                         .' action-btn',
                         'data-action' => $action->getName(),
                     ],
                 ); ?>
@@ -83,7 +75,7 @@ $this->registerJsFile(
         <?php
         endif; ?>
         <?php
-        if (!empty($responds)): ?>
+        if ( ! empty($responds)): ?>
             <h4 class="head-regular">
                 <?= $user->is_executor ? 'Ваш отклик' : 'Отклики на задание'; ?>
             </h4>
@@ -145,7 +137,7 @@ $this->registerJsFile(
                     <?php
                     if ($task->status === Task::STATUS_NEW
                         && $task->author_id === $user->id
-                        && !$respond->rejected
+                        && ! $respond->rejected
                     ): ?>
                         <div class="button-popup">
                             <?= Html::a(
@@ -199,7 +191,7 @@ $this->registerJsFile(
             </dl>
         </div>
         <?php
-        if (!empty($taskFiles)): ?>
+        if ( ! empty($taskFiles)): ?>
             <div class="right-card white file-card">
                 <h4 class="head-card">Файлы задания</h4>
                 <ul class="enumeration-list">
@@ -207,7 +199,7 @@ $this->registerJsFile(
                     foreach ($taskFiles as $file): ?>
                         <?php
                         if (file_exists(
-                            Yii::getAlias('@webroot/') . $file->file->url,
+                            Yii::getAlias('@webroot/').$file->file->url,
                         )
                         ): ?>
                             <li class="enumeration-item">
@@ -222,7 +214,7 @@ $this->registerJsFile(
                                 <p class="file-size"><?= Yii::$app->formatter->asShortSize(
                                         filesize(
                                             Yii::getAlias('@webroot/')
-                                            . $file->file->url,
+                                            .$file->file->url,
                                         ),
                                     ); ?></p>
                             </li>
@@ -296,9 +288,9 @@ $this->registerJsFile(
                 ],
             ); ?>
             <?= $form->field($reviewForm, 'comment')
-                ->textarea(
-                    ['labelOptions' => ['class' => 'control-label']],
-                ); ?>
+                     ->textarea(
+                         ['labelOptions' => ['class' => 'control-label']],
+                     ); ?>
             <p class="completion-head control-label">Оценка работы</p>
             <?= $form->field($reviewForm, 'rating')->widget(StarRating::class, [
                 'pluginOptions' => [
@@ -342,13 +334,13 @@ $this->registerJsFile(
                 ],
             ); ?>
             <?= $form->field($respondForm, 'comment')
-                ->textarea(
-                    ['labelOptions' => ['class' => 'control-label']],
-                ) ?>
+                     ->textarea(
+                         ['labelOptions' => ['class' => 'control-label']],
+                     ) ?>
             <?= $form->field($respondForm, 'price')
-                ->textInput(
-                    ['labelOptions' => ['class' => 'control-label']],
-                ) ?>
+                     ->textInput(
+                         ['labelOptions' => ['class' => 'control-label']],
+                     ) ?>
             <?= Html::submitInput(
                 'Завершить',
                 ['class' => 'button button--pop-up button--blue'],

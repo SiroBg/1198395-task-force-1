@@ -54,9 +54,9 @@ class TaskSearch extends Model
     /**
      * @throws \DateMalformedIntervalStringException
      */
-    public function getFilteredProvider(): ActiveDataProvider
+    public function getFilteredProvider(int $userCityId): ActiveDataProvider
     {
-        $provider = $this->getNewTasksProvider();
+        $provider = $this->getNewTasksProvider($userCityId);
 
         if ( ! empty($this->categories)) {
             $provider->query->andWhere(['category_id' => $this->categories]);
@@ -87,10 +87,10 @@ class TaskSearch extends Model
         return $provider;
     }
 
-    public function getNewTasksProvider(): ActiveDataProvider
+    public function getNewTasksProvider(int $userCityId): ActiveDataProvider
     {
         $provider = $this->initProvider();
-        $provider->query->andWhere(['status' => Task::STATUS_NEW]);
+        $provider->query->andWhere(['status' => Task::STATUS_NEW, 'city_id' => [$userCityId, null]]);
         return $provider;
     }
 

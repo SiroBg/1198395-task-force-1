@@ -51,12 +51,13 @@ class TasksController extends Controller
     public function actionIndex(): string
     {
         $categories = Category::find()->select(['id', 'name'])->all();
+        $user       = User::findOne(Yii::$app->user->id);
 
         $taskSearch = new TaskSearch();
-        $provider   = $taskSearch->getNewTasksProvider();
+        $provider   = $taskSearch->getNewTasksProvider($user->city_id);
 
         if ($taskSearch->load(Yii::$app->request->get())) {
-            $provider = $taskSearch->getFilteredProvider();
+            $provider = $taskSearch->getFilteredProvider($user->city_id);
         }
 
         return $this->render(

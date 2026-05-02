@@ -19,7 +19,7 @@ class YandexGeocoder extends Component
         try {
             $response = $client->request('GET', $this->apiUrl, [
                 'query' => [
-                    'apikey'  => Yii::$app->params['yandexJsApiKey'],
+                    'apikey'  => Yii::$app->params['yandexGeocoderApiKey'],
                     'geocode' => $address,
                     'format'  => 'json',
                     'results' => 1,
@@ -39,7 +39,7 @@ class YandexGeocoder extends Component
                 $geoObject['Point']['pos']
             );
             $result['fullAddress']
-                = $geoObject['metaDataProperty']['GeocoderMetaData']
+                                   = $geoObject['metaDataProperty']['GeocoderMetaData']
             ['text'];
         }
         return $result;

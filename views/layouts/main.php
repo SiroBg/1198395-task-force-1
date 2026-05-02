@@ -84,7 +84,7 @@ $this->beginBody() ?>
         </div>
         </nav>
         <div class="user-block">
-            <a href="<?= Url::to('/users/view/'.$user->id) ?>">
+            <a href="<?= Url::to($user->is_executor ? '/users/view/'.$user->id : '#') ?>">
                 <img class="user-photo" src="<?= $user->profileImgFile->url ?? '/img/avatar-placeholder.png' ?>"
                      width="55"
                      height="55" alt="Аватар">
