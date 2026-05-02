@@ -3,8 +3,8 @@
 
 /**
  * @var string $content
- * @var User $user
-*/
+ * @var User   $user
+ */
 
 use app\assets\AppAsset;
 use app\models\User;
@@ -20,7 +20,7 @@ $this->registerMetaTag(
 );
 $this->registerMetaTag(
     [
-        'name' => 'description',
+        'name'    => 'description',
         'content' => $this->params['meta_description'] ?? '',
     ],
 );
@@ -29,14 +29,12 @@ $this->registerMetaTag(
 );
 $this->registerLinkTag(
     [
-        'rel' => 'icon',
+        'rel'  => 'icon',
         'type' => 'image/x-icon',
         'href' => Yii::getAlias('@web/favicon.ico'),
     ],
 );
-$user = User::find()->select(['is_executor', 'name'])->where(
-    ['id' => Yii::$app->user->id],
-)->one();
+$user = User::findOne(Yii::$app->user->id);
 ?>
 <?php
 $this->beginPage() ?>
@@ -61,7 +59,8 @@ $this->beginBody() ?>
         <?php
         if (Url::current() === '/sign-up/index'): ?>
     </nav>
-    <?php else : ?>
+    <?php
+    else : ?>
         <div class="nav-wrapper">
             <ul class="nav-list">
                 <li class="list-item <?= Url::current() === '/tasks/index' ? 'list-item--active' : '' ?>">
@@ -71,39 +70,39 @@ $this->beginBody() ?>
                     <a href="/my-tasks/" class="link link--nav">Мои задания</a>
                 </li>
                 <?php
-                if (!$user->is_executor) : ?>
+                if ( ! $user->is_executor) : ?>
                     <li class="list-item <?= Url::current() === '/add-task/index' ? 'list-item--active' : '' ?>">
                         <a href="/add-task" class="link link--nav">Создать
                             задание</a>
                     </li>
                 <?php
                 endif; ?>
-                <li class="list-item <?= Url::current() === '/settings/index' ? 'list-item--active' : '' ?>">
-                    <a href="/settings" class="link link--nav">Настройки</a>
+                <li class="list-item <?= Url::current() === '/user-settings/index' ? 'list-item--active' : '' ?>">
+                    <a href="/user-settings" class="link link--nav">Настройки</a>
                 </li>
             </ul>
         </div>
         </nav>
         <div class="user-block">
-            <a href="#">
-                <img class="user-photo" src="<?= $user->profileImgFile->url ?? '/img/avatar-placeholder.png' ?>" width="55"
+            <a href="<?= Url::to('/users/view/'.$user->id) ?>">
+                <img class="user-photo" src="<?= $user->profileImgFile->url ?? '/img/avatar-placeholder.png' ?>"
+                     width="55"
                      height="55" alt="Аватар">
             </a>
             <div class="user-menu">
                 <p class="user-name"><?= htmlspecialchars(
-                    $user->name,
-                ); ?></p>
+                        $user->name,
+                    ); ?></p>
                 <div class="popup-head">
                     <ul class="popup-menu">
                         <li class="menu-item">
-                            <a href="#" class="link">Настройки</a>
+                            <?= Html::a('Настройки', ['/user-settings/'], ['class' => 'link']) ?>
                         </li>
                         <li class="menu-item">
                             <a href="#" class="link">Связаться с нами</a>
                         </li>
                         <li class="menu-item">
-                            <a href="/users/logout" class="link">Выход из
-                                системы</a>
+                            <?= Html::a('Выход из системы', ['/users/logout/'], ['class' => 'link']) ?>
                         </li>
                     </ul>
                 </div>

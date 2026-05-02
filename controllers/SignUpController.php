@@ -38,7 +38,8 @@ class SignUpController extends Controller
     {
         $cities = City::find()->select(['id', 'name'])->all();
 
-        $user = new User();
+        $user           = new User();
+        $user->scenario = 'signup';
         if (Yii::$app->request->getIsPost()) {
             $user->load(Yii::$app->request->post());
             if (Yii::$app->request->isAjax) {
