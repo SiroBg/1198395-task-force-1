@@ -2,12 +2,12 @@
 
 namespace app\models;
 
-use app\actions\actionAbstract;
-use app\actions\actionCancel;
-use app\actions\actionFinish;
-use app\actions\actionRefuse;
-use app\actions\actionRespond;
-use app\actions\actionStart;
+use app\actions\ActionAbstract;
+use app\actions\ActionCancel;
+use app\actions\ActionFinish;
+use app\actions\ActionRefuse;
+use app\actions\ActionRespond;
+use app\actions\ActionStart;
 use app\exceptions\TaskStatusException;
 use Yii;
 use yii\db\ActiveQuery;
@@ -84,7 +84,7 @@ class Task extends \yii\db\ActiveRecord
                     'expire_date',
                     'location',
                 ],
-                'safe'
+                'safe',
             ],
             [
                 'expire_date',
@@ -116,7 +116,7 @@ class Task extends \yii\db\ActiveRecord
             ],
             [['lat', 'long'], 'number'],
             [['name', 'location'], 'string', 'max' => 256],
-            ['location', 'validateLocation'],
+            ['location', 'validateLocation', 'on' => 'create'],
             [['lat', 'long', 'city_id'], 'clearIfEmpty'],
             [
                 'name',
@@ -354,28 +354,25 @@ class Task extends \yii\db\ActiveRecord
     public function validateLocation($attribute, $params): void
     {
         $objectData = Yii::$app->yandexGeoCoder->getObjectData(
-            $this->$attribute
+            $this->$attribute,
         );
 
-        $userCity = User::find()
-            ->where(['id' => Yii::$app->user->id])->one()->city;
-
-        $isRightCity = array_any(
-            $objectData['addressComponents'],
-            function ($value) use ($userCity) {
-                return in_array($userCity->name, $value);
-            }
+        $searchedCity = array_find(
+            City::find()->all(),
+            function ($city) use ($objectData) {
+                return str_contains($objectData['fullAddress'], $city->name);
+            },
         );
 
-        if (!$isRightCity) {
+        if (!$searchedCity) {
             $this->addError(
                 $attribute,
-                'Выберите адрес, находящийся в пределах вашего города'
+                'Выбранного города нет в базе данных',
             );
         } else {
             $this->lat = $objectData['coordinates'][1];
             $this->long = $objectData['coordinates'][0];
-            $this->city_id = $userCity->id;
+            $this->city_id = $searchedCity->id;
         }
     }
 
@@ -389,19 +386,19 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Получает статус, в который перейдёт задание после примененного действия.
      *
-     * @param actionAbstract $action Объект класса AbstractAction
+     * @param ActionAbstract $action Объект класса AbstractAction
      *
      * @return string Статус задания.
      */
     public function getNextStatus(
-        actionAbstract $action,
+        ActionAbstract $action,
     ): string {
         return match ($action->getName()) {
-            actionRespond::getName() => self::STATUS_NEW,
-            actionStart::getName() => self::STATUS_ACTIVE,
-            actionCancel::getName() => self::STATUS_CANCELED,
-            actionFinish::getName() => self::STATUS_FINISHED,
-            actionRefuse::getName() => self::STATUS_FAILED,
+            new ActionRespond()->getName() => self::STATUS_NEW,
+            new ActionStart()->getName() => self::STATUS_ACTIVE,
+            new ActionCancel()->getName() => self::STATUS_CANCELED,
+            new ActionFinish()->getName() => self::STATUS_FINISHED,
+            new ActionRefuse()->getName() => self::STATUS_FAILED,
         };
     }
 
@@ -415,21 +412,19 @@ class Task extends \yii\db\ActiveRecord
      * @throws TaskStatusException Исключение при непредусмотренном статусе задания.
      *
      */
-    public function getActions(
-        int $userId,
-        bool $isExecutor,
-    ): array {
+    public function getActions(): array
+    {
         $actionsToStatus = [
             self::STATUS_NEW      =>
                 [
-                    new actionCancel(),
-                    new actionRespond(),
-                    new actionStart(),
+                    new ActionCancel(),
+                    new ActionRespond(),
+                    new ActionStart(),
                 ],
             self::STATUS_ACTIVE   =>
                 [
-                    new actionFinish(),
-                    new actionRefuse(),
+                    new ActionFinish(),
+                    new ActionRefuse(),
                 ],
             self::STATUS_CANCELED => [],
             self::STATUS_FAILED   => [],
@@ -442,55 +437,6 @@ class Task extends \yii\db\ActiveRecord
             );
         }
 
-        return array_filter(
-            $actionsToStatus[$this->status],
-            function ($action) use ($userId, $isExecutor) {
-                return $action->checkRights(
-                    $this->executor_id,
-                    $this->author_id,
-                    $userId,
-                    $isExecutor,
-                );
-            },
-        );
-    }
-
-    /**
-     * Применяет действие к заданию, если оно возможно для текущего статуса.
-     *
-     * @param actionAbstract $action     Действие.
-     * @param int            $userId     Id пользователя.
-     * @param bool           $isExecutor Является ли пользователь исполнителем.
-     * @param ?int           $executorId Id исполнителя (при действии "начать задание").
-     *
-     * @return bool `true` - действие применилось, `false` - действие невозможно.
-     * @throws TaskStatusException
-     */
-    public function applyAction(
-        actionAbstract $action,
-        int $userId,
-        bool $isExecutor,
-        ?int $executorId = null,
-    ): bool {
-        $result = false;
-
-        $currentActionsNames = array_map(
-            function ($action) {
-                return $action->getName();
-            },
-            $this->getActions($userId, $isExecutor),
-        );
-
-        if (in_array($action->getName(), $currentActionsNames)
-        ) {
-            if ($action->getName() === actionStart::getName()) {
-                $this->executor_id = $executorId;
-            }
-
-            $this->status = $this->getNextStatus($action);
-            $result = true;
-        }
-
-        return $result;
+        return $actionsToStatus[$this->status];
     }
 }

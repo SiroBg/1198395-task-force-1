@@ -38,9 +38,9 @@ class YandexGeocoder extends Component
                 ' ',
                 $geoObject['Point']['pos']
             );
-            $result['addressComponents']
+            $result['fullAddress']
                 = $geoObject['metaDataProperty']['GeocoderMetaData']
-                  ['Address']['Components'];
+            ['text'];
         }
         return $result;
     }

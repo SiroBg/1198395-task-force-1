@@ -2,8 +2,11 @@
 
 namespace app\models;
 
+use DateInterval;
+use DateTime;
 use Yii;
 use yii\web\IdentityInterface;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "users".
@@ -20,6 +23,7 @@ use yii\web\IdentityInterface;
  * @property string|null    $phone
  * @property string|null    $telegram
  * @property string|null    $about
+ * @property bool           $show_contacts
  *
  * @property City           $city
  * @property File           $profileImgFile
@@ -33,7 +37,9 @@ use yii\web\IdentityInterface;
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
-    public string $password_retype = '';
+    public string                   $password_retype = '';
+    public array|string             $categories      = [];
+    public null|UploadedFile|string $avatar          = null;
 
     public static function findIdentity($id): User|IdentityInterface|null
     {
@@ -78,6 +84,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function rules(): array
     {
+        $date = new DateTime();
+        $date->sub(new DateInterval('P18Y'));
+        $maxDate = $date->format('Y-m-d');
         return [
             [
                 [
@@ -90,18 +99,25 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 'default',
                 'value' => null,
             ],
-            [['created_at', 'birthday'], 'safe'],
+            [['created_at', 'birthday', 'show_contacts', 'categories'], 'safe'],
+            [
+                'birthday',
+                'date',
+                'format' => 'php:Y-m-d',
+                'max'    => $maxDate,
+                'tooBig' => 'Вам должно быть не меньше 18 лет. Выберите дату раньше '.$maxDate,
+            ],
+            [['show_contacts'], 'boolean'],
             [
                 [
                     'email',
                     'name',
                     'city_id',
-                    'password',
-                    'password_retype',
                     'is_executor',
                 ],
                 'required',
             ],
+            [['password', 'password_retype'], 'required', 'on' => ['validatePassword', 'signup']],
             [['city_id', 'is_executor', 'profile_img_file_id'], 'integer'],
             [['about'], 'string'],
             [['email', 'name'], 'string', 'max' => 256],
@@ -113,6 +129,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 'message'          => 'Пароли не совпадают',
             ],
             [['phone'], 'string', 'max' => 11],
+            ['phone', 'match', 'pattern' => '/^[0-9]+$/'],
             [['telegram'], 'string', 'max' => 64],
             [['email'], 'unique'],
             [
@@ -129,6 +146,16 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 'targetClass'     => City::class,
                 'targetAttribute' => ['city_id' => 'id'],
             ],
+            [
+                'avatar',
+                'file',
+                'skipOnEmpty'              => true,
+                'extensions'               => 'png, jpg, jpeg',
+                'mimeTypes'                => 'image/jpeg, image/png',
+                'checkExtensionByMimeType' => true,
+                'maxSize'                  => 1024 * 1024 * 2,
+                'wrongExtension'           => 'Выберите файл jpeg, jpg или png'
+            ]
         ];
     }
 
@@ -147,10 +174,11 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'password_retype'     => 'Повтор пароля',
             'is_executor'         => 'я собираюсь откликаться на заказы',
             'profile_img_file_id' => 'Profile Img File ID',
-            'birthday'            => 'Birthday',
-            'phone'               => 'Phone',
+            'birthday'            => 'День рождения',
+            'phone'               => 'Номер телефона',
             'telegram'            => 'Telegram',
-            'about'               => 'About',
+            'about'               => 'Информация о себе',
+            'show_contacts'       => 'Показывать контактную информацию',
         ];
     }
 
@@ -245,14 +273,14 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         $result = 0;
 
-        $ratingSum = Review::find()->where(['executor_id' => $this->id])->sum(
-            'rating'
+        $ratingSum    = Review::find()->where(['executor_id' => $this->id])->sum(
+            'rating',
         );
         $reviewsCount = count($this->reviewsAsExecutor);
-        $failedTasks = count(
+        $failedTasks  = count(
             Task::find()->where(
-                ['executor_id' => $this->id, 'status' => Task::STATUS_FAILED]
-            )->all()
+                ['executor_id' => $this->id, 'status' => Task::STATUS_FAILED],
+            )->all(),
         );
 
         if ($reviewsCount + $failedTasks !== 0) {

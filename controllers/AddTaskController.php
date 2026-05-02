@@ -8,6 +8,7 @@ use app\models\Task;
 use app\models\TaskFile;
 use app\models\User;
 use Yii;
+use yii\db\Exception;
 use yii\web\Controller;
 use yii\web\Response;
 use yii\web\UploadedFile;
@@ -58,7 +59,8 @@ class AddTaskController extends Controller
             );
 
             $task->author_id = $user->id;
-            $task->status = $task::STATUS_NEW;
+            $task->status    = $task::STATUS_NEW;
+            $task->scenario  = 'create';
 
             if (Yii::$app->request->isAjax) {
                 Yii::$app->response->format = Response::FORMAT_JSON;
@@ -68,7 +70,7 @@ class AddTaskController extends Controller
             $transaction = Yii::$app->db->beginTransaction();
 
             try {
-                if (!$task->save() || !$this->uploadTaskFiles($task)) {
+                if ( ! $task->save() || ! $this->uploadTaskFiles($task)) {
                     throw new \Exception(
                         'Ошибка при сохранении задания на сервер.',
                     );
@@ -78,7 +80,7 @@ class AddTaskController extends Controller
                 return $this->goHome();
             } catch (\Throwable $e) {
                 $transaction->rollBack();
-                Yii::error($e->getMessage());
+                throw new Exception($e->getMessage());
             }
         }
 
@@ -93,19 +95,19 @@ class AddTaskController extends Controller
     {
         $success = true;
 
-        if (!empty($task->task_files)) {
+        if ( ! empty($task->task_files)) {
             foreach ($task->task_files as $file) {
-                $fileName = uniqid() . '.' . $file->extension;
-                $file->saveAs('@webroot/uploads/' . $fileName);
+                $fileName = uniqid().'.'.$file->extension;
+                $file->saveAs('@webroot/uploads/'.$fileName);
 
-                $newFile = new File();
+                $newFile            = new File();
                 $newFile->file_path = Yii::getAlias('@webroot/uploads/')
-                    . $fileName;
-                $newFile->url = '/uploads/' . $fileName;
-                $newFile->name = $file->name;
+                                      .$fileName;
+                $newFile->url       = '/uploads/'.$fileName;
+                $newFile->name      = $file->name;
 
                 if ($newFile->save()) {
-                    $taskFile = new TaskFile();
+                    $taskFile          = new TaskFile();
                     $taskFile->task_id = $task->id;
                     $taskFile->file_id = $newFile->id;
 
