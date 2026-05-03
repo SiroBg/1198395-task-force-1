@@ -32,6 +32,10 @@ class TaskSearch extends Model
             'closed',
         ];
 
+    /**
+     * {@inheritDoc}
+     * @return string[]
+     */
     public function attributeLabels(): array
     {
         return [
@@ -42,6 +46,10 @@ class TaskSearch extends Model
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
     public function rules(): array
     {
         return [
@@ -52,6 +60,9 @@ class TaskSearch extends Model
     }
 
     /**
+     * Получает отфильтрованный провайдер.
+     * @param  int  $userCityId  Город пользователя для фильтрации по городам.
+     * @return ActiveDataProvider
      * @throws \DateMalformedIntervalStringException
      */
     public function getFilteredProvider(int $userCityId): ActiveDataProvider
@@ -87,6 +98,11 @@ class TaskSearch extends Model
         return $provider;
     }
 
+    /**
+     * Получает провайдер без фильтров формы.
+     * @param  int  $userCityId  Город пользователя.
+     * @return ActiveDataProvider
+     */
     public function getNewTasksProvider(int $userCityId): ActiveDataProvider
     {
         $provider = $this->initProvider();
@@ -94,6 +110,12 @@ class TaskSearch extends Model
         return $provider;
     }
 
+    /**
+     * Получает провайдер с заданиями для страницы "мои задания".
+     * @param  User         $user    Информация о пользователе.
+     * @param  string|null  $status  Статус для фильтрации заданий.
+     * @return ActiveDataProvider
+     */
     public function getUsersTasksProvider(User $user, ?string $status): ActiveDataProvider
     {
         $provider = $this->initProvider();
@@ -130,6 +152,10 @@ class TaskSearch extends Model
         return $provider;
     }
 
+    /**
+     * Создаёт изначальный провайдер.
+     * @return ActiveDataProvider
+     */
     private function initProvider(): ActiveDataProvider
     {
         return new ActiveDataProvider([
@@ -145,7 +171,11 @@ class TaskSearch extends Model
         ]);
     }
 
-
+    /**
+     * Валидирует фильтр поиска по периоду.
+     * @param $attribute
+     * @return void
+     */
     public function validateIsoDuration($attribute): void
     {
         if ( ! empty($this->$attribute)) {

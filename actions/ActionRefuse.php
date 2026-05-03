@@ -12,34 +12,44 @@ use Yii;
 
 class ActionRefuse extends ActionAbstract
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getName(): string
     {
         return 'refusal';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getDescription(): string
     {
         return 'Отказаться от задания';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getButtonColor(): string
     {
         return 'orange';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function checkRights(
         ?int $executorId,
-        int $authorId,
-        int $userId,
+        int  $authorId,
+        int  $userId,
         bool $isExecutor,
     ): bool {
         return $isExecutor && $userId === $executorId && $userId !== $authorId;
     }
 
     /**
-     * @throws Exception
-     * @throws TaskStatusException
-     * @throws ForbiddenHttpException
+     * {@inheritDoc}
      */
     public function applyAction(
         Task $task,

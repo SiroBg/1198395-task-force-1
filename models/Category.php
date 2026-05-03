@@ -3,7 +3,7 @@
 namespace app\models;
 
 /**
- * This is the model class for table "categories".
+ * Модель для таблицы категорий "categories".
  *
  * @property int            $id
  * @property string|null    $created_at
@@ -15,8 +15,6 @@ namespace app\models;
  */
 class Category extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -51,7 +49,7 @@ class Category extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Tasks]].
+     * Получает ActiveQuery для [[Tasks]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -61,7 +59,7 @@ class Category extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[UserCategories]].
+     * Получает ActiveQuery для [[UserCategories]].
      *
      * @return \yii\db\ActiveQuery
      */

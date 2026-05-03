@@ -12,28 +12,40 @@ use Yii;
 
 class ActionStart extends ActionAbstract
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getName(): string
     {
         return 'action_start';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getDescription(): string
     {
         return 'Начать';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getButtonColor(): string
     {
         return '';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function checkRights(
         ?int $executorId,
-        int $authorId,
-        int $userId,
+        int  $authorId,
+        int  $userId,
         bool $isExecutor,
     ): bool {
-        return !$isExecutor && is_null($executorId) && $userId === $authorId;
+        return ! $isExecutor && is_null($executorId) && $userId === $authorId;
     }
 
     /**
@@ -48,9 +60,9 @@ class ActionStart extends ActionAbstract
     ): void {
         try {
             parent::applyAction($task, $user);
-            if (!is_null($executorId)) {
+            if ( ! is_null($executorId)) {
                 $task->executor_id = $executorId;
-                $task->status = $task->getNextStatus($this);
+                $task->status      = $task->getNextStatus($this);
 
                 $task->save();
             }

@@ -10,22 +10,46 @@ use yii\db\Exception;
 
 abstract class ActionAbstract
 {
+    /**
+     * Возвращает имя действия.
+     * @return string
+     */
     abstract public function getName(): string;
 
+    /**
+     * Возвращает описание действия.
+     * @return string
+     */
     abstract public function getDescription(): string;
 
+    /**
+     * Возвращает цвет для кнопки действия.
+     * @return string
+     */
     abstract public function getButtonColor(): string;
 
+    /**
+     * Проверяет права для применения действия.
+     * @param  int   $executorId  ID исполнителя задания.
+     * @param  int   $authorId    ID автора задания.
+     * @param  int   $userId      ID пользователя, применяюещего действие.
+     * @param  bool  $isExecutor  Является ли пользователь исполнителем.
+     * @return bool
+     */
     abstract public function checkRights(
-        int $executorId,
-        int $authorId,
-        int $userId,
+        int  $executorId,
+        int  $authorId,
+        int  $userId,
         bool $isExecutor,
     ): bool;
 
     /**
+     * Применяет действие к переданному заданию.
+     * @param  Task  $task  Задание, к которому будет применено действие.
+     * @param  User  $user  Пользователь, применяющий действие.
      * @throws ActionRightsException
      * @throws TaskStatusException
+     * @throws Exception
      */
     public function applyAction(
         Task $task,
@@ -39,8 +63,8 @@ abstract class ActionAbstract
                 $task->getActions(),
             );
             if (
-                !in_array($this->getName(), $taskActionsNames)
-                || !$this->checkRights(
+                ! in_array($this->getName(), $taskActionsNames)
+                || ! $this->checkRights(
                     $task->executor_id,
                     $task->author_id,
                     $user->id,
@@ -49,7 +73,7 @@ abstract class ActionAbstract
             ) {
                 throw new ActionRightsException(
                     'Нет прав для выполнения действия '
-                    . $this->getDescription()
+                    .$this->getDescription()
                 );
             }
         } catch (\Throwable $e) {

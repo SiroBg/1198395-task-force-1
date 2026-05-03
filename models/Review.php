@@ -3,7 +3,7 @@
 namespace app\models;
 
 /**
- * This is the model class for table "reviews".
+ * Модель для таблицы отзывов "reviews".
  *
  * @property int         $id
  * @property string|null $created_at
@@ -19,8 +19,6 @@ namespace app\models;
  */
 class Review extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -83,7 +81,7 @@ class Review extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Author]].
+     * Получает ActiveQuery для [[Author]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -93,7 +91,7 @@ class Review extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Executor]].
+     * Получает ActiveQuery для [[Executor]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -103,7 +101,7 @@ class Review extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
+     * Получает ActiveQuery для [[Task]].
      *
      * @return \yii\db\ActiveQuery
      */

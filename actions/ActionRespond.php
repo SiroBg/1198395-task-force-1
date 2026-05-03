@@ -12,33 +12,44 @@ use yii\db\Exception;
 
 class ActionRespond extends ActionAbstract
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getName(): string
     {
         return 'act_response';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getDescription(): string
     {
         return 'Откликнуться на задание';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getButtonColor(): string
     {
         return 'blue';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function checkRights(
         ?int $executorId,
-        int $authorId,
-        int $userId,
+        int  $authorId,
+        int  $userId,
         bool $isExecutor,
     ): bool {
         return $isExecutor && is_null($executorId) && $userId !== $authorId;
     }
 
     /**
-     * @throws TaskStatusException
-     * @throws Exception
+     * {@inheritDoc}
      */
     public function applyAction(
         Task $task,
@@ -48,7 +59,7 @@ class ActionRespond extends ActionAbstract
             parent::applyAction($task, $user);
             $respond = new Respond();
 
-            $respond->task_id = $task->id;
+            $respond->task_id     = $task->id;
             $respond->executor_id = $user->id;
 
             if (Yii::$app->request->getIsPost()) {

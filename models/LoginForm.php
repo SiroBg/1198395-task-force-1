@@ -6,11 +6,15 @@ use yii\base\Model;
 
 class LoginForm extends Model
 {
-    public string $email = '';
+    public string $email    = '';
     public string $password = '';
 
     private ?User $_user = null;
 
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
     public function rules(): array
     {
         return [
@@ -19,6 +23,10 @@ class LoginForm extends Model
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     * @return string[]
+     */
     public function attributeLabels(): array
     {
         return [
@@ -27,16 +35,26 @@ class LoginForm extends Model
         ];
     }
 
+    /**
+     * Валидирует пароль.
+     * @param $attribute
+     * @param $params
+     * @return void
+     */
     public function validatePassword($attribute, $params): void
     {
-        if (!$this->hasErrors()) {
+        if ( ! $this->hasErrors()) {
             $user = $this->getUser();
-            if (!$user || !$user->validatePassword($this->password)) {
+            if ( ! $user || ! $user->validatePassword($this->password)) {
                 $this->addError($attribute, 'Неправильный email или пароль');
             }
         }
     }
 
+    /**
+     * Получает информацию о пользователе по email.
+     * @return User|null
+     */
     public function getUser(): ?User
     {
         if ($this->_user === null) {

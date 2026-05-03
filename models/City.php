@@ -4,7 +4,7 @@ namespace app\models;
 
 
 /**
- * This is the model class for table "cities".
+ * Модель для таблицы городов "cities".
  *
  * @property int         $id
  * @property string|null $created_at
@@ -53,23 +53,23 @@ class City extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Tasks]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getTasks(): \yii\db\ActiveQuery
-    {
-        return $this->hasMany(Task::class, ['city_id' => 'id']);
-    }
-
-    /**
-     * Gets query for [[Users]].
+     * Получает ActiveQuery для [[Users]].
      *
      * @return \yii\db\ActiveQuery
      */
     public function getUsers(): \yii\db\ActiveQuery
     {
         return $this->hasMany(User::class, ['city_id' => 'id']);
+    }
+
+    /**
+     * Получает ActiveQuery для [[Tasks]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getTasks(): \yii\db\ActiveQuery
+    {
+        return $this->hasMany(Task::class, ['city_id' => 'id']);
     }
 
 }

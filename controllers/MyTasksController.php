@@ -2,16 +2,16 @@
 
 namespace app\controllers;
 
-use app\models\Task;
 use app\models\TaskSearch;
 use app\models\User;
 use Yii;
-use yii\data\ActiveDataProvider;
-use yii\db\Expression;
 use yii\web\Controller;
 
 class MyTasksController extends Controller
 {
+    /**
+     * {@inheritdoc}
+     */
     public function behaviors(): array
     {
         return [
@@ -27,6 +27,10 @@ class MyTasksController extends Controller
         ];
     }
 
+    /**
+     * Отображает страницу заданий пользователя.
+     * @return string
+     */
     public function actionIndex(): string
     {
         $user       = User::findOne(Yii::$app->user->id);

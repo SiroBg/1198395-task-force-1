@@ -13,7 +13,7 @@ use Yii;
 use yii\db\ActiveQuery;
 
 /**
- * This is the model class for table "tasks".
+ * Модель для таблицы заданий "tasks".
  *
  * @property int         $id
  * @property string|null $created_at
@@ -41,13 +41,13 @@ use yii\db\ActiveQuery;
 class Task extends \yii\db\ActiveRecord
 {
     /**
-     * ENUM field values
+     * ENUM поля статусов задания.
      */
-    public const string STATUS_NEW = 'status_new';
+    public const string STATUS_NEW      = 'status_new';
     public const string STATUS_CANCELED = 'status_canceled';
-    public const string STATUS_ACTIVE = 'status_active';
+    public const string STATUS_ACTIVE   = 'status_active';
     public const string STATUS_FINISHED = 'status_finished';
-    public const string STATUS_FAILED = 'status_failed';
+    public const string STATUS_FAILED   = 'status_failed';
 
     public array $task_files = [];
 
@@ -91,7 +91,7 @@ class Task extends \yii\db\ActiveRecord
                 'date',
                 'format'   => 'php:Y-m-d',
                 'min'      => date('Y-m-d'),
-                'tooSmall' => 'Выберите дату позже ' . date('d.m.Y'),
+                'tooSmall' => 'Выберите дату позже '.date('d.m.Y'),
             ],
             [
                 ['author_id', 'name', 'description', 'category_id'],
@@ -181,7 +181,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Author]].
+     * Получает ActiveQuery для [[Author]].
      *
      * @return ActiveQuery
      */
@@ -191,7 +191,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Category]].
+     * Получает ActiveQuery для [[Category]].
      *
      * @return ActiveQuery
      */
@@ -201,7 +201,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[City]].
+     * Получает ActiveQuery для [[City]].
      *
      * @return ActiveQuery
      */
@@ -211,7 +211,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Executor]].
+     * Получает ActiveQuery для [[Executor]].
      *
      * @return ActiveQuery
      */
@@ -221,7 +221,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Responds]].
+     * Получает ActiveQuery для [[Responds]].
      *
      * @return ActiveQuery
      */
@@ -231,7 +231,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Reviews]].
+     * Получает ActiveQuery для [[Reviews]].
      *
      * @return ActiveQuery
      */
@@ -241,7 +241,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[TaskFiles]].
+     * Получает ActiveQuery для[[TaskFiles]].
      *
      * @return ActiveQuery
      */
@@ -251,7 +251,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * column status ENUM value labels
+     * Описания для ENUM значений статусов задания.
      *
      * @return string[]
      */
@@ -267,6 +267,7 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
+     * Отображает описание статуса.
      * @return string
      */
     public function displayStatus(): string
@@ -275,82 +276,29 @@ class Task extends \yii\db\ActiveRecord
     }
 
     /**
-     * @return bool
+     * Валидирует длину строки без учета пробелов.
+     * @param $attribute
+     * @param $params
+     * @return void
      */
-    public function isStatusNew(): bool
-    {
-        return $this->status === self::STATUS_NEW;
-    }
-
-    public function setStatusToNew(): void
-    {
-        $this->status = self::STATUS_NEW;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isStatusCanceled(): bool
-    {
-        return $this->status === self::STATUS_CANCELED;
-    }
-
-    public function setStatusToCanceled(): void
-    {
-        $this->status = self::STATUS_CANCELED;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isStatusActive(): bool
-    {
-        return $this->status === self::STATUS_ACTIVE;
-    }
-
-    public function setStatusToActive(): void
-    {
-        $this->status = self::STATUS_ACTIVE;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isStatusFinished(): bool
-    {
-        return $this->status === self::STATUS_FINISHED;
-    }
-
-    public function setStatusToFinished(): void
-    {
-        $this->status = self::STATUS_FINISHED;
-    }
-
-    /**
-     * @return bool
-     */
-    public function isStatusFailed(): bool
-    {
-        return $this->status === self::STATUS_FAILED;
-    }
-
-    public function setStatusToFailed(): void
-    {
-        $this->status = self::STATUS_FAILED;
-    }
-
     public function validateStringLengthNoSpaces($attribute, $params): void
     {
         if (mb_strlen(trim($this->$attribute)) < $params['length']) {
             $this->addError(
                 $attribute,
                 'Длина поля должна быть не меньше '
-                . $params['length']
-                . ' символов.',
+                .$params['length']
+                .' символов.',
             );
         }
     }
 
+    /**
+     * Валидирует локацию задания.
+     * @param $attribute
+     * @param $params
+     * @return void
+     */
     public function validateLocation($attribute, $params): void
     {
         $objectData = Yii::$app->yandexGeoCoder->getObjectData(
@@ -364,18 +312,24 @@ class Task extends \yii\db\ActiveRecord
             },
         );
 
-        if (!$searchedCity) {
+        if ( ! $searchedCity) {
             $this->addError(
                 $attribute,
                 'Выбранного города нет в базе данных',
             );
         } else {
-            $this->lat = $objectData['coordinates'][1];
-            $this->long = $objectData['coordinates'][0];
+            $this->lat     = $objectData['coordinates'][1];
+            $this->long    = $objectData['coordinates'][0];
             $this->city_id = $searchedCity->id;
         }
     }
 
+    /**
+     * Очищает значения координат при пустой локации.
+     * @param $attribute
+     * @param $params
+     * @return void
+     */
     public function clearIfEmpty($attribute, $params): void
     {
         if (empty($this->location)) {
@@ -386,7 +340,7 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Получает статус, в который перейдёт задание после примененного действия.
      *
-     * @param ActionAbstract $action Объект класса AbstractAction
+     * @param  ActionAbstract  $action  Объект класса AbstractAction
      *
      * @return string Статус задания.
      */
@@ -395,22 +349,17 @@ class Task extends \yii\db\ActiveRecord
     ): string {
         return match ($action->getName()) {
             new ActionRespond()->getName() => self::STATUS_NEW,
-            new ActionStart()->getName() => self::STATUS_ACTIVE,
-            new ActionCancel()->getName() => self::STATUS_CANCELED,
-            new ActionFinish()->getName() => self::STATUS_FINISHED,
-            new ActionRefuse()->getName() => self::STATUS_FAILED,
+            new ActionStart()->getName()   => self::STATUS_ACTIVE,
+            new ActionCancel()->getName()  => self::STATUS_CANCELED,
+            new ActionFinish()->getName()  => self::STATUS_FINISHED,
+            new ActionRefuse()->getName()  => self::STATUS_FAILED,
         };
     }
 
     /**
-     * Получает доступные действия над заданием для пользователя по статусу задания и Id.
-     *
-     * @param int  $userId     Id пользователя.
-     * @param bool $isExecutor Является ли пользователь исполнителем.
-     *
-     * @return array Массив с объектами-потомками класса AbstractAction.
-     * @throws TaskStatusException Исключение при непредусмотренном статусе задания.
-     *
+     * Получает список доступных действий в зависимости от статуса задания.
+     * @return array
+     * @throws TaskStatusException
      */
     public function getActions(): array
     {
@@ -431,7 +380,7 @@ class Task extends \yii\db\ActiveRecord
             self::STATUS_FINISHED => [],
         ];
 
-        if (!isset($actionsToStatus[$this->status])) {
+        if ( ! isset($actionsToStatus[$this->status])) {
             throw new TaskStatusException(
                 'Статус задания не предусмотрен',
             );

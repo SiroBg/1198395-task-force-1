@@ -16,6 +16,9 @@ use yii\widgets\ActiveForm;
 
 class UserSettingsController extends Controller
 {
+    /**
+     * {@inheritdoc}
+     */
     public function behaviors(): array
     {
         return [
@@ -34,6 +37,11 @@ class UserSettingsController extends Controller
         ];
     }
 
+    /**
+     * Отображает страницу настроек пользователя.
+     * @return array|Response|string
+     * @throws Exception
+     */
     public function actionIndex(): array|Response|string
     {
         $user             = User::findOne(Yii::$app->user->id);
@@ -84,8 +92,10 @@ class UserSettingsController extends Controller
     }
 
     /**
-     * @throws \yii\base\Exception
+     * Отображает страницу изменения пароля и показа контактов.
+     * @return array|Response|string
      * @throws Exception
+     * @throws \yii\base\Exception
      */
     public function actionSecurity(): array|Response|string
     {
@@ -122,6 +132,11 @@ class UserSettingsController extends Controller
         return $this->render('security', ['settingsForm' => $settingsForm]);
     }
 
+    /**
+     * Загружает аватарку пользователя.
+     * @param  User  $user  Пользователь.
+     * @return File|null
+     */
     private function uploadUserAvatar(User $user): null|File
     {
         $result = null;
@@ -140,6 +155,12 @@ class UserSettingsController extends Controller
         return $result;
     }
 
+    /**
+     * Обновляет информацию о категориях польлзователя.
+     * @param  User  $user  Пользователь.
+     * @return bool
+     * @throws Exception
+     */
     public function updateUserCategories(User $user): bool
     {
         $success = true;

@@ -11,32 +11,44 @@ use yii\db\Exception;
 
 class ActionFinish extends ActionAbstract
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getName(): string
     {
         return 'completion';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getDescription(): string
     {
         return 'Завершить задание';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getButtonColor(): string
     {
         return 'pink';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function checkRights(
         ?int $executorId,
-        int $authorId,
-        int $userId,
+        int  $authorId,
+        int  $userId,
         bool $isExecutor,
     ): bool {
-        return !$isExecutor && $userId === $authorId && $userId !== $executorId;
+        return ! $isExecutor && $userId === $authorId && $userId !== $executorId;
     }
 
     /**
-     * @throws Exception
+     * {@inheritDoc}
      */
     public function applyAction(
         Task $task,
@@ -50,8 +62,8 @@ class ActionFinish extends ActionAbstract
 
         $review = new Review();
 
-        $review->task_id = $task->id;
-        $review->author_id = $task->author_id;
+        $review->task_id     = $task->id;
+        $review->author_id   = $task->author_id;
         $review->executor_id = $task->executor_id;
 
         if (Yii::$app->request->getIsPost()) {

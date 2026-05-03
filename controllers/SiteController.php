@@ -52,7 +52,7 @@ class SiteController extends Controller
     }
 
     /**
-     * Displays homepage.
+     * Отображает лэндинг.
      *
      * @return Response
      */

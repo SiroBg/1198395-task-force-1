@@ -12,21 +12,19 @@ use app\models\Respond;
 use app\models\Review;
 use app\models\TaskFile;
 use app\models\Task;
-use app\models\TaskForm;
 use app\models\TaskSearch;
 use app\models\User;
-use DateInterval;
-use DateTime;
 use Exception;
 use Yii;
-use yii\data\ActiveDataProvider;
 use yii\web\Controller;
-use yii\web\ForbiddenHttpException;
 use yii\web\NotFoundHttpException;
 use yii\web\Response;
 
 class TasksController extends Controller
 {
+    /**
+     * {@inheritdoc}
+     */
     public function behaviors(): array
     {
         return [
@@ -71,6 +69,9 @@ class TasksController extends Controller
     }
 
     /**
+     * Отображает страницу отдельного задания по ID.
+     * @param  int  $id  ID задания.
+     * @return string
      * @throws NotFoundHttpException
      */
     public function actionView(int $id): string
@@ -122,6 +123,12 @@ class TasksController extends Controller
         );
     }
 
+    /**
+     * Отменяет задание
+     * @param  int  $taskId  ID задания.
+     * @return Response
+     * @throws Exception
+     */
     public function actionCancel(int $taskId): Response
     {
         $task = Task::find()->where(['id' => $taskId])->one();
@@ -139,6 +146,9 @@ class TasksController extends Controller
     }
 
     /**
+     * Завершает задание.
+     * @param  int  $taskId  ID задания.
+     * @return array|Response
      * @throws Exception
      */
     public function actionFinish(int $taskId): array|Response
@@ -158,6 +168,12 @@ class TasksController extends Controller
         return $this->redirect(['view', 'id' => $task->id]);
     }
 
+    /**
+     * Добавляет отклик к заданию.
+     * @param  int  $taskId  ID задания.
+     * @return array|Response
+     * @throws Exception
+     */
     public function actionRespond(int $taskId): array|Response
     {
         $task = Task::find()->where(['id' => $taskId])->one();
@@ -175,7 +191,14 @@ class TasksController extends Controller
         return $this->redirect(['view', 'id' => $task->id]);
     }
 
-    public function actionStart($taskId, $executorId): Response
+    /**
+     * Принимает отклик исполнителя и начинает задание.
+     * @param  int  $taskId      ID задания.
+     * @param  int  $executorId  ID исполнителя.
+     * @return Response
+     * @throws Exception
+     */
+    public function actionStart(int $taskId, int $executorId): Response
     {
         $task = Task::find()->where(['id' => $taskId])->one();
         $user = User::find()->select(['id', 'is_executor'])->where(
@@ -191,6 +214,12 @@ class TasksController extends Controller
         return $this->redirect(['view', 'id' => $task->id]);
     }
 
+    /**
+     * Отклоняет отклик исполнителя.
+     * @param  int  $taskId     ID задания.
+     * @param  int  $respondId  ID отклика.
+     * @return Response
+     */
     public function actionReject(int $taskId, int $respondId): Response
     {
         $task = Task::find()->where(['id' => $taskId])->one();
@@ -206,9 +235,12 @@ class TasksController extends Controller
     }
 
     /**
-     * @throws ForbiddenHttpException
+     * Исполнитель отказывается от задания.
+     * @param  int  $taskId  ID задания.
+     * @return Response
+     * @throws Exception
      */
-    public function actionRefuse($taskId): Response
+    public function actionRefuse(int $taskId): Response
     {
         $task = Task::find()->where(['id' => $taskId])->one();
 

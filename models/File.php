@@ -3,7 +3,7 @@
 namespace app\models;
 
 /**
- * This is the model class for table "files".
+ * Модель для таблицы файлов "files".
  *
  * @property int         $id
  * @property string|null $created_at
@@ -51,7 +51,7 @@ class File extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[TaskFiles]].
+     * Получает ActiveQuery для [[TaskFiles]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -61,7 +61,7 @@ class File extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Users]].
+     * Получает ActiveQuery для [[Users]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -70,6 +70,10 @@ class File extends \yii\db\ActiveRecord
         return $this->hasMany(User::class, ['profile_img_file_id' => 'id']);
     }
 
+    /**
+     * Получает ID файла.
+     * @return int
+     */
     public function getId(): int
     {
         return $this->id;

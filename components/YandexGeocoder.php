@@ -12,6 +12,12 @@ class YandexGeocoder extends Component
 {
     private string $apiUrl = 'https://geocode-maps.yandex.ru/v1/';
 
+    /**
+     * Возвращает координаты и полный адрес переданной строки.
+     * @param  string  $address  Адрес.
+     * @return array
+     * @throws \Exception
+     */
     public function getObjectData(string $address): array
     {
         $result = [];
@@ -19,7 +25,7 @@ class YandexGeocoder extends Component
         try {
             $response = $client->request('GET', $this->apiUrl, [
                 'query' => [
-                    'apikey'  => Yii::$app->params['yandexGeocoderApiKey'],
+                    'apikey'  => Yii::$app->params['yandexGeocoderApiKey'] ?? '',
                     'geocode' => $address,
                     'format'  => 'json',
                     'results' => 1,
@@ -30,17 +36,30 @@ class YandexGeocoder extends Component
         }
         $data = Json::decode($response->getBody());
 
+        if ( ! isset(
+            $data['response'], $data['response']['GeoObjectCollection'], $data['response']['GeoObjectCollection']
+            ['featureMember'], $data['response']['GeoObjectCollection']
+                               ['featureMember'][0], $data['response']['GeoObjectCollection']
+                                                     ['featureMember'][0]['GeoObject']
+        )) {
+            throw new \Exception('Ошибка ответа геокодера');
+        }
         $geoObject = $data['response']['GeoObjectCollection']
-                     ['featureMember'][0]['GeoObject'] ?? null;
+                     ['featureMember'][0]['GeoObject'];
 
         if ($geoObject) {
             $result['coordinates'] = explode(
                 ' ',
-                $geoObject['Point']['pos']
+                isset($geoObject['Point'], $geoObject['Point']['pos']) ?
+                    $geoObject['Point']['pos'] : []
             );
-            $result['fullAddress']
-                                   = $geoObject['metaDataProperty']['GeocoderMetaData']
-            ['text'];
+            $result['fullAddress'] = isset(
+                $geoObject['metaDataProperty'],
+                $geoObject['metaDataProperty']['GeocoderMetaData'],
+                $geoObject['metaDataProperty']['GeocoderMetaData']
+                ['text']
+            ) ? $geoObject['metaDataProperty']['GeocoderMetaData']
+            ['text'] : '';
         }
         return $result;
     }

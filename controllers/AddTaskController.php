@@ -16,6 +16,9 @@ use yii\widgets\ActiveForm;
 
 class AddTaskController extends Controller
 {
+    /**
+     * {@inheritdoc}
+     */
     public function behaviors(): array
     {
         return [
@@ -34,6 +37,11 @@ class AddTaskController extends Controller
         ];
     }
 
+    /**
+     * Отображает страницу добавления задания.
+     * @return array|Response|string
+     * @throws Exception
+     */
     public function actionIndex(): array|Response|string
     {
         $user = User::find()->where(
@@ -91,6 +99,12 @@ class AddTaskController extends Controller
         ]);
     }
 
+    /**
+     * Загружает файлы задания.
+     * @param  Task  $task  Задание.
+     * @return bool Успех/провал добавления файлов задания.
+     * @throws Exception
+     */
     private function uploadTaskFiles(Task $task): bool
     {
         $success = true;

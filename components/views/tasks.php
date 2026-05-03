@@ -32,10 +32,10 @@ foreach ($provider->getModels() as $task) : ?>
         <div class="footer-task">
             <?php
             if ($task->city) : ?>
-                <p class="info-text town-text"><?= $task->city->name; ?></p>
+                <p class="info-text town-text"><?= Html::encode($task->city->name); ?></p>
             <?php
             endif; ?>
-            <p class="info-text category-text"><?= $task->category->name; ?></p>
+            <p class="info-text category-text"><?= Html::encode($task->category->name); ?></p>
             <a href="/tasks/view/<?= $task->id; ?>"
                class="button button--black">Смотреть
                 Задание</a>

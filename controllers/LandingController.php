@@ -10,6 +10,10 @@ use yii\widgets\ActiveForm;
 
 class LandingController extends Controller
 {
+    /**
+     * {@inheritDoc}
+     * @return array[]
+     */
     public function behaviors(): array
     {
         return [
@@ -28,10 +32,14 @@ class LandingController extends Controller
         ];
     }
 
+    /**
+     * Отображает страницу лендинга.
+     * @return array|Response|string
+     */
     public function actionIndex(): array|Response|string
     {
         $this->layout = 'landing';
-        $loginForm = new LoginForm();
+        $loginForm    = new LoginForm();
 
         if (Yii::$app->request->getIsPost()) {
             $loginForm->load(Yii::$app->request->post());

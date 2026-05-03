@@ -12,6 +12,10 @@ class SettingsSecurityForm extends Model
     public string $password_retype = '';
     public bool   $show_contacts   = true;
 
+    /**
+     * {@inheritDoc}
+     * @return array
+     */
     public function rules(): array
     {
         return [
@@ -32,6 +36,10 @@ class SettingsSecurityForm extends Model
         ];
     }
 
+    /**
+     * {@inheritDoc}
+     * @return string[]
+     */
     public function attributeLabels(): array
     {
         return [
@@ -42,6 +50,12 @@ class SettingsSecurityForm extends Model
         ];
     }
 
+    /**
+     * Валидирует пароль.
+     * @param $attribute
+     * @param $params
+     * @return void
+     */
     public function validatePassword($attribute, $params): void
     {
         $user = User::findOne(Yii::$app->user->id);

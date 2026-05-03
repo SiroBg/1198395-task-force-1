@@ -3,8 +3,9 @@
 use kartik\rating\StarRating;
 
 /**
- * @var \app\models\User     $user        ;
- * @var \app\models\Review[] $userReviews ;
+ * @var \app\models\User     $user         ;
+ * @var \app\models\Review[] $userReviews  ;
+ * @var bool                 $showContacts ;
  */
 
 use yii\helpers\Html;
@@ -56,7 +57,7 @@ use yii\helpers\Url;
                             <a href="<?= Url::toRoute(
                                 [
                                     'tasks/index',
-                                    'TaskForm[categories][]' => $userCategory->category->id
+                                    'TaskSearch[categories][]' => $userCategory->category->id
                                 ]
                             ); ?>"
                                class="link link--regular"><?= $userCategory->category->name; ?></a>
@@ -140,7 +141,7 @@ use yii\helpers\Url;
             </dl>
         </div>
         <?php
-        if ($user->show_contacts): ?>
+        if ($showContacts): ?>
             <div class="right-card white">
                 <h4 class="head-card">Контакты</h4>
                 <ul class="enumeration-list">

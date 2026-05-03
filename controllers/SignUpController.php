@@ -12,6 +12,9 @@ use yii\widgets\ActiveForm;
 
 class SignUpController extends Controller
 {
+    /**
+     * {@inheritdoc}
+     */
     public function behaviors(): array
     {
         return [
@@ -31,6 +34,7 @@ class SignUpController extends Controller
     }
 
     /**
+     * Отображает страницу регистрации.
      * @throws Exception
      * @throws \yii\db\Exception
      */
@@ -50,8 +54,8 @@ class SignUpController extends Controller
                 $user->password = Yii::$app->security->generatePasswordHash(
                     $user->password
                 );
-
-                if ($user->save(false)) {
+                $user->scenario = 'default';
+                if ($user->save()) {
                     return $this->goHome();
                 }
             }

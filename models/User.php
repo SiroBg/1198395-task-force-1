@@ -9,7 +9,7 @@ use yii\web\IdentityInterface;
 use yii\web\UploadedFile;
 
 /**
- * This is the model class for table "users".
+ * Модель для таблицы пользователей "users".
  *
  * @property int            $id
  * @property string|null    $created_at
@@ -45,28 +45,57 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public array|string             $categories      = [];
     public null|UploadedFile|string $avatar          = null;
 
+    /**
+     * {@inheritDoc}
+     * @param $id
+     * @return User|IdentityInterface|null
+     */
     public static function findIdentity($id): User|IdentityInterface|null
     {
         return self::findOne($id);
     }
 
+    /**
+     * {@inheritDoc}
+     * @param $token
+     * @param $type
+     * @return void
+     */
     public static function findIdentityByAccessToken($token, $type = null)
     {
     }
 
+    /**
+     * {@inheritDoc}
+     * @return array|int|mixed|string|null
+     */
     public function getId()
     {
         return $this->getPrimaryKey();
     }
 
+    /**
+     * {@inheritDoc}
+     * @return void
+     */
     public function getAuthKey()
     {
     }
 
+    /**
+     * {@inheritDoc}
+     * @param $authKey
+     * @return void
+     */
     public function validateAuthKey($authKey)
     {
     }
 
+    /**
+     * Валидирует пароль пользователя.
+     * @param $password
+     * @return bool
+     */
     public function validatePassword($password): bool
     {
         return Yii::$app->security->validatePassword(
@@ -131,6 +160,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
                 'compare',
                 'compareAttribute' => 'password',
                 'message'          => 'Пароли не совпадают',
+                'on'               => ['signup', 'validatePassword'],
             ],
             [['phone'], 'string', 'max' => 11],
             ['phone', 'match', 'pattern' => '/^[0-9]+$/'],
@@ -187,7 +217,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[City]].
+     * Получает ActiveQuery для [[City]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -197,7 +227,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[ProfileImgFile]].
+     * Получает ActiveQuery для [[ProfileImgFile]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -207,7 +237,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Responds]].
+     * Получает ActiveQuery для [[Responds]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -217,7 +247,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Reviews]].
+     * Получает ActiveQuery для [[Reviews]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -227,7 +257,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[ReviewsAsExecutor]].
+     * Получает ActiveQuery для [[ReviewsAsExecutor]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -237,7 +267,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Tasks]].
+     * Получает ActiveQuery для [[Tasks]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -247,7 +277,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Tasks0]].
+     * Получает ActiveQuery для [[Tasks0]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -256,18 +286,26 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->hasMany(Task::class, ['executor_id' => 'id']);
     }
 
+    /**
+     * Получает количество завершенных заданий.
+     * @return int
+     */
     public function getFinishedTasksAmount(): int
     {
         return count($this->getTasksAsExecutor()->andWhere(['status' => Task::STATUS_FINISHED])->all());
     }
 
+    /**
+     * Получает количество проваленных заданий.
+     * @return int
+     */
     public function getFailedTasksAmount(): int
     {
         return count($this->getTasksAsExecutor()->andWhere(['status' => Task::STATUS_FAILED])->all());
     }
 
     /**
-     * Gets query for [[UserCategories]].
+     * Получает ActiveQuery для [[UserCategories]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -276,6 +314,10 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->hasMany(UserCategory::class, ['user_id' => 'id']);
     }
 
+    /**
+     * Получает имя пользователя.
+     * @return User|void|null
+     */
     public function getName()
     {
         if ($id = Yii::$app->user->getId()) {
@@ -283,6 +325,10 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         }
     }
 
+    /**
+     * Получает рейтинг пользователя.
+     * @return float|int
+     */
     public function getRating(): float|int
     {
         $result = 0;
@@ -304,6 +350,10 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $result;
     }
 
+    /**
+     * Получает место в рейтинге пользователя.
+     * @return int|false
+     */
     public function getRatingPlacement(): int|false
     {
         $users = User::findAll(['is_executor' => true]);
@@ -312,10 +362,14 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         });
 
         $result = array_search($this->id, array_column($users, 'id'));
-        
+
         return $result ? $result++ : 1;
     }
 
+    /**
+     * Получает информацию, выполняет ли пользователь задания в данный момент.
+     * @return bool
+     */
     public function getIsBusy(): bool
     {
         return ! empty(Task::findAll(['executor_id' => $this->id, 'status' => Task::STATUS_ACTIVE]));

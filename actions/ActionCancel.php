@@ -8,32 +8,44 @@ use yii\db\Exception;
 
 class ActionCancel extends ActionAbstract
 {
+    /**
+     * {@inheritDoc}
+     */
     public function getName(): string
     {
         return 'cancel';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getDescription(): string
     {
         return 'Отменить';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function getButtonColor(): string
     {
         return 'pink';
     }
 
+    /**
+     * {@inheritDoc}
+     */
     public function checkRights(
         ?int $executorId,
-        int $authorId,
-        int $userId,
+        int  $authorId,
+        int  $userId,
         bool $isExecutor,
     ): bool {
-        return !$isExecutor && is_null($executorId) && $userId === $authorId;
+        return ! $isExecutor && is_null($executorId) && $userId === $authorId;
     }
 
     /**
-     * @throws Exception
+     * {@inheritDoc}
      */
     public function applyAction(
         Task $task,

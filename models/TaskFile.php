@@ -5,7 +5,7 @@ namespace app\models;
 use Yii;
 
 /**
- * This is the model class for table "task_files".
+ * Модель для таблицы файлов заданиия "task_files".
  *
  * @property int         $id
  * @property string|null $created_at
@@ -17,8 +17,6 @@ use Yii;
  */
 class TaskFile extends \yii\db\ActiveRecord
 {
-
-
     /**
      * {@inheritdoc}
      */
@@ -67,7 +65,7 @@ class TaskFile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[File]].
+     * Получает ActiveQuery для [[File]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -77,7 +75,7 @@ class TaskFile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
+     * Получает ActiveQuery для [[Task]].
      *
      * @return \yii\db\ActiveQuery
      */

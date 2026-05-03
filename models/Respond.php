@@ -3,7 +3,7 @@
 namespace app\models;
 
 /**
- * This is the model class for table "responds".
+ * Модель для таблицы откликов "responds".
  *
  * @property int         $id
  * @property string|null $created_at
@@ -78,7 +78,7 @@ class Respond extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Executor]].
+     * Получает ActiveQuery для [[Executor]].
      *
      * @return \yii\db\ActiveQuery
      */
@@ -88,7 +88,7 @@ class Respond extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
+     * Получает ActiveQuery для [[Task]].
      *
      * @return \yii\db\ActiveQuery
      */
